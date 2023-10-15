@@ -1,15 +1,9 @@
 name: ci
 
 on:
-  pull_request:
-    branches:
-      - "master"
   push:
     branches:
-      - "master"
-env:
-  IMAGE_NAME: ${{ github.repository }}
-
+      - "main"
 jobs:
   build-commons:
     runs-on: ubuntu-latest
