@@ -9,6 +9,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class ServiceRegistrationConfigDTO {
+    private String name;
     private String host;
     private String port;
     private List<AdaptorEndpointDeclarationDTO> adaptorEndpoints;

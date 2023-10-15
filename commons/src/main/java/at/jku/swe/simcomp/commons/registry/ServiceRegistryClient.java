@@ -11,4 +11,9 @@ public class ServiceRegistryClient {
         String serviceRegistryEndpointUrl = System.getenv("SERVICE_REGISTRY_ENDPOINT");
         // send request to register at registry
     }
+    public void unregister(String serviceName){
+        // register automatically at client
+        String serviceRegistryEndpointUrl = System.getenv("SERVICE_REGISTRY_ENDPOINT");
+        // send request to unregister from registry
+    }
 }
