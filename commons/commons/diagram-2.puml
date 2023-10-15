@@ -1,0 +1,11 @@
+@startuml
+enum at.jku.swe.simcomp.commons.adaptor.endpoint.dto.AdaptorEndpointType {
++  EXECUTE_ACTION
++  GET_ATTRIBUTE
++  HEALTH_CHECK
+}
+class at.jku.swe.simcomp.commons.adaptor.endpoint.dto.AdaptorEndpointDeclarationDTO {
+- AdaptorEndpointType endpointType
+- String path
+}
+@enduml

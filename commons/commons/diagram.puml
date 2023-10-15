@@ -1,0 +1,69 @@
+@startuml
+class at.jku.swe.simcomp.commons.adaptor.dto.RoboJointStateDTO {
+- RoboJoint joint
+- double position
+- double velocity
+- double effort
+}
+class at.jku.swe.simcomp.commons.adaptor.dto.PoseDTO {
+- PositionDTO position
+- QuaternionDTO quaternion
+}
+class at.jku.swe.simcomp.commons.adaptor.dto.PositionDTO {
+- double x
+- double y
+- double z
+}
+class at.jku.swe.simcomp.commons.adaptor.endpoint.dto.AdaptorEndpointDeclarationDTO {
+- AdaptorEndpointType endpointType
+- String path
+}
+class at.jku.swe.simcomp.commons.adaptor.dto.ExecutionCommandDTO {
+- ExecutionCommandType executionCommandType
+- PoseDTO pose
+- List<RoboJointStateDTO> targetJoints
+}
+enum at.jku.swe.simcomp.commons.adaptor.dto.ExecutionCommandType {
+}
+class at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResponseDTO {
+- boolean success
+- String message
+- RoboStateDTO currentState
+}
+abstract class at.jku.swe.simcomp.commons.adaptor.endpoint.AbstractAdaptorEndpoint {
+# ServiceRegistryClient serviceRegistryClient
+# {abstract}ResponseEntity<ExecutionResponseDTO> executeAction(ExecutionCommandDTO)
+# {abstract}ResponseEntity<String> getAttribute()
+}
+enum at.jku.swe.simcomp.commons.adaptor.endpoint.dto.AdaptorEndpointType {
++  EXECUTE_ACTION
++  GET_ATTRIBUTE
++  HEALTH_CHECK
+}
+enum at.jku.swe.simcomp.commons.adaptor.dto.RoboJoint {
+}
+class at.jku.swe.simcomp.commons.registry.ServiceRegistryClient {
++ void register(ServiceRegistrationConfigDTO)
+}
+class at.jku.swe.simcomp.commons.adaptor.dto.RoboStateDTO {
+- ExecutionCommandType executionCommandType
+- PoseDTO pose
+- List<RoboJointStateDTO> targetJoints
+}
+class at.jku.swe.simcomp.commons.adaptor.dto.QuaternionDTO {
+- double x
+- double y
+- double z
+- double w
+}
+class at.jku.swe.simcomp.commons.adaptor.dto.AnomalyDetectionDTO {
+- boolean isAnomalyDetected
+- String description
+- List<RoboStateDTO> roboStates
+}
+class at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO {
+- String host
+- String port
+- List<AdaptorEndpointDeclarationDTO> adaptorEndpoints
+}
+@enduml
