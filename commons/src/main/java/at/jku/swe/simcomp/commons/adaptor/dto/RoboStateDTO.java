@@ -10,8 +10,6 @@ import java.util.List;
 @Builder
 public class RoboStateDTO {
     @NonNull
-    private ExecutionCommandType executionCommandType;
-    @NonNull
     private PoseDTO pose;
     @NonNull
     private List<RoboJointStateDTO> targetJoints;
