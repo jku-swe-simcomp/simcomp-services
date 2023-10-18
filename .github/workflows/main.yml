@@ -30,7 +30,7 @@ jobs:
       run: mvn -B package
       
       
-    - name: Publish jar
+    - name: Publish commons jar
       uses: actions/upload-artifact@v3
       with:
         name: commons-jar
