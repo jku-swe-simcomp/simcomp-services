@@ -27,7 +27,7 @@ jobs:
         
     - name: Build commons
       working-directory: simcomp-services/commons
-      run: mvn -B package
+      run: mvn clean install
 
     - name: Build service-registry
       working-directory: simcomp-services/service-registry
