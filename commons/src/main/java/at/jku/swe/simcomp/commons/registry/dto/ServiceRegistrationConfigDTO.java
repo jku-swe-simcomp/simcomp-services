@@ -15,7 +15,7 @@ public class ServiceRegistrationConfigDTO {
     @NonNull
     private String host;
     @NonNull
-    private String port;
+    private Integer port;
     @NonNull
     private List<AdaptorEndpointDeclarationDTO> adaptorEndpoints;
 }
