@@ -5,9 +5,17 @@ import at.jku.swe.simcomp.serviceregistry.rest.exceptions.AdaptorAlreadyRegister
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+/**
+ * Handles errors thrown in the rest-endpoints.
+ */
 @org.springframework.web.bind.annotation.ControllerAdvice
 public class ControllerAdvice {
 
+    /**
+     * Handles the given exception.
+     * @param e the exception
+     * @return a dto with information about the exception.
+     */
     @ExceptionHandler
     public ResponseEntity<ErrorDTO> handleAdaptorAlreadyRegistered(AdaptorAlreadyRegisteredException e){
         ErrorDTO result = ErrorDTO.builder()

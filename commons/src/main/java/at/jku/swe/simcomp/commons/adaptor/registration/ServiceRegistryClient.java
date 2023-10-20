@@ -1,6 +1,5 @@
 package at.jku.swe.simcomp.commons.adaptor.registration;
 
-import at.jku.swe.simcomp.commons.adaptor.registration.ServiceRegistrationConfigDTO;
 import at.jku.swe.simcomp.commons.adaptor.registration.exception.ServiceRegistrationFailedException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -13,12 +12,25 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Objects;
 
+/**
+ * Client to register an adaptor at the service-registry.
+ * Environment variable SERVICE_REGISTRY_ENDPOINT has to be set.
+ */
 @NoArgsConstructor
 public class ServiceRegistryClient {
+    /**
+     * The path of the delete endpoint of the service-registry.
+     */
     private static final String DELETE_PATH_SUFFIX = "/{name}";
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    /**
+     * Registers the adaptor by posting the passed config.
+     * @param serviceRegistrationConfigDTO the config
+     * @throws JsonProcessingException if the config cannot be serialized
+     * @throws ServiceRegistrationFailedException if an exception occurs during registration
+     */
     public void register(ServiceRegistrationConfigDTO serviceRegistrationConfigDTO) throws JsonProcessingException, ServiceRegistrationFailedException {
         String serviceRegistryEndpointUrl = System.getenv("SERVICE_REGISTRY_ENDPOINT");
 
@@ -36,6 +48,12 @@ public class ServiceRegistryClient {
             throw new ServiceRegistrationFailedException("Could not register at service registry. Request returned %s".formatted(e.getMessage()));
         }
     }
+
+    /**
+     * Unregisters the adaptor by calling the endpoint with the name of the adaptor.
+     * @param serviceName the name of the adaptor
+     * @throws ServiceRegistrationFailedException if an exception occurs during unregistering.
+     */
     public void unregister(String serviceName) throws ServiceRegistrationFailedException {
         String serviceRegistryEndpointUrl = System.getenv("SERVICE_REGISTRY_ENDPOINT") + DELETE_PATH_SUFFIX;
         try {

@@ -10,9 +10,22 @@ import org.springframework.context.annotation.Configuration;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Config class that produces a configuration bean of type
+ * {@link ServiceRegistrationConfigDTO}
+ */
 @Configuration
 public class ServiceRegistrationConfig {
 
+    /**
+     * The method producing the config bean.
+     * The configured endpoints have to match the implemented {@link at.jku.swe.simcomp.commons.adaptor.endpoint.AbstractAdaptorEndpoint},
+     * see {@link at.jku.swe.simcomp.demoadaptor.rest.AdaptorEndpointController}
+     * @param name the name of the adaptor (has to be unique)
+     * @param host the host of the adaptor
+     * @param port the port of the adaptor
+     * @return the config bean
+     */
     @Bean
     public ServiceRegistrationConfigDTO getServiceRegistrationConfig(@Value("${adaptor.endpoint.name}") String name,
                                                                      @Value("${adaptor.endpoint.host}") String host,
