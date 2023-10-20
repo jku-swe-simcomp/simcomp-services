@@ -12,5 +12,5 @@ public class RoboStateDTO {
     @NonNull
     private PoseDTO pose;
     @NonNull
-    private List<RoboJointStateDTO> targetJoints;
+    private List<RoboJointStateDTO> jointStates;
 }
