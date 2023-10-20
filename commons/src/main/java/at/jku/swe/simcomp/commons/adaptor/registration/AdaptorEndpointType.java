@@ -1,4 +1,4 @@
-package at.jku.swe.simcomp.commons.adaptor.endpoint.dto;
+package at.jku.swe.simcomp.commons.adaptor.registration;
 
 public enum AdaptorEndpointType {
     EXECUTE_ACTION,

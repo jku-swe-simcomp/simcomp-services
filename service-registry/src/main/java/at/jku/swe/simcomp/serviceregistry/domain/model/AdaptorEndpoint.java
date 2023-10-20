@@ -1,6 +1,6 @@
 package at.jku.swe.simcomp.serviceregistry.domain.model;
 
-import at.jku.swe.simcomp.commons.adaptor.endpoint.dto.AdaptorEndpointType;
+import at.jku.swe.simcomp.commons.adaptor.registration.AdaptorEndpointType;
 import jakarta.persistence.*;
 import lombok.*;
 

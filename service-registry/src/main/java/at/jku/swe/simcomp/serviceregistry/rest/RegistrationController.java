@@ -1,6 +1,6 @@
 package at.jku.swe.simcomp.serviceregistry.rest;
 
-import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
+import at.jku.swe.simcomp.commons.adaptor.registration.ServiceRegistrationConfigDTO;
 import at.jku.swe.simcomp.serviceregistry.rest.exceptions.AdaptorAlreadyRegisteredException;
 import at.jku.swe.simcomp.serviceregistry.service.RegistrationService;
 import lombok.extern.slf4j.Slf4j;

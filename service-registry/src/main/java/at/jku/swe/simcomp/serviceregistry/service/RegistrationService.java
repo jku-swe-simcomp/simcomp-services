@@ -1,6 +1,6 @@
 package at.jku.swe.simcomp.serviceregistry.service;
 
-import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
+import at.jku.swe.simcomp.commons.adaptor.registration.ServiceRegistrationConfigDTO;
 import at.jku.swe.simcomp.serviceregistry.domain.mapper.AdaptorMapper;
 import at.jku.swe.simcomp.serviceregistry.domain.model.Adaptor;
 import at.jku.swe.simcomp.serviceregistry.domain.repository.AdaptorRepository;

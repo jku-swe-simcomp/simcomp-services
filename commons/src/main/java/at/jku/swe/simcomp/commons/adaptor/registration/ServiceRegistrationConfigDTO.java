@@ -1,6 +1,5 @@
-package at.jku.swe.simcomp.commons.registry.dto;
+package at.jku.swe.simcomp.commons.adaptor.registration;
 
-import at.jku.swe.simcomp.commons.adaptor.endpoint.dto.AdaptorEndpointDeclarationDTO;
 import lombok.*;
 
 import java.util.List;

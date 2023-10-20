@@ -1,19 +1,11 @@
 package at.jku.swe.simcomp.serviceregistry.domain.mapper;
 
-import at.jku.swe.simcomp.commons.adaptor.endpoint.dto.AdaptorEndpointDeclarationDTO;
-import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
+import at.jku.swe.simcomp.commons.adaptor.registration.AdaptorEndpointDeclarationDTO;
+import at.jku.swe.simcomp.commons.adaptor.registration.ServiceRegistrationConfigDTO;
 import at.jku.swe.simcomp.serviceregistry.domain.model.Adaptor;
 import at.jku.swe.simcomp.serviceregistry.domain.model.AdaptorEndpoint;
-import org.mapstruct.Context;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Mapper
 public interface AdaptorMapper {
