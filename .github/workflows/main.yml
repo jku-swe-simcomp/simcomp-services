@@ -27,7 +27,7 @@ jobs:
         
     - name: Build commons
       working-directory: simcomp-services/commons
-      run: mvn -B package
+      run: mvn clean install
 
     - name: Build service-registry
       working-directory: simcomp-services/service-registry
@@ -54,14 +54,6 @@ jobs:
     - name: Set date
       run: |
         echo "DATE=$(date +%Y%m%d)" >> $GITHUB_ENV
-        
-    - name: Build and push commons Docker image (just for demo)
-      uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
-      with:
-        context: ./simcomp-services/commons
-        push: true
-        tags: ${{ secrets.DOCKER_NAMESPACE }}/commons:${{ env.DATE }}
-        labels: ${{ steps.meta.outputs.labels }}
 
     - name: Build and push service-registry Docker image (just for demo)
       uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
