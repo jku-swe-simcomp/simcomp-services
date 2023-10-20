@@ -25,17 +25,18 @@ public class RegistrationService {
         }
 
         Adaptor adaptor = AdaptorMapper.INSTANCE.dtoToEntity(config);
-        log.info(adaptor.toString());
 
         // currently setting the reference to the parent in the endpoints manually as mapstruct approach not working
         adaptor.getAdaptorEndpoints()
                         .forEach(endpoint -> endpoint.setAdaptor(adaptor));
 
         adaptorRepository.save(adaptor);
+        log.info("Registered service {}", adaptor);
     }
 
     public void unregister(String adaptorId){
         adaptorRepository.deleteById(adaptorId);
+        log.info("Unregistered service with name {}", adaptorId);
     }
 
     public List<ServiceRegistrationConfigDTO> getAllRegisteredAdaptors(){

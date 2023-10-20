@@ -4,6 +4,7 @@ import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionCommandDTO;
 import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResponseDTO;
 import at.jku.swe.simcomp.commons.registry.ServiceRegistryClient;
 import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
+import at.jku.swe.simcomp.commons.registry.exception.ServiceRegistrationFailedException;
 import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -35,13 +36,17 @@ public abstract class AbstractAdaptorEndpoint {
 
     @PreDestroy
     public void onDestroy(){
-        serviceRegistryClient.unregister(this.serviceRegistrationConfigDTO.getName());
+        try {
+            serviceRegistryClient.unregister(this.serviceRegistrationConfigDTO.getName());
+        } catch (ServiceRegistrationFailedException e) {
+            log.warning("Could not unregister from service with message: %s".formatted(e.getMessage()));
+        }
     }
 
     private void registerThisAdaptorEndpointAtServiceRegistry() {
         try{
             this.serviceRegistryClient.register(this.serviceRegistrationConfigDTO);
-        }catch(Exception e){
+        }catch(Exception e){//we want to catch all possible exceptions as this method is called during object initialization
             log.log(Level.WARNING, "Could not register adaptor endpoint at service registry.");
         }
     }

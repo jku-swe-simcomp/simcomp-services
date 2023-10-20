@@ -2,10 +2,7 @@ package at.jku.swe.simcomp.serviceregistry.domain.model;
 
 import at.jku.swe.simcomp.commons.adaptor.endpoint.dto.AdaptorEndpointType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "adaptor_endpoint")
@@ -26,6 +23,7 @@ public class AdaptorEndpoint {
     @Column(name = "path", nullable = false)
     private String path;
 
+    @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "adaptor_name")
     private Adaptor adaptor;

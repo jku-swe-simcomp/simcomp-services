@@ -27,7 +27,8 @@ public class RegistrationController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> unregisterService(@RequestParam String name){
+    @RequestMapping("/{name}")
+    public ResponseEntity<Void> unregisterService(@PathVariable String name){
         log.info("Unregistering service: {}", name);
         registrationService.unregister(name);
         return ResponseEntity.ok().build();
