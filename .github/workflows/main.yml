@@ -36,6 +36,9 @@ jobs:
     - name: Build demo-adaptor
       working-directory: simcomp-services/demo-adaptor
       run: mvn -B package
+      env:
+        SERVICE_REGISTRY_ENDPOINT: not_required_but_has_to_be_set
+        ADAPTOR_HOST: not_required_but_has_to_be_set
 
     - name: Publish commons jar
       uses: actions/upload-artifact@v3
