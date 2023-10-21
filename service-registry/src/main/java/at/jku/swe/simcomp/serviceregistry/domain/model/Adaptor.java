@@ -1,5 +1,6 @@
 package at.jku.swe.simcomp.serviceregistry.domain.model;
 
+import at.jku.swe.simcomp.commons.adaptor.dto.ActionType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,6 +27,9 @@ public class Adaptor {
     @Column(name = "port", nullable = false)
     private Integer port;
 
+    @Column(name = "base_endpoint", nullable = false)
+    private String baseEndpoint;
+
     @OneToMany(mappedBy = "adaptor", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AdaptorEndpoint> adaptorEndpoints = new ArrayList<>();
+    private List<SupportedActionType> supportedActions = new ArrayList<>();
 }

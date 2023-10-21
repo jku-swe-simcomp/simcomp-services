@@ -1,4 +1,4 @@
-package at.jku.swe.simcomp.commons.registry.dto;
+package at.jku.swe.simcomp.commons;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

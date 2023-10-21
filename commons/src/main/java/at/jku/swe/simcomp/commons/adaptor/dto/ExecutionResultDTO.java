@@ -6,10 +6,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ExecutionResponseDTO {
+public class ExecutionResultDTO {
     @NonNull
     private boolean success;
     private String message;
-    @NonNull
     private RoboStateDTO currentState;
 }

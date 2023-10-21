@@ -1,11 +1,13 @@
 package at.jku.swe.simcomp.commons.adaptor.endpoint;
 
 import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionCommandDTO;
-import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResponseDTO;
+import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
 import at.jku.swe.simcomp.commons.adaptor.registration.ServiceRegistryClient;
 import at.jku.swe.simcomp.commons.adaptor.registration.ServiceRegistrationConfigDTO;
 import at.jku.swe.simcomp.commons.adaptor.registration.exception.ServiceRegistrationFailedException;
+import at.jku.swe.simcomp.commons.ErrorDTO;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PreDestroy;
 
@@ -28,57 +30,81 @@ public abstract class AbstractAdaptorEndpoint {
      * The configuration which is used to register the endpoint.
      */
     protected final ServiceRegistrationConfigDTO serviceRegistrationConfigDTO;
+    /**
+     * The service
+     */
+    protected final AdaptorEndpointService adaptorEndpointService;
 
     /**
      * Constructor.
      * Is equivalent to calling {@link AbstractAdaptorEndpoint} with {@link #IS_AUTO_REGISTRATION_ENABLED_BY_DEFAULT}
      * @param serviceRegistrationConfigDTO the config
+     * @param adaptorEndpointService the service
      */
-    protected AbstractAdaptorEndpoint(ServiceRegistrationConfigDTO serviceRegistrationConfigDTO){
-        this(serviceRegistrationConfigDTO, IS_AUTO_REGISTRATION_ENABLED_BY_DEFAULT);
+    protected AbstractAdaptorEndpoint(ServiceRegistrationConfigDTO serviceRegistrationConfigDTO,
+                                      AdaptorEndpointService adaptorEndpointService){
+        this(serviceRegistrationConfigDTO, adaptorEndpointService, IS_AUTO_REGISTRATION_ENABLED_BY_DEFAULT);
     }
 
     /**
      * Constructor.
      * Automatically registers the adaptor if auto-registration is enabled.
      * @param serviceRegistrationConfigDTO the config
+     * @param adaptorEndpointService the service
      * @param isAutoRegistrationEnabled flag indicating if registration should be attempted automatically
      *                                  in the course of the object initialization.
      */
-    protected AbstractAdaptorEndpoint(ServiceRegistrationConfigDTO serviceRegistrationConfigDTO, boolean isAutoRegistrationEnabled){
+    protected AbstractAdaptorEndpoint(ServiceRegistrationConfigDTO serviceRegistrationConfigDTO,
+                                      AdaptorEndpointService adaptorEndpointService,
+                                      boolean isAutoRegistrationEnabled){
         this.serviceRegistrationConfigDTO=serviceRegistrationConfigDTO;
+        this.adaptorEndpointService=adaptorEndpointService;
         if(isAutoRegistrationEnabled){
            registerThisAdaptorEndpointAtServiceRegistry();
         }
     }
 
     /**
-     * Abstract endpoint to execute an action.
-     * Has to be exposed as REST endpoint that accepts POST requests.
-     * Path has to be configured in the configuration bean {@link #serviceRegistrationConfigDTO},
-     * for the {@link at.jku.swe.simcomp.commons.adaptor.registration.AdaptorEndpointType#EXECUTE_ACTION}
+     * Endpoint to execute an action.
      * @param executionCommandDTO the command to execute
      * @return a response entity with details about the execution
      */
-    public abstract ResponseEntity<ExecutionResponseDTO> executeAction(ExecutionCommandDTO executionCommandDTO);
+    @PostMapping("/action/execute")
+    public final ResponseEntity<ExecutionResultDTO> executeAction(@RequestBody ExecutionCommandDTO executionCommandDTO){
+        if(!this.serviceRegistrationConfigDTO.getSupportedActions().contains(executionCommandDTO.getActionType())){
+           throw new UnsupportedOperationException("The action %s is not supported by this adaptor");
+        }
+        ExecutionResultDTO executionResultDTO = adaptorEndpointService.executeAction(executionCommandDTO);
+        return ResponseEntity.ok(executionResultDTO);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorDTO> handleUnsupportedOperation(UnsupportedOperationException e){
+        ErrorDTO errorDTO = ErrorDTO.builder()
+                .code(400)
+                .message(e.getMessage())
+                .build();
+        return ResponseEntity.status(404).body(errorDTO);
+    }
 
     /**
      * Abstract endpoint to get an attribute.
-     * Has to be exposed as REST endpoint that accepts GET requests.
-     * Path has to be configured in the configuration bean {@link #serviceRegistrationConfigDTO},
-     * for the {@link at.jku.swe.simcomp.commons.adaptor.registration.AdaptorEndpointType#GET_ATTRIBUTE}
      * @return the attribute
      */
-    public abstract ResponseEntity<String> getAttribute();
+    @GetMapping("/attribute/{name}")
+    public final ResponseEntity<String> getAttribute(@PathVariable String name){
+        String attributeValue = adaptorEndpointService.getAttributeValue(name);
+        return ResponseEntity.ok(attributeValue);
+    }
 
     /**
-     * Abstract endpoint to perform a health check.
-     * Has to be exposed as REST endpoint that accepts GET requests.
-     * Path has to be configured in the configuration bean {@link #serviceRegistrationConfigDTO},
-     * for the {@link at.jku.swe.simcomp.commons.adaptor.registration.AdaptorEndpointType#HEALTH_CHECK}
-     * @return response-entity indicating the health
+     * Endpoint for health check.
+     * @return the attribute
      */
-    public abstract ResponseEntity<Void> healthCheck();
+    @GetMapping("/health")
+    public final ResponseEntity<Void> healthCheck(){
+        return ResponseEntity.ok().build();
+    }
 
     /**
      * Lifecycle method that gets called when object is destroyed.

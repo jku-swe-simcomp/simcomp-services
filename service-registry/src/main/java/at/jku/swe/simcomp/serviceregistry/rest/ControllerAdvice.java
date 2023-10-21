@@ -1,6 +1,6 @@
 package at.jku.swe.simcomp.serviceregistry.rest;
 
-import at.jku.swe.simcomp.commons.registry.dto.ErrorDTO;
+import at.jku.swe.simcomp.commons.ErrorDTO;
 import at.jku.swe.simcomp.serviceregistry.rest.exceptions.AdaptorAlreadyRegisteredException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

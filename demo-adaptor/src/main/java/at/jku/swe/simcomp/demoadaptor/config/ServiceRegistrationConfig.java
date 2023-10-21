@@ -1,14 +1,15 @@
 package at.jku.swe.simcomp.demoadaptor.config;
 
-import at.jku.swe.simcomp.commons.adaptor.registration.AdaptorEndpointDeclarationDTO;
-import at.jku.swe.simcomp.commons.adaptor.registration.AdaptorEndpointType;
+import at.jku.swe.simcomp.commons.adaptor.dto.ActionType;
 import at.jku.swe.simcomp.commons.adaptor.registration.ServiceRegistrationConfigDTO;
+import at.jku.swe.simcomp.demoadaptor.rest.DemoAdaptorEndpointController;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Config class that produces a configuration bean of type
@@ -19,8 +20,6 @@ public class ServiceRegistrationConfig {
 
     /**
      * The method producing the config bean.
-     * The configured endpoints have to match the implemented {@link at.jku.swe.simcomp.commons.adaptor.endpoint.AbstractAdaptorEndpoint},
-     * see {@link at.jku.swe.simcomp.demoadaptor.rest.AdaptorEndpointController}
      * @param name the name of the adaptor (has to be unique)
      * @param host the host of the adaptor
      * @param port the port of the adaptor
@@ -34,20 +33,10 @@ public class ServiceRegistrationConfig {
                 .name(name)
                 .host(host)
                 .port(port)
-                .adaptorEndpoints(new ArrayList<>(List.of(
-                        AdaptorEndpointDeclarationDTO.builder()
-                                .endpointType(AdaptorEndpointType.EXECUTE_ACTION)
-                                .path("/api/execute")
-                                .build(),
-                        AdaptorEndpointDeclarationDTO.builder()
-                                .endpointType(AdaptorEndpointType.GET_ATTRIBUTE)
-                                .path("/api/attribute")
-                                .build(),
-                        AdaptorEndpointDeclarationDTO.builder()
-                                .endpointType(AdaptorEndpointType.HEALTH_CHECK)
-                                .path("/api/health")
-                                .build()
-                )))
+                .baseEndpoint("/api")
+                .supportedActions(Stream.of(ActionType.values())
+                        .filter(type -> !type.equals(ActionType.CALIBRATE)) // all methods but calibrate supported by demo-adaptor
+                        .toList())
                 .build();
     }
 }
