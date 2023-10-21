@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -30,10 +31,9 @@ public class ServiceRegistrationConfig {
                 .name(name)
                 .host(host)
                 .port(port)
-                .baseEndpoint("/api")
                 .supportedActions(Stream.of(ActionType.values())
                         .filter(type -> !type.equals(ActionType.CALIBRATE)) // all methods but calibrate supported by demo-adaptor
-                        .toList())
+                        .collect(Collectors.toSet()))
                 .build();
     }
 }

@@ -13,16 +13,14 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Objects;
 
+import static at.jku.swe.simcomp.commons.adaptor.registration.ServiceRegistryConstants.*;
+
 /**
  * Client to register an adaptor at the service-registry.
  * Environment variable SERVICE_REGISTRY_ENDPOINT has to be set.
  */
 @NoArgsConstructor
 public class ServiceRegistryClient {
-    /**
-     * The path of the delete endpoint of the service-registry.
-     */
-    private static final String DELETE_PATH_SUFFIX = "/{name}";
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -33,7 +31,7 @@ public class ServiceRegistryClient {
      * @throws ServiceRegistrationFailedException if an exception occurs during registration
      */
     public void register(ServiceRegistrationConfigDTO serviceRegistrationConfigDTO) throws JsonProcessingException, ServiceRegistrationFailedException {
-        String serviceRegistryEndpointUrl = System.getenv("SERVICE_REGISTRY_ENDPOINT");
+        String serviceRegistryEndpointUrl = System.getenv(SERVICE_REGISTRY_ENDPOINT_ENVIRONMENT_VARIABLE_NAME);
 
         if(Objects.isNull(serviceRegistryEndpointUrl)){
             throw new ServiceRegistrationFailedException("Environment variable SERVICE_REGISTRY_ENDPOINT not set");
@@ -56,7 +54,7 @@ public class ServiceRegistryClient {
      * @throws ServiceRegistrationFailedException if an exception occurs during unregistering.
      */
     public void unregister(String serviceName) throws ServiceRegistrationFailedException {
-        String serviceRegistryEndpointUrl = System.getenv("SERVICE_REGISTRY_ENDPOINT") + DELETE_PATH_SUFFIX;
+        String serviceRegistryEndpointUrl = System.getenv(SERVICE_REGISTRY_ENDPOINT_ENVIRONMENT_VARIABLE_NAME) + getUnregisterPathForAdaptorName(serviceName);
         try {
             restTemplate.delete(serviceRegistryEndpointUrl, serviceName);
         } catch (HttpClientErrorException | HttpServerErrorException e) {

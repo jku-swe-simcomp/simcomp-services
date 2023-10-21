@@ -27,9 +27,6 @@ public class Adaptor {
     @Column(name = "port", nullable = false)
     private Integer port;
 
-    @Column(name = "base_endpoint", nullable = false)
-    private String baseEndpoint;
-
     @OneToMany(mappedBy = "adaptor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SupportedActionType> supportedActions = new ArrayList<>();
 }

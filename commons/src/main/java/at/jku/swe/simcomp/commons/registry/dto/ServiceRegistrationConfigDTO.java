@@ -3,7 +3,7 @@ package at.jku.swe.simcomp.commons.registry.dto;
 import at.jku.swe.simcomp.commons.adaptor.dto.ActionType;
 import lombok.*;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * Configuration class to register an adaptor at the service registry.
@@ -29,13 +29,8 @@ public class ServiceRegistrationConfigDTO {
     @NonNull
     private Integer port;
     /**
-     * The base endpoint.
-     */
-    @NonNull
-    private String baseEndpoint;
-    /**
      * List with details about the available endpoints.
      */
     @NonNull
-    private List<ActionType> supportedActions;
+    private Set<ActionType> supportedActions;
 }
