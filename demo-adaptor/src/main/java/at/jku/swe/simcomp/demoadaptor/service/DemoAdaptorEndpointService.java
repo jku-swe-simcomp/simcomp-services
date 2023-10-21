@@ -66,6 +66,8 @@ public class DemoAdaptorEndpointService implements AdaptorEndpointService {
         };
     }
 
+    // private region
+
     private ExecutionResultDTO executeToggleGripperMode(ExecutionCommandDTO command, String sessionId) {
         return getDemoResult("Toggled gripper mode");
     }
