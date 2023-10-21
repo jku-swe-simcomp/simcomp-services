@@ -27,6 +27,10 @@ public class Adaptor {
     @Column(name = "port", nullable = false)
     private Integer port;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private AdaptorStatus status;
+
     @OneToMany(mappedBy = "adaptor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SupportedActionType> supportedActions = new ArrayList<>();
 }

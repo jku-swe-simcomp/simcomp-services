@@ -2,6 +2,7 @@ package at.jku.swe.simcomp.serviceregistry.service;
 
 import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 import at.jku.swe.simcomp.serviceregistry.domain.model.Adaptor;
+import at.jku.swe.simcomp.serviceregistry.domain.model.AdaptorStatus;
 import at.jku.swe.simcomp.serviceregistry.domain.model.SupportedActionType;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,7 @@ public class AdaptorMapper {
         adaptor.setName(config.getName());
         adaptor.setHost(config.getHost());
         adaptor.setPort(config.getPort());
+        adaptor.setStatus(AdaptorStatus.HEALTHY);
         adaptor.setSupportedActions(config.getSupportedActions().stream()
                 .map(type -> {
                     SupportedActionType supportedActionType = new SupportedActionType();

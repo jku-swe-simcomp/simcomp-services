@@ -2,14 +2,13 @@ package at.jku.swe.simcomp.serviceregistry.service;
 
 import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 import at.jku.swe.simcomp.serviceregistry.domain.model.Adaptor;
-import at.jku.swe.simcomp.serviceregistry.domain.model.SupportedActionType;
+import at.jku.swe.simcomp.serviceregistry.domain.model.AdaptorStatus;
 import at.jku.swe.simcomp.serviceregistry.domain.repository.AdaptorRepository;
 import at.jku.swe.simcomp.serviceregistry.rest.exceptions.AdaptorAlreadyRegisteredException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -48,7 +47,10 @@ public class RegistrationService {
      * Returns all registrations available.
      * @return the list with all registrations
      */
-    public List<ServiceRegistrationConfigDTO> getAllRegisteredAdaptors(){
-       return adaptorRepository.findAll().stream().map(adaptorMapper::entityToDto).toList();
+    public List<ServiceRegistrationConfigDTO> getAllHealthyRegisteredAdaptors(){
+       return adaptorRepository.findAll()
+               .stream()
+               .filter(adaptor -> adaptor.getStatus().equals(AdaptorStatus.HEALTHY))
+               .map(adaptorMapper::entityToDto).toList();
     }
 }

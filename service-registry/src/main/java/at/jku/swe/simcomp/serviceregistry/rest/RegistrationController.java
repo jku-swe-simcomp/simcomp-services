@@ -53,8 +53,8 @@ public class RegistrationController {
      * @return the list
      */
     @GetMapping
-    public ResponseEntity<List<ServiceRegistrationConfigDTO>> getAll(){
-        log.info("Fetching all adaptor configurations");
-        return ResponseEntity.ok(registrationService.getAllRegisteredAdaptors());
+    public ResponseEntity<List<ServiceRegistrationConfigDTO>> getAllHealthyAndRegisteredAdaptors(){
+        log.info("Fetching all adaptor configurations and returning only healthy ones");
+        return ResponseEntity.ok(registrationService.getAllHealthyRegisteredAdaptors());
     }
 }
