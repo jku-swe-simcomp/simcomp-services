@@ -1,14 +1,11 @@
 package at.jku.swe.simcomp.demoadaptor.config;
 
 import at.jku.swe.simcomp.commons.adaptor.dto.ActionType;
-import at.jku.swe.simcomp.commons.adaptor.registration.ServiceRegistrationConfigDTO;
-import at.jku.swe.simcomp.demoadaptor.rest.DemoAdaptorEndpointController;
+import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Stream;
 
 /**

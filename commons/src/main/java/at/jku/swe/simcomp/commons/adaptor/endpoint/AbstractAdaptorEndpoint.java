@@ -3,7 +3,7 @@ package at.jku.swe.simcomp.commons.adaptor.endpoint;
 import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionCommandDTO;
 import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
 import at.jku.swe.simcomp.commons.adaptor.registration.ServiceRegistryClient;
-import at.jku.swe.simcomp.commons.adaptor.registration.ServiceRegistrationConfigDTO;
+import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 import at.jku.swe.simcomp.commons.adaptor.registration.exception.ServiceRegistrationFailedException;
 import at.jku.swe.simcomp.commons.ErrorDTO;
 import org.springframework.http.ResponseEntity;
@@ -72,7 +72,7 @@ public abstract class AbstractAdaptorEndpoint {
     @PostMapping("/action/execute")
     public final ResponseEntity<ExecutionResultDTO> executeAction(@RequestBody ExecutionCommandDTO executionCommandDTO){
         if(!this.serviceRegistrationConfigDTO.getSupportedActions().contains(executionCommandDTO.getActionType())){
-           throw new UnsupportedOperationException("The action %s is not supported by this adaptor");
+           throw new UnsupportedOperationException("The action %s is not supported by this adaptor".formatted(executionCommandDTO.getActionType()));
         }
         ExecutionResultDTO executionResultDTO = adaptorEndpointService.executeAction(executionCommandDTO);
         return ResponseEntity.ok(executionResultDTO);

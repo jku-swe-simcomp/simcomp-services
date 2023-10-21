@@ -1,4 +1,4 @@
-package at.jku.swe.simcomp.commons.adaptor.registration;
+package at.jku.swe.simcomp.commons.registry.dto;
 
 import at.jku.swe.simcomp.commons.adaptor.dto.ActionType;
 import lombok.*;

@@ -1,7 +1,7 @@
 package at.jku.swe.simcomp.demoadaptor.rest;
 
 import at.jku.swe.simcomp.commons.adaptor.endpoint.AbstractAdaptorEndpoint;
-import at.jku.swe.simcomp.commons.adaptor.registration.ServiceRegistrationConfigDTO;
+import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 import at.jku.swe.simcomp.demoadaptor.service.DemoAdaptorEndpointService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;

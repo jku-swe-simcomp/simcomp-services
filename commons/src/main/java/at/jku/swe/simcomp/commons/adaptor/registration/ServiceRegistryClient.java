@@ -1,6 +1,7 @@
 package at.jku.swe.simcomp.commons.adaptor.registration;
 
 import at.jku.swe.simcomp.commons.adaptor.registration.exception.ServiceRegistrationFailedException;
+import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
