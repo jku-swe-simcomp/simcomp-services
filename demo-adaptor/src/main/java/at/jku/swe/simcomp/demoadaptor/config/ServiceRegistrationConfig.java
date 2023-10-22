@@ -32,7 +32,7 @@ public class ServiceRegistrationConfig {
                 .host(host)
                 .port(port)
                 .supportedActions(Stream.of(ActionType.values())
-                        .filter(type -> !type.equals(ActionType.CALIBRATE)) // all methods but calibrate supported by demo-adaptor
+                        .filter(type -> !type.equals(ActionType.CALIBRATE)) // all methods but calibrate supported by demo-adaptor, should be better enumerated explicitly
                         .collect(Collectors.toSet()))
                 .build();
     }

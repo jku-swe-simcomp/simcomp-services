@@ -1,5 +1,6 @@
 package at.jku.swe.simcomp.commons.adaptor.dto;
 
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.InvalidCommandParametersException;
 import at.jku.swe.simcomp.commons.adaptor.execution.command.*;
 import lombok.*;
 
@@ -26,7 +27,7 @@ public class ExecutionCommandDTO implements ExecutionCommand {
     private QuaternionDTO orientation;
     private List<JointAngleAdjustmentDTO> jointAdjustments;
     private List<JointPositionDTO> jointPositions;
-    private double speed;
+    private Double speed;
 
     public PoseCommand viewAsPoseCommand(){
        return new PoseCommand(PoseDTO.builder()
@@ -36,22 +37,42 @@ public class ExecutionCommandDTO implements ExecutionCommand {
     }
 
     public AdjustJointAngleCommand viewAsAdjustJointAngleCommand(){
-        return new AdjustJointAngleCommand(jointAdjustments);
+        try{
+            return new AdjustJointAngleCommand(jointAdjustments);
+        } catch (NullPointerException e){
+            throw new InvalidCommandParametersException("Joint adjustments are required for action type %s".formatted(actionType));
+        }
     }
 
     public SetJointPositionCommand viewAsSetJointPositionCommand(){
-        return new SetJointPositionCommand(jointPositions);
+        try{
+            return new SetJointPositionCommand(jointPositions);
+        } catch (NullPointerException e){
+            throw new InvalidCommandParametersException("Joint positions are required for action type %s".formatted(actionType));
+        }
     }
 
     public SetSpeedCommand viewAsSetSpeedCommand(){
-        return new SetSpeedCommand(speed);
+        try{
+            return new SetSpeedCommand(speed);
+        } catch (NullPointerException e){
+            throw new InvalidCommandParametersException("Speed is required for action type %s".formatted(actionType));
+        }
     }
 
     public SetOrientationCommand viewAsSetOrientationCommand(){
-        return new SetOrientationCommand(orientation);
+        try{
+            return new SetOrientationCommand(orientation);
+        } catch (NullPointerException e){
+            throw new InvalidCommandParametersException("Orientation is required for action type %s".formatted(actionType));
+        }
     }
 
     public SetPositionCommand viewAsSetPositionCommand(){
-        return new SetPositionCommand(position);
+        try{
+            return new SetPositionCommand(position);
+        } catch (NullPointerException e){
+            throw new InvalidCommandParametersException("Position is required for action type %s".formatted(actionType));
+        }
     }
 }
