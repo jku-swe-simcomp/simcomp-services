@@ -1,8 +1,10 @@
-package at.jku.swe.simcomp.commons.adaptor.dto;
+package at.jku.swe.simcomp.commons.adaptor.execution.command;
 
 public enum ActionType {
     DEFAULT,
     POSE,
+    SET_POSITION,
+    SET_ORIENTATION,
     GRAB,
     OPEN_HAND,
     ADJUST_JOINT_ANGLE,
@@ -11,7 +13,6 @@ public enum ActionType {
     PAUSE,
     RESUME,
     RESET_TO_HOME,
-    SET_ORIENTATION,
     STOP,
     CALIBRATE,
     TOGGLE_GRIPPER_MODE

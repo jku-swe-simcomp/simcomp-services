@@ -1,6 +1,6 @@
 package at.jku.swe.simcomp.demoadaptor.config;
 
-import at.jku.swe.simcomp.commons.adaptor.dto.ActionType;
+import at.jku.swe.simcomp.commons.adaptor.execution.command.ActionType;
 import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

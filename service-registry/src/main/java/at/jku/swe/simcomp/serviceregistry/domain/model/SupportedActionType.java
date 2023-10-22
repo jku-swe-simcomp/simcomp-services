@@ -1,7 +1,7 @@
 package at.jku.swe.simcomp.serviceregistry.domain.model;
 
 
-import at.jku.swe.simcomp.commons.adaptor.dto.ActionType;
+import at.jku.swe.simcomp.commons.adaptor.execution.command.ActionType;
 import jakarta.persistence.*;
 import lombok.*;
 

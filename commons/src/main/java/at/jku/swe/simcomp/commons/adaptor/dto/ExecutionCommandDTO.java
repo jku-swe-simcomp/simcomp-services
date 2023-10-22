@@ -1,5 +1,6 @@
 package at.jku.swe.simcomp.commons.adaptor.dto;
 
+import at.jku.swe.simcomp.commons.adaptor.execution.command.*;
 import lombok.*;
 
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ExecutionCommandDTO {
+public class ExecutionCommandDTO implements ExecutionCommand {
     @NonNull
     private ActionType actionType;
     /**
@@ -23,6 +24,34 @@ public class ExecutionCommandDTO {
      */
     private PositionDTO position;
     private QuaternionDTO orientation;
-    List<JointAngleAdjustmentDTO> jointAdjustments;
+    private List<JointAngleAdjustmentDTO> jointAdjustments;
+    private List<JointPositionDTO> jointPositions;
     private double speed;
+
+    public PoseCommand viewAsPoseCommand(){
+       return new PoseCommand(PoseDTO.builder()
+                          .position(position)
+                          .quaternion(orientation)
+                          .build());
+    }
+
+    public AdjustJointAngleCommand viewAsAdjustJointAngleCommand(){
+        return new AdjustJointAngleCommand(jointAdjustments);
+    }
+
+    public SetJointPositionCommand viewAsSetJointPositionCommand(){
+        return new SetJointPositionCommand(jointPositions);
+    }
+
+    public SetSpeedCommand viewAsSetSpeedCommand(){
+        return new SetSpeedCommand(speed);
+    }
+
+    public SetOrientationCommand viewAsSetOrientationCommand(){
+        return new SetOrientationCommand(orientation);
+    }
+
+    public SetPositionCommand viewAsSetPositionCommand(){
+        return new SetPositionCommand(position);
+    }
 }

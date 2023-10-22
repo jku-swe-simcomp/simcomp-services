@@ -5,6 +5,7 @@ import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.AdaptorEndpointService;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
+import at.jku.swe.simcomp.commons.adaptor.execution.command.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -49,26 +50,31 @@ public class DemoAdaptorEndpointService implements AdaptorEndpointService {
             throw new SessionNotValidException("Session %s not valid".formatted(sessionId));
 
         return switch(command.getActionType()){
-           case POSE -> executePose(command, sessionId);
-           case DEFAULT -> executeDefault(command, sessionId);
-           case GRAB -> executeGrab(command, sessionId);
-           case OPEN_HAND -> executeOpenHand(command, sessionId);
-           case ADJUST_JOINT_ANGLE -> executeAdjustJointAngle(command, sessionId);
-           case SET_JOINT_POSITIONS -> executeSetJointPositions(command, sessionId);
-           case SET_SPEED -> executeSetSpeed(command, sessionId);
-           case PAUSE -> executePause(command, sessionId);
-           case RESUME -> executeResume(command, sessionId);
-           case RESET_TO_HOME -> executeResetToHome(command, sessionId);
-           case SET_ORIENTATION -> executeSetOrientation(command, sessionId);
+           case POSE -> executePose(command.viewAsPoseCommand(), sessionId);
+           case SET_ORIENTATION -> executeSetOrientation(command.viewAsSetOrientationCommand(), sessionId);
+           case SET_POSITION -> executeSetPosition(command.viewAsSetPositionCommand(), sessionId);
+           case ADJUST_JOINT_ANGLE -> executeAdjustJointAngle(command.viewAsAdjustJointAngleCommand(), sessionId);
+           case SET_JOINT_POSITIONS -> executeSetJointPositions(command.viewAsSetJointPositionCommand(), sessionId);
+           case SET_SPEED -> executeSetSpeed(command.viewAsSetSpeedCommand(), sessionId);
+           case DEFAULT -> executeDefault(sessionId);
+           case GRAB -> executeGrab(sessionId);
+           case OPEN_HAND -> executeOpenHand(sessionId);
+           case PAUSE -> executePause(sessionId);
+           case RESUME -> executeResume(sessionId);
+           case RESET_TO_HOME -> executeResetToHome(sessionId);
            case STOP -> executeStop(command, sessionId);
-           case TOGGLE_GRIPPER_MODE -> executeToggleGripperMode(command, sessionId);
+           case TOGGLE_GRIPPER_MODE -> executeToggleGripperMode(sessionId);
            default -> throw new UnsupportedOperationException("Unsupported action type: " + command.getActionType());
         };
     }
 
-    // private region
 
-    private ExecutionResultDTO executeToggleGripperMode(ExecutionCommandDTO command, String sessionId) {
+    // private region
+    private ExecutionResultDTO executeSetPosition(SetPositionCommand setPositionCommand, String sessionId) {
+        return getDemoResult("Set position");
+    }
+
+    private ExecutionResultDTO executeToggleGripperMode(String sessionId) {
         return getDemoResult("Toggled gripper mode");
     }
 
@@ -76,47 +82,47 @@ public class DemoAdaptorEndpointService implements AdaptorEndpointService {
         return getDemoResult("Stopped");
     }
 
-    private ExecutionResultDTO executeSetOrientation(ExecutionCommandDTO command, String sessionId) {
+    private ExecutionResultDTO executeSetOrientation(SetOrientationCommand command, String sessionId) {
         return getDemoResult("Set orientation");
     }
 
-    private ExecutionResultDTO executeResetToHome(ExecutionCommandDTO command, String sessionId) {
+    private ExecutionResultDTO executeResetToHome(String sessionId) {
         return getDemoResult("Reset to home");
     }
 
-    private ExecutionResultDTO executeResume(ExecutionCommandDTO command, String sessionId) {
+    private ExecutionResultDTO executeResume(String sessionId) {
         return getDemoResult("Resumed");
     }
 
-    private ExecutionResultDTO executePause(ExecutionCommandDTO command, String sessionId) {
+    private ExecutionResultDTO executePause(String sessionId) {
         return getDemoResult("Paused");
     }
 
-    private ExecutionResultDTO executeSetSpeed(ExecutionCommandDTO command, String sessionId) {
+    private ExecutionResultDTO executeSetSpeed(SetSpeedCommand command, String sessionId) {
         return getDemoResult("Set speed");
     }
 
-    private ExecutionResultDTO executeSetJointPositions(ExecutionCommandDTO command, String sessionId) {
+    private ExecutionResultDTO executeSetJointPositions(SetJointPositionCommand command, String sessionId) {
         return getDemoResult("Set joint positions");
     }
 
-    private ExecutionResultDTO executeAdjustJointAngle(ExecutionCommandDTO command, String sessionId) {
+    private ExecutionResultDTO executeAdjustJointAngle(AdjustJointAngleCommand command, String sessionId) {
         return getDemoResult("Adjusted joint angle");
     }
 
-    private ExecutionResultDTO executeOpenHand(ExecutionCommandDTO command, String sessionId) {
+    private ExecutionResultDTO executeOpenHand(String sessionId) {
         return getDemoResult("Opened hand");
     }
 
-    private ExecutionResultDTO executeGrab(ExecutionCommandDTO command, String sessionId) {
+    private ExecutionResultDTO executeGrab(String sessionId) {
         return getDemoResult("Grabbed");
     }
 
-    private ExecutionResultDTO executeDefault(ExecutionCommandDTO command, String sessionId) {
+    private ExecutionResultDTO executeDefault(String sessionId) {
         return getDemoResult("Executed default action");
     }
 
-    private ExecutionResultDTO executePose(ExecutionCommandDTO command, String sessionId) {
+    private ExecutionResultDTO executePose(PoseCommand command, String sessionId) {
         return getDemoResult("Executed pose");
     }
 
