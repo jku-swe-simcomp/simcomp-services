@@ -199,7 +199,7 @@ public class AdaptorEndpointController implements AdaptorEndpoint{
             serviceRegistryClient.unregister(this.serviceRegistrationConfigDTO.getName());
         } catch (ServiceRegistrationFailedException e) {
             // Note: Logging currently not working in commons so that it shows up in projects that depend on it
-            System.out.println("Could not unregister from service with message: %s".formatted(e.getMessage()));
+            System.out.printf("Could not unregister from service with message: %s%n", e.getMessage());
         }
     }
 

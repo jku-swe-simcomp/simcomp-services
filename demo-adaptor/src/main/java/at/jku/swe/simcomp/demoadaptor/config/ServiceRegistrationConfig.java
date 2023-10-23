@@ -6,8 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Set;
 
 /**
  * Config class that produces a configuration bean of type
@@ -31,9 +30,8 @@ public class ServiceRegistrationConfig {
                 .name(name)
                 .host(host)
                 .port(port)
-                .supportedActions(Stream.of(ActionType.values())
-                        .filter(type -> !type.equals(ActionType.CALIBRATE)) // all methods but calibrate supported by demo-adaptor, should be better enumerated explicitly
-                        .collect(Collectors.toSet()))
+                .supportedActions(Set.of(ActionType.POSE,
+                        ActionType.ADJUST_JOINT_ANGLES))
                 .build();
     }
 }

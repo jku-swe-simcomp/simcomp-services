@@ -5,6 +5,7 @@ import at.jku.swe.simcomp.commons.adaptor.execution.command.*;
 import lombok.*;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * A rich DTO which contains data required for the execution
@@ -30,49 +31,69 @@ public class ExecutionCommandDTO implements ExecutionCommand {
     private Double speed;
 
     public PoseCommand viewAsPoseCommand(){
-       return new PoseCommand(PoseDTO.builder()
-                          .position(position)
-                          .quaternion(orientation)
-                          .build());
+        return tryViewAsExecutionCommand(() -> new PoseCommand(position, orientation));
     }
 
-    public AdjustJointAngleCommand viewAsAdjustJointAngleCommand(){
-        try{
-            return new AdjustJointAngleCommand(jointAdjustments);
-        } catch (NullPointerException e){
-            throw new InvalidCommandParametersException("Joint adjustments are required for action type %s".formatted(actionType));
-        }
+    public AdjustJointAnglesCommand viewAsAdjustJointAngleCommand(){
+        return tryViewAsExecutionCommand(() -> new AdjustJointAnglesCommand(jointAdjustments));
     }
 
-    public SetJointPositionCommand viewAsSetJointPositionCommand(){
-        try{
-            return new SetJointPositionCommand(jointPositions);
-        } catch (NullPointerException e){
-            throw new InvalidCommandParametersException("Joint positions are required for action type %s".formatted(actionType));
-        }
+    public SetJointPositionsCommand viewAsSetJointPositionCommand(){
+        return tryViewAsExecutionCommand(() -> new SetJointPositionsCommand(jointPositions));
     }
 
     public SetSpeedCommand viewAsSetSpeedCommand(){
-        try{
-            return new SetSpeedCommand(speed);
-        } catch (NullPointerException e){
-            throw new InvalidCommandParametersException("Speed is required for action type %s".formatted(actionType));
-        }
+        return tryViewAsExecutionCommand(() -> new SetSpeedCommand(speed));
     }
 
     public SetOrientationCommand viewAsSetOrientationCommand(){
-        try{
-            return new SetOrientationCommand(orientation);
-        } catch (NullPointerException e){
-            throw new InvalidCommandParametersException("Orientation is required for action type %s".formatted(actionType));
-        }
+        return tryViewAsExecutionCommand(() -> new SetOrientationCommand(orientation));
     }
 
     public SetPositionCommand viewAsSetPositionCommand(){
-        try{
-            return new SetPositionCommand(position);
+       return tryViewAsExecutionCommand(() -> new SetPositionCommand(position));
+    }
+
+    public StopCommand viewAsStopCommand(){
+        return tryViewAsExecutionCommand(StopCommand::new);
+    }
+    public SetJointPositionsCommand viewAsSetJointAnglesCommand(){
+        return tryViewAsExecutionCommand(() -> new SetJointPositionsCommand(jointPositions));
+    }
+
+    public PauseCommand viewAsPauseCommand(){
+        return tryViewAsExecutionCommand(PauseCommand::new);
+    }
+
+    public CalibrateCommand viewAsCalibrateCommand(){
+        return tryViewAsExecutionCommand(CalibrateCommand::new);
+    }
+
+    public ToggleGripperModeCommand viewAsToggleGripperModeCommand(){
+        return tryViewAsExecutionCommand(ToggleGripperModeCommand::new);
+    }
+
+    public ResumeCommand viewAsResumeCommand(){
+        return tryViewAsExecutionCommand(ResumeCommand::new);
+    }
+
+    public ResetToHomeCommand viewAsResetToHomeCommand(){
+        return tryViewAsExecutionCommand(ResetToHomeCommand::new);
+    }
+
+    public OpenHandCommand viewAsOpenHandCommand(){
+        return tryViewAsExecutionCommand(OpenHandCommand::new);
+    }
+
+    public GrabCommand viewAsGrabCommand(){
+        return tryViewAsExecutionCommand(GrabCommand::new);
+    }
+
+    private <T extends ExecutionCommand> T tryViewAsExecutionCommand(Supplier<T> supplier){
+        try {
+            return supplier.get();
         } catch (NullPointerException e){
-            throw new InvalidCommandParametersException("Position is required for action type %s".formatted(actionType));
+            throw new InvalidCommandParametersException("Required parameters are missing for action type %s".formatted(actionType));
         }
     }
 }

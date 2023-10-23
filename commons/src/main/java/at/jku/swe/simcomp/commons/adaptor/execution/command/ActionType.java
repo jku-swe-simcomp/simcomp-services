@@ -1,13 +1,12 @@
 package at.jku.swe.simcomp.commons.adaptor.execution.command;
 
 public enum ActionType {
-    DEFAULT,
     POSE,
     SET_POSITION,
     SET_ORIENTATION,
     GRAB,
     OPEN_HAND,
-    ADJUST_JOINT_ANGLE,
+    ADJUST_JOINT_ANGLES,
     SET_JOINT_POSITIONS,
     SET_SPEED,
     PAUSE,
