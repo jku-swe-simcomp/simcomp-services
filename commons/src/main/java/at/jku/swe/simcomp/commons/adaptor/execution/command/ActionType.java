@@ -17,7 +17,8 @@ public enum ActionType {
     RESET_TO_HOME("RESET_TO_HOME"),
     STOP("STOP"),
     CALIBRATE("CALIBRATE"),
-    TOGGLE_GRIPPER_MODE("TOGGLE_GRIPPER_MODE");
+    TOGGLE_GRIPPER_MODE("TOGGLE_GRIPPER_MODE"),
+    COMPOSITE("COMPOSITE");
 
     private final String actionName;
     ActionType(String name){

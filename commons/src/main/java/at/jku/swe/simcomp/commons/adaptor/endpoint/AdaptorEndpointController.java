@@ -1,6 +1,5 @@
 package at.jku.swe.simcomp.commons.adaptor.endpoint;
 
-import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionCommandDTO;
 import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.InvalidCommandParametersException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
@@ -16,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PreDestroy;
-import java.util.List;
 
 /**
  * Class for endpoints acting as adaptors for simulations.
@@ -79,17 +77,6 @@ public class AdaptorEndpointController implements AdaptorEndpoint{
     @PostMapping("/{sessionId}/action/execute")
     public final ResponseEntity<ExecutionResultDTO> executeAction(@RequestBody ExecutionCommand executionCommand, @PathVariable String sessionId) throws Exception {
         ExecutionResultDTO executionResultDTO = executionCommand.accept(executionCommandVisitor, sessionId);
-        return ResponseEntity.ok(executionResultDTO);
-    }
-
-    /**
-     * Endpoint to execute a sequence of actions.
-     * @return a response entity with details about the execution
-     */
-    @Override
-    @PostMapping("/{sessionId}/sequence/execute")
-    public final ResponseEntity<ExecutionResultDTO> executeSequence(@RequestBody List<ExecutionCommand> executionCommands, @PathVariable String sessionId) throws Exception {
-        ExecutionResultDTO executionResultDTO = executionCommandVisitor.visitMultiple(executionCommands, sessionId);
         return ResponseEntity.ok(executionResultDTO);
     }
 

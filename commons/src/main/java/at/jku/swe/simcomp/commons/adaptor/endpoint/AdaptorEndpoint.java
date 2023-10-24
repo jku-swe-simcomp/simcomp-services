@@ -15,7 +15,6 @@ public interface AdaptorEndpoint {
     ResponseEntity<String> initSession() throws SessionInitializationFailedException;
     ResponseEntity<String> closeSession(String sessionId) throws SessionNotValidException;
     ResponseEntity<ExecutionResultDTO> executeAction(ExecutionCommand executionCommand, String sessionId) throws Exception;
-    ResponseEntity<ExecutionResultDTO> executeSequence(List<ExecutionCommand> executionCommands, String sessionId) throws Exception;
     ResponseEntity<String> getAttribute(String name, String sessionId) throws SessionNotValidException;
     ResponseEntity<Void> healthCheck();
     ResponseEntity<Void> registerAdaptor() throws ServiceRegistrationFailedException, JsonProcessingException;

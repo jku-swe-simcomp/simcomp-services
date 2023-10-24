@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.NonNull;
 
 import java.util.List;
+import java.util.Objects;
+
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         property = "type")
@@ -24,7 +26,7 @@ import java.util.List;
         @JsonSubTypes.Type(value = ExecutionCommand.ResetToHomeCommand.class, name = "RESET_TO_HOME"),
         @JsonSubTypes.Type(value = ExecutionCommand.ToggleGripperModeCommand.class, name = "TOGGLE_GRIPPER_MODE"),
         @JsonSubTypes.Type(value = ExecutionCommand.SetSpeedCommand.class, name = "SET_SPEED"),
-        @JsonSubTypes.Type(value = ExecutionCommandDTO.class, name = "DTO"),
+        @JsonSubTypes.Type(value = ExecutionCommand.CompositeCommand.class, name = "COMPOSITE"),
 })
 public interface ExecutionCommand {
     ExecutionResultDTO accept(ExecutionCommandVisitor visitor, String sessionKey) throws Exception;
@@ -116,4 +118,26 @@ public interface ExecutionCommand {
         }
     }
 
+    public static record CompositeCommand(List<ExecutionCommand> commands) implements ExecutionCommand {
+        @Override
+        public ExecutionResultDTO accept(ExecutionCommandVisitor visitor, String sessionKey) throws Exception {
+            ExecutionResultDTO resultDTO = null;
+
+            StringBuilder message = new StringBuilder();
+            boolean success = true;
+
+            for(var command: commands){
+                resultDTO = command.accept(visitor, sessionKey);
+                message.append(resultDTO.getMessage()).append("\n");
+                if(!resultDTO.isSuccess())
+                    success = false;
+            }
+
+            if(!Objects.isNull(resultDTO)){
+                resultDTO.setMessage(message.toString());
+                resultDTO.setSuccess(success);
+            }
+            return resultDTO;
+        }
+    }
 }
