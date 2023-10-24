@@ -5,7 +5,7 @@ Exposed REST Apis are documented using Swagger at {SERVICE_HOST}:{SERVICE_PORT}/
 
 ## [Commons](./commons)
 Package with utility classes, DTOs which are common to different services.
-Services can implement commons with the following maven dependency:
+Services can integrate commons with the following maven dependency:
 ```
 <!--	Commons-->
 <dependency>
