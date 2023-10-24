@@ -2,6 +2,7 @@ package at.jku.swe.simcomp.commons.adaptor.execution.command;
 import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
 
 import java.util.List;
+import java.util.Objects;
 
 public interface ExecutionCommandVisitor {
     default ExecutionResultDTO visit(ExecutionCommand.AdjustJointAnglesCommand command, String sessionKey) throws Exception {
@@ -51,8 +52,20 @@ public interface ExecutionCommandVisitor {
 
     default ExecutionResultDTO visitMultiple(List<ExecutionCommand> executionCommands, String sessionKey) throws Exception{
         ExecutionResultDTO resultDTO = null;
+
+        StringBuilder message = new StringBuilder();
+        boolean success = true;
+
         for(var command: executionCommands){
             resultDTO = command.accept(this, sessionKey);
+            message.append(resultDTO.getMessage());
+            if(!resultDTO.isSuccess())
+                success = false;
+        }
+
+        if(!Objects.isNull(resultDTO)){
+            resultDTO.setMessage(message.toString());
+            resultDTO.setSuccess(success);
         }
         return resultDTO;
     }

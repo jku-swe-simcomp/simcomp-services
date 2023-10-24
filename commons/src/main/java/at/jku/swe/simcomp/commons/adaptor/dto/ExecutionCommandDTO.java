@@ -116,4 +116,23 @@ public class ExecutionCommandDTO implements ExecutionCommand {
             case TOGGLE_GRIPPER_MODE -> viewAsToggleGripperModeCommand().accept(visitor, sessionKey);
         };
     }
+
+    public ExecutionCommand viewAsExecutionCommand(){
+        return switch(actionType){
+            case POSE -> viewAsPoseCommand();
+            case SET_POSITION -> viewAsSetPositionCommand();
+            case SET_ORIENTATION -> viewAsSetOrientationCommand();
+            case GRAB -> viewAsGrabCommand() ;
+            case OPEN_HAND -> viewAsOpenHandCommand();
+            case ADJUST_JOINT_ANGLES -> viewAsAdjustJointAngleCommand();
+            case SET_JOINT_POSITIONS -> viewAsSetJointPositionCommand();
+            case SET_SPEED -> viewAsSetSpeedCommand();
+            case PAUSE -> viewAsPauseCommand();
+            case RESUME -> viewAsResumeCommand();
+            case RESET_TO_HOME -> viewAsResetToHomeCommand();
+            case STOP -> viewAsStopCommand();
+            case CALIBRATE -> viewAsCalibrateCommand();
+            case TOGGLE_GRIPPER_MODE -> viewAsToggleGripperModeCommand();
+        };
+    }
 }
