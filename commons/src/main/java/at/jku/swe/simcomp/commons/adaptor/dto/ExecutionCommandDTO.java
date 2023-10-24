@@ -114,6 +114,7 @@ public class ExecutionCommandDTO implements ExecutionCommand {
             case STOP -> viewAsStopCommand().accept(visitor, sessionKey);
             case CALIBRATE -> viewAsCalibrateCommand().accept(visitor, sessionKey);
             case TOGGLE_GRIPPER_MODE -> viewAsToggleGripperModeCommand().accept(visitor, sessionKey);
+            case COMPOSITE -> null;
         };
     }
 
@@ -133,6 +134,7 @@ public class ExecutionCommandDTO implements ExecutionCommand {
             case STOP -> viewAsStopCommand();
             case CALIBRATE -> viewAsCalibrateCommand();
             case TOGGLE_GRIPPER_MODE -> viewAsToggleGripperModeCommand();
+            case COMPOSITE -> null;
         };
     }
 }
