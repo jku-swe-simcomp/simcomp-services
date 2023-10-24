@@ -5,6 +5,19 @@ Exposed REST Apis are documented using Swagger at {SERVICE_HOST}:{SERVICE_PORT}/
 
 ## [Commons](./commons)
 Package with utility classes, DTOs which are common to different services.
+Services can integrate commons with the following maven dependency:
+```
+<!--	Commons-->
+<dependency>
+  <groupId>at.jku.swe.simcomp</groupId>
+  <artifactId>commons</artifactId>
+  <version>1.0</version>
+</dependency>
+```
+**Note:** When working locally, you might have to build the project before this works, execute this command in the [commons-directory](./commons):
+```
+mvn clean install
+```
 
 ## [Service Registry](./service-registry)
 The service registry managing available adaptors and their endpoints.
