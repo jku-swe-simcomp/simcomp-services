@@ -5,6 +5,8 @@ import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.InvalidCommandParametersException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
+import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
+import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommandVisitor;
 import at.jku.swe.simcomp.commons.adaptor.registration.ServiceRegistryClient;
 import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 import at.jku.swe.simcomp.commons.adaptor.registration.exception.ServiceRegistrationFailedException;
@@ -37,6 +39,7 @@ public class AdaptorEndpointController implements AdaptorEndpoint{
      * The service
      */
     private final AdaptorEndpointService adaptorEndpointService;
+    private final ExecutionCommandVisitor executionCommandVisitor;
 
     /**
      * Constructor.
@@ -45,9 +48,11 @@ public class AdaptorEndpointController implements AdaptorEndpoint{
      * @param adaptorEndpointService the service
      */
     public AdaptorEndpointController(ServiceRegistrationConfigDTO serviceRegistrationConfigDTO,
-                                     AdaptorEndpointService adaptorEndpointService){
+                                     AdaptorEndpointService adaptorEndpointService,
+                                     ExecutionCommandVisitor executionCommandVisitor){
         this.serviceRegistrationConfigDTO=serviceRegistrationConfigDTO;
         this.adaptorEndpointService=adaptorEndpointService;
+        this.executionCommandVisitor=executionCommandVisitor;
         registerThisAdaptorEndpointAtServiceRegistry();
     }
 
@@ -67,16 +72,13 @@ public class AdaptorEndpointController implements AdaptorEndpoint{
 
     /**
      * Endpoint to execute an action.
-     * @param executionCommandDTO the command to execute
+     * @param executionCommand the command to execute
      * @return a response entity with details about the execution
      */
     @Override
     @PostMapping("/{sessionId}/action/execute")
-    public final ResponseEntity<ExecutionResultDTO> executeAction(@RequestBody ExecutionCommandDTO executionCommandDTO, @PathVariable String sessionId) throws SessionNotValidException {
-        if(!this.serviceRegistrationConfigDTO.getSupportedActions().contains(executionCommandDTO.getActionType())){
-           throw new UnsupportedOperationException("The action %s is not supported by this adaptor".formatted(executionCommandDTO.getActionType()));
-        }
-        ExecutionResultDTO executionResultDTO = adaptorEndpointService.executeAction(executionCommandDTO, sessionId);
+    public final ResponseEntity<ExecutionResultDTO> executeAction(@RequestBody ExecutionCommand executionCommand, @PathVariable String sessionId) throws Exception {
+        ExecutionResultDTO executionResultDTO = executionCommand.accept(executionCommandVisitor, sessionId);
         return ResponseEntity.ok(executionResultDTO);
     }
 
@@ -86,14 +88,11 @@ public class AdaptorEndpointController implements AdaptorEndpoint{
      */
     @Override
     @PostMapping("/{sessionId}/sequence/execute")
-    public final ResponseEntity<ExecutionResultDTO> executeSequence(@RequestBody List<ExecutionCommandDTO> executionCommands, @PathVariable String sessionId) throws SessionNotValidException {
-        if(executionCommands.stream()
-                .anyMatch(command -> !this.serviceRegistrationConfigDTO.getSupportedActions().contains(command.getActionType()))){
-            throw new UnsupportedOperationException("An action is not supported by this adaptor. Supported actions: %s".formatted(this.serviceRegistrationConfigDTO.getSupportedActions()));
-        }
-        ExecutionResultDTO executionResultDTO = adaptorEndpointService.executeSequence(executionCommands, sessionId);
+    public final ResponseEntity<ExecutionResultDTO> executeSequence(@RequestBody List<ExecutionCommand> executionCommands, @PathVariable String sessionId) throws Exception {
+        ExecutionResultDTO executionResultDTO = executionCommandVisitor.visitMultiple(executionCommands, sessionId);
         return ResponseEntity.ok(executionResultDTO);
     }
+
     /**
      * Abstract endpoint to get an attribute.
      * @return the attribute

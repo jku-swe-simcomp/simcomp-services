@@ -96,4 +96,24 @@ public class ExecutionCommandDTO implements ExecutionCommand {
             throw new InvalidCommandParametersException("Required parameters are missing for action type %s".formatted(actionType));
         }
     }
+
+    @Override
+    public ExecutionResultDTO accept(ExecutionCommandVisitor visitor, String sessionKey) throws Exception {
+        return switch(actionType){
+            case POSE -> viewAsPoseCommand().accept(visitor, sessionKey);
+            case SET_POSITION -> viewAsSetPositionCommand().accept(visitor, sessionKey);
+            case SET_ORIENTATION -> viewAsSetOrientationCommand().accept(visitor, sessionKey);
+            case GRAB -> viewAsGrabCommand().accept(visitor, sessionKey) ;
+            case OPEN_HAND -> viewAsOpenHandCommand().accept(visitor, sessionKey);
+            case ADJUST_JOINT_ANGLES -> viewAsAdjustJointAngleCommand().accept(visitor, sessionKey);
+            case SET_JOINT_POSITIONS -> viewAsSetJointPositionCommand().accept(visitor, sessionKey);
+            case SET_SPEED -> viewAsSetSpeedCommand().accept(visitor, sessionKey);
+            case PAUSE -> viewAsPauseCommand().accept(visitor, sessionKey);
+            case RESUME -> viewAsResumeCommand().accept(visitor, sessionKey);
+            case RESET_TO_HOME -> viewAsResetToHomeCommand().accept(visitor, sessionKey);
+            case STOP -> viewAsStopCommand().accept(visitor, sessionKey);
+            case CALIBRATE -> viewAsCalibrateCommand().accept(visitor, sessionKey);
+            case TOGGLE_GRIPPER_MODE -> viewAsToggleGripperModeCommand().accept(visitor, sessionKey);
+        };
+    }
 }
