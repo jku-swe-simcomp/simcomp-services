@@ -6,6 +6,7 @@ import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializati
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
 import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
 import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommandVisitor;
+import at.jku.swe.simcomp.commons.adaptor.execution.command.exception.CompositeCommandExecutionFailedException;
 import at.jku.swe.simcomp.commons.adaptor.registration.ServiceRegistryClient;
 import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 import at.jku.swe.simcomp.commons.adaptor.registration.exception.ServiceRegistrationFailedException;
@@ -137,6 +138,15 @@ public class AdaptorEndpointController implements AdaptorEndpoint{
                 .message("Invalid command parameters with message: %s".formatted(e.getMessage()))
                 .build();
         return ResponseEntity.status(400).body(result);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorDTO> handleCompositeCommandExecutionFailed(CompositeCommandExecutionFailedException e){
+        ErrorDTO result = ErrorDTO.builder()
+                .code(500)
+                .message(e.getMessage())
+                .build();
+        return ResponseEntity.status(500).body(result);
     }
 
     @ExceptionHandler

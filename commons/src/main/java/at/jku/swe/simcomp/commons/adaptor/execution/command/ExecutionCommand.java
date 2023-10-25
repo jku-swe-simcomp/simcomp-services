@@ -2,12 +2,12 @@ package at.jku.swe.simcomp.commons.adaptor.execution.command;
 
 import at.jku.swe.simcomp.commons.adaptor.dto.*;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.InvalidCommandParametersException;
+import at.jku.swe.simcomp.commons.adaptor.execution.command.exception.CompositeCommandExecutionFailedException;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.NonNull;
 
 import java.util.List;
-import java.util.Objects;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -129,28 +129,28 @@ public interface ExecutionCommand {
             StringBuilder message = new StringBuilder();
 
             for(var command: commands){
-                resultDTO = tryAcceptSubCommand(resultDTO, command, visitor, sessionKey);
+                resultDTO = tryAcceptSubCommand(command, visitor, sessionKey, message);
                 message.append(resultDTO.getMessage()).append(" \n");
                 if(!resultDTO.isSuccess()){
                     message.append("The command ").append(command.getClass().getSimpleName()).append(" of the composite command failed.");
                     return setSuccessAndMessageAndReturn(resultDTO, false, message.toString());
                 }
             }
-
             return setSuccessAndMessageAndReturn(resultDTO, true, message.toString());
         }
 
-        private ExecutionResultDTO tryAcceptSubCommand(ExecutionResultDTO previousResult, ExecutionCommand command, ExecutionCommandVisitor visitor, String sessionKey){
+        private ExecutionResultDTO tryAcceptSubCommand(ExecutionCommand command, ExecutionCommandVisitor visitor, String sessionKey, StringBuilder message) throws CompositeCommandExecutionFailedException {
             try {
                 return command.accept(visitor, sessionKey);
+            } catch(CompositeCommandExecutionFailedException e){
+                message.insert(0, e.getMessage());
+                throw new CompositeCommandExecutionFailedException(message.toString());
             } catch (Exception e) {
-                ExecutionResultDTO result = new ExecutionResultDTO();
-                result.setMessage("The command %s failed with message: %s".formatted(command.getClass().getSimpleName(), e.getMessage()));
-                result.setSuccess(false);
-                if(previousResult != null){
-                    result.setCurrentState(previousResult.getCurrentState());
-                }
-                return result;
+                message.insert(0, "The execution of the composite command threw an exception with message: "
+                        + e.getMessage()
+                        + "\n"
+                        + "Execution messages up to this point were: \n");
+                throw new CompositeCommandExecutionFailedException(message.toString());
             }
         }
 
