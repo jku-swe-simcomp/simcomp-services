@@ -2,11 +2,12 @@ package at.jku.swe.simcomp.commons.adaptor.execution.command;
 
 import at.jku.swe.simcomp.commons.adaptor.dto.*;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.InvalidCommandParametersException;
-import at.jku.swe.simcomp.commons.adaptor.execution.command.exception.CompositeCommandExecutionFailedException;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.CompositeCommandExecutionFailedException;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.NonNull;
 
+import java.lang.reflect.Constructor;
 import java.util.List;
 
 @JsonTypeInfo(
@@ -126,37 +127,32 @@ public interface ExecutionCommand {
                 throw new InvalidCommandParametersException("The composite command must contain at least one command.");
             }
             ExecutionResultDTO resultDTO = null;
-            StringBuilder message = new StringBuilder();
+            StringBuilder report = new StringBuilder();
 
             for(var command: commands){
-                resultDTO = tryAcceptSubCommand(command, visitor, sessionKey, message);
-                message.append(resultDTO.getMessage()).append(" \n");
-                if(!resultDTO.isSuccess()){
-                    message.append("The command ").append(command.getClass().getSimpleName()).append(" of the composite command failed.");
-                    return setSuccessAndMessageAndReturn(resultDTO, false, message.toString());
-                }
+                resultDTO = tryAcceptSubCommand(command, visitor, sessionKey, report);
+                report.append(resultDTO.getReport()).append(" \n");
             }
-            return setSuccessAndMessageAndReturn(resultDTO, true, message.toString());
+            return setMessageAndReturn(resultDTO, report.toString());
         }
 
-        private ExecutionResultDTO tryAcceptSubCommand(ExecutionCommand command, ExecutionCommandVisitor visitor, String sessionKey, StringBuilder message) throws CompositeCommandExecutionFailedException {
+        private ExecutionResultDTO tryAcceptSubCommand(ExecutionCommand command, ExecutionCommandVisitor visitor, String sessionKey, StringBuilder report) throws CompositeCommandExecutionFailedException {
             try {
                 return command.accept(visitor, sessionKey);
-            } catch(CompositeCommandExecutionFailedException e){
-                message.insert(0, e.getMessage());
-                throw new CompositeCommandExecutionFailedException(message.toString());
-            } catch (Exception e) {
-                message.insert(0, "The execution of the composite command threw an exception with message: "
+            } catch(CompositeCommandExecutionFailedException e){// a nested composite-command threw the exception, not adding the prefix to the report
+                report.insert(0, e.getMessage());
+                throw new CompositeCommandExecutionFailedException(report.toString(), e.getOriginalException());
+            } catch (Exception e) {// the visit-call threw an exception, adding prefix and rethrowing
+                report.insert(0, "The execution of the composite command threw an exception with message: "
                         + e.getMessage()
                         + "\n"
-                        + "Execution messages up to this point were: \n");
-                throw new CompositeCommandExecutionFailedException(message.toString());
+                        + "Execution reports up to this point were: \n");
+                throw new CompositeCommandExecutionFailedException(report.toString(), e);
             }
         }
 
-        private ExecutionResultDTO setSuccessAndMessageAndReturn(ExecutionResultDTO resultDTO, boolean success, String message) {
-            resultDTO.setSuccess(success);
-            resultDTO.setMessage(message);
+        private ExecutionResultDTO setMessageAndReturn(ExecutionResultDTO resultDTO, String message) {
+            resultDTO.setReport(message);
             return resultDTO;
         }
     }

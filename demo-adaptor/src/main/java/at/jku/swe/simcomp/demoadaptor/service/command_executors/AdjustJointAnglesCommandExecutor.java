@@ -11,8 +11,7 @@ public class AdjustJointAnglesCommandExecutor implements CommandExecutor<Executi
     @Override
     public ExecutionResultDTO execute(ExecutionCommand.AdjustJointAnglesCommand command, DemoSimulationConfig config) {
         return ExecutionResultDTO.builder()
-                .success(true)
-                .message("AdjustJointAngle command executed")
+                .report("AdjustJointAngle command executed")
                 .build();
     }
 }

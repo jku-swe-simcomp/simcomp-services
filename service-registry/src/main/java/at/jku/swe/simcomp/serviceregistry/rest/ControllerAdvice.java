@@ -1,6 +1,6 @@
 package at.jku.swe.simcomp.serviceregistry.rest;
 
-import at.jku.swe.simcomp.commons.ErrorDTO;
+import at.jku.swe.simcomp.commons.HttpErrorDTO;
 import at.jku.swe.simcomp.serviceregistry.rest.exceptions.AdaptorAlreadyRegisteredException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,9 +17,9 @@ public class ControllerAdvice {
      * @return a dto with information about the exception.
      */
     @ExceptionHandler
-    public ResponseEntity<ErrorDTO> handleAdaptorAlreadyRegistered(AdaptorAlreadyRegisteredException e){
-        ErrorDTO result = ErrorDTO.builder()
-                .code(400)
+    public ResponseEntity<HttpErrorDTO> handleAdaptorAlreadyRegistered(AdaptorAlreadyRegisteredException e){
+        HttpErrorDTO result = HttpErrorDTO.builder()
+                .status(400)
                 .message(e.getMessage())
                 .build();
         return ResponseEntity.status(400).body(result);

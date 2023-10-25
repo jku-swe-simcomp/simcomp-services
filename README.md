@@ -42,4 +42,11 @@ For an example see the [demo-adaptor](./demo-adaptor):
 4. and [here](./demo-adaptor/src/main/java/at/jku/swe/simcomp/demoadaptor/service/DemoExecutionCommandVisitor.java)
 
 The implemented beans are injected into the [uniform controller](./commons/src/main/java/at/jku/swe/simcomp/commons/adaptor/endpoint/AdaptorEndpointController.java).
+The endpoint also comes with uniform exception handling defined in the [exception-handler](./commons/src/main/java/at/jku/swe/simcomp/commons/adaptor/endpoint/AdaptorEndpointExceptionHandler.java).
+All exceptions return a specific error-code and a message defined in the [HttpErrorDTO](./commons/src/main/java/at/jku/swe/simcomp/commons/HttpErrorDTO.java).
+Implementations of an adaptor can add additional Exception-Handlers by creating their own ControllerAdvice.
+
+When the execution of an operation fails, implementations of the adaptor are encouraged to throw a
+[RoboOperationFailedException](./commons/src/main/java/at/jku/swe/simcomp/commons/adaptor/endpoint/exception/RoboOperationFailedException.java), or a more specific exception for that matter.
+This ensures consistent handling also for errors in arbitrary nested composite-commands with expressive error-messages.
 

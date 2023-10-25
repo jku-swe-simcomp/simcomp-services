@@ -1,21 +1,20 @@
 package at.jku.swe.simcomp.commons.adaptor.endpoint;
 
 import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
-import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.InvalidCommandParametersException;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.CompositeCommandExecutionFailedException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
 import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
 import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommandVisitor;
-import at.jku.swe.simcomp.commons.adaptor.execution.command.exception.CompositeCommandExecutionFailedException;
 import at.jku.swe.simcomp.commons.adaptor.registration.ServiceRegistryClient;
 import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 import at.jku.swe.simcomp.commons.adaptor.registration.exception.ServiceRegistrationFailedException;
-import at.jku.swe.simcomp.commons.ErrorDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PreDestroy;
+import java.lang.reflect.Constructor;
 
 /**
  * Class for endpoints acting as adaptors for simulations.
@@ -77,10 +76,14 @@ public class AdaptorEndpointController implements AdaptorEndpoint{
     @Override
     @PostMapping("/{sessionId}/action/execute")
     public final ResponseEntity<ExecutionResultDTO> executeAction(@RequestBody ExecutionCommand executionCommand, @PathVariable String sessionId) throws Exception {
-        ExecutionResultDTO executionResultDTO = executionCommand.accept(executionCommandVisitor, sessionId);
+        ExecutionResultDTO executionResultDTO = null;
+        try{
+            executionResultDTO = executionCommand.accept(executionCommandVisitor, sessionId);
+        }catch (CompositeCommandExecutionFailedException e){
+            throw createExceptionWithMessage(e.getOriginalException().getClass(), e.getMessage());
+        }
         return ResponseEntity.ok(executionResultDTO);
     }
-
     /**
      * Abstract endpoint to get an attribute.
      * @return the attribute
@@ -122,67 +125,6 @@ public class AdaptorEndpointController implements AdaptorEndpoint{
         return ResponseEntity.ok().build();
     }
 
-    @ExceptionHandler
-    public ResponseEntity<ErrorDTO> handleSessionNotValidException(SessionNotValidException e){
-        ErrorDTO result = ErrorDTO.builder()
-                .code(400)
-                .message("Session not valid with message: %s".formatted(e.getMessage()))
-                .build();
-        return ResponseEntity.status(400).body(result);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorDTO> handleInvalidCommandParametersException(InvalidCommandParametersException e){
-        ErrorDTO result = ErrorDTO.builder()
-                .code(400)
-                .message("Invalid command parameters with message: %s".formatted(e.getMessage()))
-                .build();
-        return ResponseEntity.status(400).body(result);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorDTO> handleCompositeCommandExecutionFailed(CompositeCommandExecutionFailedException e){
-        ErrorDTO result = ErrorDTO.builder()
-                .code(500)
-                .message(e.getMessage())
-                .build();
-        return ResponseEntity.status(500).body(result);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorDTO> handleSessionInitializationFailedException(SessionInitializationFailedException e){
-        ErrorDTO result = ErrorDTO.builder()
-                .code(500)
-                .message("Session initialization failed with message: %s".formatted(e.getMessage()))
-                .build();
-        return ResponseEntity.status(500).body(result);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorDTO> handleServiceRegistrationFailedException(ServiceRegistrationFailedException e){
-       ErrorDTO result = ErrorDTO.builder()
-               .code(500)
-               .message("Could not (un-)register at service registry with message: %s".formatted(e.getMessage()))
-               .build();
-       return ResponseEntity.status(500).body(result);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorDTO> handleUnsupportedOperation(UnsupportedOperationException e){
-        ErrorDTO errorDTO = ErrorDTO.builder()
-                .code(400)
-                .message(e.getMessage())
-                .build();
-        return ResponseEntity.status(404).body(errorDTO);
-    }
-    @ExceptionHandler
-    public ResponseEntity<ErrorDTO> handleJsonProcessingException(JsonProcessingException e){
-        ErrorDTO result = ErrorDTO.builder()
-                .code(500)
-                .message("Error while processing JSON with message: %s".formatted(e.getMessage()))
-                .build();
-        return ResponseEntity.status(500).body(result);
-    }
 
     /**
      * Lifecycle method that gets called when object is destroyed.
@@ -207,6 +149,25 @@ public class AdaptorEndpointController implements AdaptorEndpoint{
             this.serviceRegistryClient.register(this.serviceRegistrationConfigDTO);
         }catch(Exception e){//we want to catch all possible exceptions as this method is called during object initialization
             System.out.println("Could not register adaptor endpoint at service registry.");
+        }
+    }
+
+    /**
+     * Utility method that returns an exception of type originalExClass with the message of the wrapperException.
+     * @param originalExClass the class of the exception to be created
+     * @param message the message of the exception to be created
+     * @return the exception
+     * @param <T> the type of the exception to be created
+     * @throws Exception if the original exception type doesn't have a constructor accepting a string
+     */
+    private <T extends Exception> T createExceptionWithMessage(Class<T> originalExClass, String message)
+            throws Exception {
+        try {
+            Constructor<T> constructor = originalExClass.getConstructor(String.class);
+            return constructor.newInstance(message);
+        } catch (NoSuchMethodException e) {
+            // The original exception type doesn't have a constructor accepting a string
+            throw new Exception(message);
         }
     }
 }

@@ -7,8 +7,6 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class ExecutionResultDTO {
-    @NonNull
-    private boolean success;
-    private String message;
+    private String report;
     private RoboStateDTO currentState;
 }
