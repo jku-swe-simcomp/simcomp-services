@@ -1,6 +1,7 @@
 package at.jku.swe.simcomp.commons.adaptor.execution.command;
 
 import at.jku.swe.simcomp.commons.adaptor.dto.*;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.InvalidCommandParametersException;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.NonNull;
@@ -121,22 +122,41 @@ public interface ExecutionCommand {
     public static record CompositeCommand(List<ExecutionCommand> commands) implements ExecutionCommand {
         @Override
         public ExecutionResultDTO accept(ExecutionCommandVisitor visitor, String sessionKey) throws Exception {
+            if(commands.isEmpty()){
+                throw new InvalidCommandParametersException("The composite command must contain at least one command.");
+            }
             ExecutionResultDTO resultDTO = null;
-
             StringBuilder message = new StringBuilder();
-            boolean success = true;
 
             for(var command: commands){
-                resultDTO = command.accept(visitor, sessionKey);
-                message.append(resultDTO.getMessage()).append("\n");
-                if(!resultDTO.isSuccess())
-                    success = false;
+                resultDTO = tryAcceptSubCommand(resultDTO, command, visitor, sessionKey);
+                message.append(resultDTO.getMessage()).append(" \n");
+                if(!resultDTO.isSuccess()){
+                    message.append("The command ").append(command.getClass().getSimpleName()).append(" of the composite command failed.");
+                    return setSuccessAndMessageAndReturn(resultDTO, false, message.toString());
+                }
             }
 
-            if(!Objects.isNull(resultDTO)){
-                resultDTO.setMessage(message.toString());
-                resultDTO.setSuccess(success);
+            return setSuccessAndMessageAndReturn(resultDTO, true, message.toString());
+        }
+
+        private ExecutionResultDTO tryAcceptSubCommand(ExecutionResultDTO previousResult, ExecutionCommand command, ExecutionCommandVisitor visitor, String sessionKey){
+            try {
+                return command.accept(visitor, sessionKey);
+            } catch (Exception e) {
+                ExecutionResultDTO result = new ExecutionResultDTO();
+                result.setMessage("The command %s failed with message: %s".formatted(command.getClass().getSimpleName(), e.getMessage()));
+                result.setSuccess(false);
+                if(previousResult != null){
+                    result.setCurrentState(previousResult.getCurrentState());
+                }
+                return result;
             }
+        }
+
+        private ExecutionResultDTO setSuccessAndMessageAndReturn(ExecutionResultDTO resultDTO, boolean success, String message) {
+            resultDTO.setSuccess(success);
+            resultDTO.setMessage(message);
             return resultDTO;
         }
     }
