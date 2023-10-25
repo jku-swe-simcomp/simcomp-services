@@ -139,10 +139,10 @@ public interface ExecutionCommand {
         private ExecutionResultDTO tryAcceptSubCommand(ExecutionCommand command, ExecutionCommandVisitor visitor, String sessionKey, StringBuilder report) throws CompositeCommandExecutionFailedException {
             try {
                 return command.accept(visitor, sessionKey);
-            } catch(CompositeCommandExecutionFailedException e){// a nested composite-command threw the exception, not adding the prefix to the report
+            } catch(CompositeCommandExecutionFailedException e){// a nested composite-command threw the exception, not inserting the prefix to the report
                 report.insert(0, e.getMessage());
                 throw new CompositeCommandExecutionFailedException(report.toString(), e.getOriginalException());
-            } catch (Exception e) {// the visit-call threw an exception, adding prefix and rethrowing
+            } catch (Exception e) {// a scalar operation threw the exception, inserting prefix for composite commands
                 report.insert(0, "The execution of the composite command threw an exception with message: "
                         + e.getMessage()
                         + "\n"
