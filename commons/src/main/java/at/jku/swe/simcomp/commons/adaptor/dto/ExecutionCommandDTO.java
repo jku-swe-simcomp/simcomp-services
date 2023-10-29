@@ -18,6 +18,7 @@ import java.util.function.Supplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Deprecated(forRemoval = true)
 public class ExecutionCommandDTO implements ExecutionCommand {
     @NonNull
     private ActionType actionType;
@@ -97,7 +98,6 @@ public class ExecutionCommandDTO implements ExecutionCommand {
         }
     }
 
-    @Override
     public ExecutionResultDTO accept(CommandExecutionVisitor visitor, String sessionKey) throws Exception {
         return switch(actionType){
             case POSE -> viewAsPoseCommand().accept(visitor, sessionKey);
@@ -136,5 +136,15 @@ public class ExecutionCommandDTO implements ExecutionCommand {
             case TOGGLE_GRIPPER_MODE -> viewAsToggleGripperModeCommand();
             case COMPOSITE -> null;
         };
+    }
+
+    @Override
+    public <T, P> T accept(ExecutionCommandVisitor<T, P> visitor, P param) throws Exception {
+        return null;
+    }
+
+    @Override
+    public ActionType getCorrespondingActionType() {
+        return null;
     }
 }
