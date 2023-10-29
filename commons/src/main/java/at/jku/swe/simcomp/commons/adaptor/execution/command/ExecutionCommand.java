@@ -230,39 +230,5 @@ public interface ExecutionCommand {
         public ActionType getCorrespondingActionType() {
             return correspondingActionType;
         }
-        @Override
-        public ExecutionResultDTO accept(CommandExecutionVisitor visitor, String sessionKey) throws Exception {
-            if(commands.isEmpty()){
-                throw new InvalidCommandParametersException("The composite command must contain at least one command.");
-            }
-            ExecutionResultDTO resultDTO = null;
-            StringBuilder report = new StringBuilder();
-
-            for(var command: commands){
-                resultDTO = tryAcceptSubCommand(command, visitor, sessionKey, report);
-                report.append(resultDTO.getReport()).append(" \n");
-            }
-            return setMessageAndReturn(resultDTO, report.toString());
-        }
-
-        private ExecutionResultDTO tryAcceptSubCommand(ExecutionCommand command, CommandExecutionVisitor visitor, String sessionKey, StringBuilder report) throws CompositeCommandExecutionFailedException {
-            try {
-                return command.accept(visitor, sessionKey);
-            } catch(CompositeCommandExecutionFailedException e){// a nested composite-command threw the exception, not inserting the prefix to the report
-                report.insert(0, e.getMessage());
-                throw new CompositeCommandExecutionFailedException(report.toString(), e.getOriginalException(), report.toString());
-            } catch (Exception e) {// a scalar operation threw the exception, inserting prefix for composite commands
-                report.insert(0, "The execution of the composite command threw an exception with message: "
-                        + e.getMessage()
-                        + "\n"
-                        + "Execution reports up to this point were: \n");
-                throw new CompositeCommandExecutionFailedException(report.toString(), e, report.toString());
-            }
-        }
-
-        private ExecutionResultDTO setMessageAndReturn(ExecutionResultDTO resultDTO, String message) {
-            resultDTO.setReport(message);
-            return resultDTO;
-        }
     }
 }
