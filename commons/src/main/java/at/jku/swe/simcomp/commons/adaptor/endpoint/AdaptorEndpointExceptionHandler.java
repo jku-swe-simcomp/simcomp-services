@@ -32,15 +32,6 @@ public class AdaptorEndpointExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<HttpErrorDTO> handleCompositeCommandExecutionFailed(CompositeCommandExecutionFailedException e){
-        HttpErrorDTO result = HttpErrorDTO.builder()
-                .status(500)
-                .message(e.getMessage())
-                .build();
-        return ResponseEntity.status(500).body(result);
-    }
-
-    @ExceptionHandler
     public ResponseEntity<HttpErrorDTO> handleSessionInitializationFailedException(SessionInitializationFailedException e){
         HttpErrorDTO result = HttpErrorDTO.builder()
                 .status(500)
