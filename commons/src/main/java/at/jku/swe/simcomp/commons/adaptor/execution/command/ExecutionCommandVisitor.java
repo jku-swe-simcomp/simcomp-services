@@ -1,49 +1,69 @@
 package at.jku.swe.simcomp.commons.adaptor.execution.command;
+
 import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
 
-public interface ExecutionCommandVisitor {
-    default ExecutionResultDTO visit(ExecutionCommand.AdjustJointAnglesCommand command, String sessionKey) throws Exception {
-        throw new UnsupportedOperationException("The action type %s is not supported by this service.".formatted(ActionType.ADJUST_JOINT_ANGLES));
+public interface ExecutionCommandVisitor<T,P> {
+    default T visit(ExecutionCommand.AdjustJointAnglesCommand command, P param) throws Exception{
+        throw getUnsupportedOperationException(command);
     }
 
-    default ExecutionResultDTO visit(ExecutionCommand.CalibrateCommand command, String sessionKey) throws Exception{
-        throw new UnsupportedOperationException("The action type %s is not supported by this service.".formatted(ActionType.CALIBRATE));
+    default T visit(ExecutionCommand.CalibrateCommand command, P param) throws Exception{;
+        throw getUnsupportedOperationException(command);
     }
 
-    default ExecutionResultDTO visit(ExecutionCommand.GrabCommand command, String sessionKey) throws Exception{
-        throw new UnsupportedOperationException("The action type %s is not supported by this service.".formatted(ActionType.GRAB));
+    default T visit(ExecutionCommand.GrabCommand command, P param) throws Exception{
+        throw getUnsupportedOperationException(command);
     }
-    default ExecutionResultDTO visit(ExecutionCommand.OpenHandCommand command, String sessionKey) throws Exception{
-        throw new UnsupportedOperationException("The action type %s is not supported by this service.".formatted(ActionType.OPEN_HAND));
+
+    default T visit(ExecutionCommand.OpenHandCommand command, P param) throws Exception{
+        throw getUnsupportedOperationException(command);
     }
-    default ExecutionResultDTO visit(ExecutionCommand.PauseCommand command, String sessionKey) throws Exception{
-        throw new UnsupportedOperationException("The action type %s is not supported by this service.".formatted(ActionType.PAUSE));
+
+    default T visit(ExecutionCommand.PauseCommand command, P param) throws Exception{
+        throw getUnsupportedOperationException(command);
     }
-    default ExecutionResultDTO visit(ExecutionCommand.PoseCommand command, String sessionKey) throws Exception{
-        throw new UnsupportedOperationException("The action type %s is not supported by this service.".formatted(ActionType.POSE));
+
+    default T visit(ExecutionCommand.PoseCommand command, P param) throws Exception{
+        throw getUnsupportedOperationException(command);
     }
-    default ExecutionResultDTO visit(ExecutionCommand.ResetToHomeCommand command, String sessionKey) throws Exception{
-        throw new UnsupportedOperationException("The action type %s is not supported by this service.".formatted(ActionType.RESET_TO_HOME));
+
+    default T visit(ExecutionCommand.ResetToHomeCommand command, P param) throws Exception{
+        throw getUnsupportedOperationException(command);
     }
-    default ExecutionResultDTO visit(ExecutionCommand.ResumeCommand command, String sessionKey) throws Exception{
-        throw new UnsupportedOperationException("The action type %s is not supported by this service.".formatted(ActionType.RESUME));
+
+    default T visit(ExecutionCommand.ResumeCommand command, P param) throws Exception{
+        throw getUnsupportedOperationException(command);
     }
-    default ExecutionResultDTO visit(ExecutionCommand.SetJointPositionsCommand command, String sessionKey) throws Exception{
-        throw new UnsupportedOperationException("The action type %s is not supported by this service.".formatted(ActionType.SET_JOINT_POSITIONS));
+
+    default T visit(ExecutionCommand.SetJointPositionsCommand command, P param) throws Exception{
+        throw getUnsupportedOperationException(command);
     }
-    default ExecutionResultDTO visit(ExecutionCommand.SetOrientationCommand command, String sessionKey) throws Exception{
-        throw new UnsupportedOperationException("The action type %s is not supported by this service.".formatted(ActionType.SET_ORIENTATION));
+
+    default T visit(ExecutionCommand.SetOrientationCommand command, P param) throws Exception{
+        throw getUnsupportedOperationException(command);
     }
-    default ExecutionResultDTO visit(ExecutionCommand.SetPositionCommand command, String sessionKey) throws Exception{
-        throw new UnsupportedOperationException("The action type %s is not supported by this service.".formatted(ActionType.SET_POSITION));
+
+    default T visit(ExecutionCommand.SetPositionCommand command, P param) throws Exception{
+        throw getUnsupportedOperationException(command);
     }
-    default ExecutionResultDTO visit(ExecutionCommand.SetSpeedCommand command, String sessionKey) throws Exception{
-        throw new UnsupportedOperationException("The action type %s is not supported by this service.".formatted(ActionType.SET_SPEED));
+
+    default T visit(ExecutionCommand.SetSpeedCommand command, P param) throws Exception{
+        throw getUnsupportedOperationException(command);
     }
-    default ExecutionResultDTO visit(ExecutionCommand.StopCommand command, String sessionKey) throws Exception{
-        throw new UnsupportedOperationException("The action type %s is not supported by this service.".formatted(ActionType.STOP));
+
+    default T visit(ExecutionCommand.StopCommand command, P param) throws Exception{
+        throw getUnsupportedOperationException(command);
     }
-    default ExecutionResultDTO visit(ExecutionCommand.ToggleGripperModeCommand command, String sessionKey) throws Exception{
-        throw new UnsupportedOperationException("The action type %s is not supported by this service.".formatted(ActionType.TOGGLE_GRIPPER_MODE));
+
+    default T visit(ExecutionCommand.ToggleGripperModeCommand command, P param) throws Exception{
+        throw getUnsupportedOperationException(command);
+    }
+
+    default T visit(ExecutionCommand.CompositeCommand command, P param) throws Exception{
+        throw getUnsupportedOperationException(command);
+    }
+
+    private static UnsupportedOperationException getUnsupportedOperationException(ExecutionCommand command) {
+        return new UnsupportedOperationException("The action type %s is not supported by this service.".formatted(command.getCorrespondingActionType()));
     }
 }

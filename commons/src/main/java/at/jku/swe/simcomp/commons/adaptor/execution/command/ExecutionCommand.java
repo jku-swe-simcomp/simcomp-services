@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.NonNull;
 
-import java.lang.reflect.Constructor;
 import java.util.List;
 
 @JsonTypeInfo(
@@ -31,98 +30,208 @@ import java.util.List;
         @JsonSubTypes.Type(value = ExecutionCommand.CompositeCommand.class, name = "COMPOSITE"),
 })
 public interface ExecutionCommand {
-    ExecutionResultDTO accept(ExecutionCommandVisitor visitor, String sessionKey) throws Exception;
+    <T,P> T accept(ExecutionCommandVisitor<T,P> visitor, P param) throws Exception;
+    ActionType getCorrespondingActionType();
     public static record PoseCommand(@NonNull PositionDTO position, @NonNull QuaternionDTO orientation) implements ExecutionCommand {
+        private static final ActionType correspondingActionType = ActionType.POSE;
+
         @Override
-        public ExecutionResultDTO accept(ExecutionCommandVisitor visitor, String sessionKey) throws Exception {
-            return visitor.visit(this, sessionKey);
+        public <T,P> T accept(ExecutionCommandVisitor<T, P> visitor, P param) throws Exception {
+            return visitor.visit(this, param);
+        }
+
+        @Override
+        public ActionType getCorrespondingActionType() {
+            return correspondingActionType;
         }
     }
 
     public static record SetPositionCommand(@NonNull PositionDTO position) implements ExecutionCommand {
+        private static final ActionType correspondingActionType = ActionType.SET_POSITION;
+
         @Override
-        public ExecutionResultDTO accept(ExecutionCommandVisitor visitor, String sessionKey) throws Exception {
-            return visitor.visit(this, sessionKey);
+        public <T,P> T accept(ExecutionCommandVisitor<T, P> visitor, P param) throws Exception {
+            return visitor.visit(this, param);
+        }
+
+        @Override
+        public ActionType getCorrespondingActionType() {
+            return correspondingActionType;
         }
     }
     public static record SetOrientationCommand(@NonNull QuaternionDTO orientation) implements ExecutionCommand {
+        private static final ActionType correspondingActionType = ActionType.SET_ORIENTATION;
+
         @Override
-        public ExecutionResultDTO accept(ExecutionCommandVisitor visitor, String sessionKey) throws Exception {
-            return visitor.visit(this, sessionKey);
+        public <T,P> T accept(ExecutionCommandVisitor<T, P> visitor, P param) throws Exception {
+            return visitor.visit(this, param);
+        }
+
+        @Override
+        public ActionType getCorrespondingActionType() {
+            return correspondingActionType;
         }
     }
     public static record AdjustJointAnglesCommand(@NonNull List<JointAngleAdjustmentDTO> jointAngleAdjustments) implements ExecutionCommand {
+        private static final ActionType correspondingActionType = ActionType.ADJUST_JOINT_ANGLES;
+
         @Override
-        public ExecutionResultDTO accept(ExecutionCommandVisitor visitor, String sessionKey) throws Exception {
-            return visitor.visit(this, sessionKey);
+        public <T,P> T accept(ExecutionCommandVisitor<T, P> visitor, P param) throws Exception {
+            return visitor.visit(this, param);
+        }
+
+        @Override
+        public ActionType getCorrespondingActionType() {
+            return correspondingActionType;
         }
     }
     public static record SetJointPositionsCommand(@NonNull List<JointPositionDTO> jointPosition) implements ExecutionCommand {
+        private static final ActionType correspondingActionType = ActionType.SET_JOINT_POSITIONS;
+
         @Override
-        public ExecutionResultDTO accept(ExecutionCommandVisitor visitor, String sessionKey) throws Exception {
-            return visitor.visit(this, sessionKey);
+        public <T,P> T accept(ExecutionCommandVisitor<T, P> visitor, P param) throws Exception {
+            return visitor.visit(this, param);
+        }
+
+        @Override
+        public ActionType getCorrespondingActionType() {
+            return correspondingActionType;
         }
     }
     public static record SetSpeedCommand(@NonNull Double speed) implements ExecutionCommand {
+        private static final ActionType correspondingActionType = ActionType.SET_SPEED;
+
         @Override
-        public ExecutionResultDTO accept(ExecutionCommandVisitor visitor, String sessionKey) throws Exception {
-            return visitor.visit(this, sessionKey);
+        public <T,P> T accept(ExecutionCommandVisitor<T, P> visitor, P param) throws Exception {
+            return visitor.visit(this, param);
+        }
+
+        @Override
+        public ActionType getCorrespondingActionType() {
+            return correspondingActionType;
         }
     }
 
     public static record PauseCommand() implements ExecutionCommand {
+        private static final ActionType correspondingActionType = ActionType.PAUSE;
+
         @Override
-        public ExecutionResultDTO accept(ExecutionCommandVisitor visitor, String sessionKey) throws Exception {
-            return visitor.visit(this, sessionKey);
+        public <T,P> T accept(ExecutionCommandVisitor<T, P> visitor, P param) throws Exception {
+            return visitor.visit(this, param);
+        }
+
+        @Override
+        public ActionType getCorrespondingActionType() {
+            return correspondingActionType;
         }
     }
     public static record ResumeCommand() implements ExecutionCommand {
+        private static final ActionType correspondingActionType = ActionType.RESUME;
+
         @Override
-        public ExecutionResultDTO accept(ExecutionCommandVisitor visitor, String sessionKey) throws Exception {
-            return visitor.visit(this, sessionKey);
+        public <T,P> T accept(ExecutionCommandVisitor<T, P> visitor, P param) throws Exception {
+            return visitor.visit(this, param);
+        }
+
+        @Override
+        public ActionType getCorrespondingActionType() {
+            return correspondingActionType;
         }
 
     }
     public static record ResetToHomeCommand() implements ExecutionCommand {
+        private static final ActionType correspondingActionType = ActionType.RESET_TO_HOME;
+
         @Override
-        public ExecutionResultDTO accept(ExecutionCommandVisitor visitor, String sessionKey) throws Exception {
-            return visitor.visit(this, sessionKey);
+        public <T,P> T accept(ExecutionCommandVisitor<T, P> visitor, P param) throws Exception {
+            return visitor.visit(this, param);
+        }
+
+        @Override
+        public ActionType getCorrespondingActionType() {
+            return correspondingActionType;
         }
     }
     public static record StopCommand() implements ExecutionCommand {
+        private static final ActionType correspondingActionType = ActionType.STOP;
+
         @Override
-        public ExecutionResultDTO accept(ExecutionCommandVisitor visitor, String sessionKey) throws Exception {
-            return visitor.visit(this, sessionKey);
+        public <T,P> T accept(ExecutionCommandVisitor<T, P> visitor, P param) throws Exception {
+            return visitor.visit(this, param);
+        }
+
+        @Override
+        public ActionType getCorrespondingActionType() {
+            return correspondingActionType;
         }
     }
     public static record CalibrateCommand() implements ExecutionCommand {
+        private static final ActionType correspondingActionType = ActionType.CALIBRATE;
+
         @Override
-        public ExecutionResultDTO accept(ExecutionCommandVisitor visitor, String sessionKey) throws Exception {
-            return visitor.visit(this, sessionKey);
+        public <T,P> T accept(ExecutionCommandVisitor<T, P> visitor, P param) throws Exception {
+            return visitor.visit(this, param);
+        }
+
+        @Override
+        public ActionType getCorrespondingActionType() {
+            return correspondingActionType;
         }
     }
     public static record ToggleGripperModeCommand() implements ExecutionCommand {
+        private static final ActionType correspondingActionType = ActionType.TOGGLE_GRIPPER_MODE;
+
         @Override
-        public ExecutionResultDTO accept(ExecutionCommandVisitor visitor, String sessionKey) throws Exception {
-            return visitor.visit(this, sessionKey);
+        public <T,P> T accept(ExecutionCommandVisitor<T, P> visitor, P param) throws Exception {
+            return visitor.visit(this, param);
+        }
+
+        @Override
+        public ActionType getCorrespondingActionType() {
+            return correspondingActionType;
         }
     }
     public static record GrabCommand() implements ExecutionCommand {
+        private static final ActionType correspondingActionType = ActionType.GRAB;
+
         @Override
-        public ExecutionResultDTO accept(ExecutionCommandVisitor visitor, String sessionKey) throws Exception {
-            return visitor.visit(this, sessionKey);
+        public <T,P> T accept(ExecutionCommandVisitor<T, P> visitor, P param) throws Exception {
+            return visitor.visit(this, param);
+        }
+
+        @Override
+        public ActionType getCorrespondingActionType() {
+            return correspondingActionType;
         }
     }
     public static record OpenHandCommand() implements ExecutionCommand {
+        private static final ActionType correspondingActionType = ActionType.OPEN_HAND;
+
         @Override
-        public ExecutionResultDTO accept(ExecutionCommandVisitor visitor, String sessionKey) throws Exception {
-            return visitor.visit(this, sessionKey);
+        public <T,P> T accept(ExecutionCommandVisitor<T, P> visitor, P param) throws Exception {
+            return visitor.visit(this, param);
+        }
+
+        @Override
+        public ActionType getCorrespondingActionType() {
+            return correspondingActionType;
         }
     }
 
     public static record CompositeCommand(List<ExecutionCommand> commands) implements ExecutionCommand {
+        private static final ActionType correspondingActionType = ActionType.COMPOSITE;
+
         @Override
-        public ExecutionResultDTO accept(ExecutionCommandVisitor visitor, String sessionKey) throws Exception {
+        public <T,P> T accept(ExecutionCommandVisitor<T, P> visitor, P param) throws Exception {
+            return visitor.visit(this, param);
+        }
+
+        @Override
+        public ActionType getCorrespondingActionType() {
+            return correspondingActionType;
+        }
+        @Override
+        public ExecutionResultDTO accept(CommandExecutionVisitor visitor, String sessionKey) throws Exception {
             if(commands.isEmpty()){
                 throw new InvalidCommandParametersException("The composite command must contain at least one command.");
             }
@@ -136,18 +245,18 @@ public interface ExecutionCommand {
             return setMessageAndReturn(resultDTO, report.toString());
         }
 
-        private ExecutionResultDTO tryAcceptSubCommand(ExecutionCommand command, ExecutionCommandVisitor visitor, String sessionKey, StringBuilder report) throws CompositeCommandExecutionFailedException {
+        private ExecutionResultDTO tryAcceptSubCommand(ExecutionCommand command, CommandExecutionVisitor visitor, String sessionKey, StringBuilder report) throws CompositeCommandExecutionFailedException {
             try {
                 return command.accept(visitor, sessionKey);
             } catch(CompositeCommandExecutionFailedException e){// a nested composite-command threw the exception, not inserting the prefix to the report
                 report.insert(0, e.getMessage());
-                throw new CompositeCommandExecutionFailedException(report.toString(), e.getOriginalException());
+                throw new CompositeCommandExecutionFailedException(report.toString(), e.getOriginalException(), report.toString());
             } catch (Exception e) {// a scalar operation threw the exception, inserting prefix for composite commands
                 report.insert(0, "The execution of the composite command threw an exception with message: "
                         + e.getMessage()
                         + "\n"
                         + "Execution reports up to this point were: \n");
-                throw new CompositeCommandExecutionFailedException(report.toString(), e);
+                throw new CompositeCommandExecutionFailedException(report.toString(), e, report.toString());
             }
         }
 

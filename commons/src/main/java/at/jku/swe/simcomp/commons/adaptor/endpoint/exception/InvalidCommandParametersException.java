@@ -1,6 +1,8 @@
 package at.jku.swe.simcomp.commons.adaptor.endpoint.exception;
 
-public class InvalidCommandParametersException extends RuntimeException{
+import java.security.InvalidParameterException;
+
+public class InvalidCommandParametersException extends InvalidParameterException {
     public InvalidCommandParametersException(String message) {
         super(message);
     }

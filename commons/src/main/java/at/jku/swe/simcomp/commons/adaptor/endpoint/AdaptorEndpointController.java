@@ -6,7 +6,7 @@ import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.RoboOperationFailed
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
 import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
-import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommandVisitor;
+import at.jku.swe.simcomp.commons.adaptor.execution.command.CommandExecutionVisitor;
 import at.jku.swe.simcomp.commons.adaptor.registration.ServiceRegistryClient;
 import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 import at.jku.swe.simcomp.commons.adaptor.registration.exception.ServiceRegistrationFailedException;
@@ -38,7 +38,7 @@ public class AdaptorEndpointController implements AdaptorEndpoint{
      * The service
      */
     private final AdaptorEndpointService adaptorEndpointService;
-    private final ExecutionCommandVisitor executionCommandVisitor;
+    private final CommandExecutionVisitor commandExecutionVisitor;
 
     /**
      * Constructor.
@@ -48,10 +48,10 @@ public class AdaptorEndpointController implements AdaptorEndpoint{
      */
     public AdaptorEndpointController(ServiceRegistrationConfigDTO serviceRegistrationConfigDTO,
                                      AdaptorEndpointService adaptorEndpointService,
-                                     ExecutionCommandVisitor executionCommandVisitor){
+                                     CommandExecutionVisitor commandExecutionVisitor){
         this.serviceRegistrationConfigDTO=serviceRegistrationConfigDTO;
         this.adaptorEndpointService=adaptorEndpointService;
-        this.executionCommandVisitor=executionCommandVisitor;
+        this.commandExecutionVisitor = commandExecutionVisitor;
         registerThisAdaptorEndpointAtServiceRegistry();
     }
 
@@ -79,12 +79,12 @@ public class AdaptorEndpointController implements AdaptorEndpoint{
     public final ResponseEntity<ExecutionResultDTO> executeAction(@RequestBody ExecutionCommand executionCommand, @PathVariable String sessionId) throws Exception {
         ExecutionResultDTO executionResultDTO = null;
         try{
-            executionResultDTO = executionCommand.accept(executionCommandVisitor, sessionId);
+            executionResultDTO = executionCommand.accept(commandExecutionVisitor, sessionId);
         }catch (CompositeCommandExecutionFailedException e){
             if(e.getOriginalException() instanceof RoboOperationFailedException rofe){
-                throw new RoboOperationFailedException(e.getMessage(), rofe.getState());   
+                throw new RoboOperationFailedException(e.getMessageWithReports(), rofe.getState());
             }else {
-                throw createExceptionWithMessage(e.getOriginalException().getClass(), e.getMessage());
+                throw createExceptionWithMessage(e.getOriginalException().getClass(), e.getMessageWithReports());
             }
         }
         return ResponseEntity.ok(executionResultDTO);

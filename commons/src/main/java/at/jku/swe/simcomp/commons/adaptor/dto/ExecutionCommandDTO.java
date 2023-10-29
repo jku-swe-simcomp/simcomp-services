@@ -98,7 +98,7 @@ public class ExecutionCommandDTO implements ExecutionCommand {
     }
 
     @Override
-    public ExecutionResultDTO accept(ExecutionCommandVisitor visitor, String sessionKey) throws Exception {
+    public ExecutionResultDTO accept(CommandExecutionVisitor visitor, String sessionKey) throws Exception {
         return switch(actionType){
             case POSE -> viewAsPoseCommand().accept(visitor, sessionKey);
             case SET_POSITION -> viewAsSetPositionCommand().accept(visitor, sessionKey);
