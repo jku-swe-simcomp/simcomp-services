@@ -47,6 +47,6 @@ All exceptions return a specific error-code and a message defined in the [HttpEr
 Implementations of an adaptor can add additional Exception-Handlers by creating their own ControllerAdvice.
 
 When the execution of an operation fails, implementations of the adaptor are encouraged to throw a
-[RoboOperationFailedException](./commons/src/main/java/at/jku/swe/simcomp/commons/adaptor/endpoint/exception/RoboOperationFailedException.java), or a more specific exception for that matter.
+[RoboOperationFailedException](./commons/src/main/java/at/jku/swe/simcomp/commons/adaptor/endpoint/exception/RoboOperationFailedException.java), or a more specific exception for that matter. Adaptors can initialize this exception with the [state](./commons/src/main/java/at/jku/swe/simcomp/commons/adaptor/dto/RoboStateDTO.java) of the roboter-arm in order to return the state and a message if desired.
 This ensures consistent handling also for errors in arbitrary nested composite-commands with expressive error-messages.
 

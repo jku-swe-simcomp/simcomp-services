@@ -68,12 +68,13 @@ public class AdaptorEndpointExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<HttpErrorDTO> handleRoboOperationFailed(RoboOperationFailedException e){
-        HttpErrorDTO result = HttpErrorDTO.builder()
-                .status(500)
-                .message("The operation failed with message: %s".formatted(e.getMessage()))
-                .build();
+        ExecutionErrorDTO result = new ExecutionErrorDTO();
+        result.setMessage(e.getMessage());
+        result.setStatus(500);
+        result.setState(e.getState());
         return ResponseEntity.status(500).body(result);
     }
+
     @ExceptionHandler
     public ResponseEntity<HttpErrorDTO> handleException(Exception e){
         HttpErrorDTO result = HttpErrorDTO.builder()
