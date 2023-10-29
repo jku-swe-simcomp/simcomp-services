@@ -2,6 +2,7 @@ package at.jku.swe.simcomp.commons.adaptor.endpoint;
 
 import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.CompositeCommandExecutionFailedException;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.RoboOperationFailedException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
 import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
@@ -80,10 +81,15 @@ public class AdaptorEndpointController implements AdaptorEndpoint{
         try{
             executionResultDTO = executionCommand.accept(executionCommandVisitor, sessionId);
         }catch (CompositeCommandExecutionFailedException e){
-            throw createExceptionWithMessage(e.getOriginalException().getClass(), e.getMessage());
+            if(e.getOriginalException() instanceof RoboOperationFailedException rofe){
+                throw new RoboOperationFailedException(e.getMessage(), rofe.getState());   
+            }else {
+                throw createExceptionWithMessage(e.getOriginalException().getClass(), e.getMessage());
+            }
         }
         return ResponseEntity.ok(executionResultDTO);
     }
+
     /**
      * Abstract endpoint to get an attribute.
      * @return the attribute
