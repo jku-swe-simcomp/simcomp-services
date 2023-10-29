@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class JointAngleAdjustmentDTO {
     RoboJoint joint;
-    double byDegree;
+    Double byDegree;
     JointAngleAdjustmentDirection direction;
 }

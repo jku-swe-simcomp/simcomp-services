@@ -8,11 +8,11 @@ import lombok.*;
 @Builder
 public class QuaternionDTO {
     @NonNull
-    private double x;
+    private Double x;
     @NonNull
-    private double y;
+    private Double y;
     @NonNull
-    private double z;
+    private Double z;
     @NonNull
-    private double w;
+    private Double w;
 }

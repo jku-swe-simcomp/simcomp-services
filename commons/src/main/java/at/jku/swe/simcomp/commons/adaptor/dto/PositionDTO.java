@@ -8,9 +8,9 @@ import lombok.*;
 @Builder
 public class PositionDTO {
     @NonNull
-    private double x;
+    private Double x;
     @NonNull
-    private double y;
+    private Double y;
     @NonNull
-    private double z;
+    private Double z;
 }
