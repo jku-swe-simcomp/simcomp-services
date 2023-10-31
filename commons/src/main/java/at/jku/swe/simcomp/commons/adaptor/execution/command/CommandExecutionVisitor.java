@@ -3,7 +3,7 @@ import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.CompositeCommandExecutionFailedException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.InvalidCommandParametersException;
 
-public class CommandExecutionVisitor implements ExecutionCommandVisitor<ExecutionResultDTO, String> {
+public abstract class CommandExecutionVisitor implements ExecutionCommandVisitor<ExecutionResultDTO, String> {
     @Override
     public final ExecutionResultDTO visit(ExecutionCommand.CompositeCommand composite, String sessionKey) throws Exception {
         var commands = composite.commands();
