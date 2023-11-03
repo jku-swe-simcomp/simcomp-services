@@ -1,0 +1,112 @@
+#VRML_SIM R2023b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/floors/protos/Floor.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/Parquetry.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/robots/niryo/ned/protos/Ned.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/tables/protos/Table.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/VarnishedPine.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/apartment_structure/protos/Wall.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/Roughcast.proto"
+
+WorldInfo {
+  basicTimeStep 16
+}
+Viewpoint {
+  orientation 0 1 0 0.4209
+  position 1.0712008818453862 0.3112176689165387 2.7106512325641967
+  followType "None"
+}
+TexturedBackground {
+  texture "empty_office"
+}
+TexturedBackgroundLight {
+  texture "empty_office"
+}
+Floor {
+  translation 6 -3 0
+  name "floor(2)"
+  size 14 13
+  appearance Parquetry {
+    type "dark strip"
+  }
+}
+Ned {
+  translation 4.40242 0.513432 0.739997
+  rotation 0 0 1 0.7854
+}
+Floor {
+  translation 4.22 0 3
+  rotation 1 0 0 3.1415926
+  size 20 16.4
+  tileSize 1 1
+  appearance PBRAppearance {
+    baseColorMap ImageTexture {
+      url [
+        "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/default/worlds/textures/asphalt.jpg"
+      ]
+    }
+    roughness 1
+    metalness 0
+  }
+}
+Table {
+  translation 4.85029 -0.238828 0
+  name "table(2)"
+  size 1.5 4.5 0.74
+  trayAppearance VarnishedPine {
+    colorOverride 0.85 0.8 0.808
+    textureTransform TextureTransform {
+      scale 10 10
+    }
+  }
+  legAppearance VarnishedPine {
+    colorOverride 0.85 0.8 0.8
+    textureTransform TextureTransform {
+      scale 4 5
+    }
+  }
+}
+Wall {
+  translation 11.48 -0.88 0
+  name "wall(3)"
+  size 0.2 8 3
+  appearance Roughcast {
+    textureTransform TextureTransform {
+      scale 7 1.83
+    }
+  }
+}
+Wall {
+  translation 0.25 -0.88 0
+  name "wall(1)"
+  size 0.2 8 3
+  appearance Roughcast {
+    textureTransform TextureTransform {
+      scale 7 1.83
+    }
+  }
+}
+Wall {
+  translation 5.88017 3.04997 0
+  rotation 0 0 -1 4.7123353
+  name "wall(2)"
+  size 0.2 11.4 3
+  appearance Roughcast {
+    textureTransform TextureTransform {
+      scale 7 1.83
+    }
+  }
+}
+Wall {
+  translation 5.88051 -3.55003 0
+  rotation 0 0 -1 4.7123353
+  name "wall(4)"
+  size 0.2 11.4 3
+  appearance Roughcast {
+    textureTransform TextureTransform {
+      scale 7 1.83
+    }
+  }
+}
