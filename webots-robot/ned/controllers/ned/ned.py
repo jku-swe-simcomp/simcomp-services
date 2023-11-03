@@ -82,7 +82,11 @@ def wait_for_connection():
 
 def get_value(motor):
     motor.getPositionSensor().enable(100)
-    return motor.getPositionSensor().getValue()
+    value = motor.getPositionSensor().getValue()
+    if not value:
+        return 0
+    else:
+        return value
 
 
 def set_axis(set_axis_input):
@@ -103,6 +107,8 @@ def set_axis(set_axis_input):
             m5.setPosition(position)
         elif axis == 6:
             m6.setPosition(position)
+        elif axis == 7:
+            m7.setPosition(position)
     except ValueError:
         print("Invalid position value received.")
         return '{"result":"The axis could not be set"}\n'
@@ -138,6 +144,10 @@ def adjust_axis(adjust_axis_input):
             current_value = get_value(m6)
             print(f'Setting axis 6 to value {current_value + position}')
             m6.setPosition(current_value + position)
+        elif axis == 7:
+            current_value = get_value(m7)
+            print(f'Setting axis 7 to value {current_value + position}')
+            m7.setPosition(current_value + position)
     except ValueError:
         print("Invalid position value received.")
         return '{"result":"The axis could not be adjusted"}\n'
@@ -151,6 +161,7 @@ def get_position_json():
     val4 = get_value(m4)
     val5 = get_value(m5)
     val6 = get_value(m6)
+    val7 = get_value(m7)
     json_result = {
         "result": "success",
         "axis1": val1,
@@ -158,7 +169,8 @@ def get_position_json():
         "axis3": val3,
         "axis4": val4,
         "axis5": val5,
-        "axis6": val6
+        "axis6": val6,
+        "axis7": val7
     }
     result = json.dumps(json_result)+'\n'
     print(f'Returning: {result}')
@@ -190,6 +202,8 @@ while robot.step(timestep) != -1:
             response = set_axis(json_data)
         elif operation == 'initial_position':
             response = initial_position()
+        elif operation == 'get_position':
+            response = get_position_json()
 
     except json.JSONDecodeError as e:
         print('json could not be pared')
