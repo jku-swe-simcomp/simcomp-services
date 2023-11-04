@@ -23,7 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 @Service
-public class AdjustJointAnglesCommandExecutor implements CommandExecutor<ExecutionCommand.AdjustJointAngleCommand, WebotsSimulationConfig, ExecutionResultDTO> {
+public class AdjustJointAngleCommandExecutor implements CommandExecutor<ExecutionCommand.AdjustJointAngleCommand, WebotsSimulationConfig, ExecutionResultDTO> {
 
     @SneakyThrows
     @Override

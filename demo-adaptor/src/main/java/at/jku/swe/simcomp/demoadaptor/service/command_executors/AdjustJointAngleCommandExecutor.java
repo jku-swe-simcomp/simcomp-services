@@ -7,7 +7,7 @@ import at.jku.swe.simcomp.demoadaptor.domain.simulation.DemoSimulationConfig;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AdjustJointAnglesCommandExecutor implements CommandExecutor<ExecutionCommand.AdjustJointAngleCommand, DemoSimulationConfig, ExecutionResultDTO> {
+public class AdjustJointAngleCommandExecutor implements CommandExecutor<ExecutionCommand.AdjustJointAngleCommand, DemoSimulationConfig, ExecutionResultDTO> {
     @Override
     public ExecutionResultDTO execute(ExecutionCommand.AdjustJointAngleCommand command, DemoSimulationConfig config) {
         return ExecutionResultDTO.builder()

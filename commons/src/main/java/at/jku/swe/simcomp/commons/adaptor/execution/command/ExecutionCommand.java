@@ -71,7 +71,7 @@ public interface ExecutionCommand {
         }
     }
     public static record AdjustJointAngleCommand(@NonNull JointAngleAdjustmentDTO jointAngleAdjustment) implements ExecutionCommand {
-        private static final ActionType correspondingActionType = ActionType.ADJUST_JOINT_ANGLES;
+        private static final ActionType correspondingActionType = ActionType.ADJUST_JOINT_ANGLE;
 
         @Override
         public <T,P> T accept(ExecutionCommandVisitor<T, P> visitor, P param) throws Exception {
@@ -84,7 +84,7 @@ public interface ExecutionCommand {
         }
     }
     public static record SetJointPositionCommand(@NonNull JointPositionDTO jointPosition) implements ExecutionCommand {
-        private static final ActionType correspondingActionType = ActionType.SET_JOINT_POSITIONS;
+        private static final ActionType correspondingActionType = ActionType.SET_JOINT_POSITION;
 
         @Override
         public <T,P> T accept(ExecutionCommandVisitor<T, P> visitor, P param) throws Exception {

@@ -31,7 +31,7 @@ public class ServiceRegistrationConfig {
                 .host(host)
                 .port(port)
                 .supportedActions(Set.of(ActionType.POSE,
-                        ActionType.ADJUST_JOINT_ANGLES))
+                        ActionType.ADJUST_JOINT_ANGLE))
                 .build();
     }
 }
