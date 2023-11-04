@@ -22,7 +22,7 @@ public class WebotsCommandExecutionVisitor extends CommandExecutionVisitor {
     }
 
     @Override
-    public ExecutionResultDTO visit(ExecutionCommand.AdjustJointAnglesCommand command, String sessionKey) throws SessionNotValidException {
+    public ExecutionResultDTO visit(ExecutionCommand.AdjustJointAngleCommand command, String sessionKey) throws SessionNotValidException {
         return adjustJointAnglesCommandExecutor.execute(command, demoSessionService.renewSession(sessionKey));
     }
 

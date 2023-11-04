@@ -23,11 +23,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 @Service
-public class AdjustJointAnglesCommandExecutor implements CommandExecutor<ExecutionCommand.AdjustJointAnglesCommand, WebotsSimulationConfig, ExecutionResultDTO> {
+public class AdjustJointAnglesCommandExecutor implements CommandExecutor<ExecutionCommand.AdjustJointAngleCommand, WebotsSimulationConfig, ExecutionResultDTO> {
 
     @SneakyThrows
     @Override
-    public ExecutionResultDTO execute(ExecutionCommand.AdjustJointAnglesCommand command, WebotsSimulationConfig config) {
+    public ExecutionResultDTO execute(ExecutionCommand.AdjustJointAngleCommand command, WebotsSimulationConfig config) {
 
         System.out.println("Connecting to " + config.getSimulationEndpointUrl() + " on port " + config.getSimulationPort());
         Socket client;
@@ -38,7 +38,7 @@ public class AdjustJointAnglesCommandExecutor implements CommandExecutor<Executi
             System.out.println("Connected to " + client.getRemoteSocketAddress());
 
             JSONObject json = new JSONObject();
-            JointAngleAdjustmentDTO movement = command.jointAngleAdjustments().get(0); // now a list is used, maybe change to only send one angle adjustment per command
+            JointAngleAdjustmentDTO movement = command.jointAngleAdjustment(); // now a list is used, maybe change to only send one angle adjustment per command
             json.put("operation", "move_axis");
             json.put("axis", movement.getJoint());
             json.put("value", movement.getByDegree());

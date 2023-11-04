@@ -1,9 +1,7 @@
 package at.jku.swe.simcomp.commons.adaptor.execution.command;
 
-import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
-
 public interface ExecutionCommandVisitor<T,P> {
-    default T visit(ExecutionCommand.AdjustJointAnglesCommand command, P param) throws Exception{
+    default T visit(ExecutionCommand.AdjustJointAngleCommand command, P param) throws Exception{
         throw getUnsupportedOperationException(command);
     }
 
@@ -35,7 +33,7 @@ public interface ExecutionCommandVisitor<T,P> {
         throw getUnsupportedOperationException(command);
     }
 
-    default T visit(ExecutionCommand.SetJointPositionsCommand command, P param) throws Exception{
+    default T visit(ExecutionCommand.SetJointPositionCommand command, P param) throws Exception{
         throw getUnsupportedOperationException(command);
     }
 

@@ -1,6 +1,5 @@
 package at.jku.swe.simcomp.commons.adaptor.endpoint;
 
-import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionCommandDTO;
 import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
@@ -8,8 +7,6 @@ import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
 import at.jku.swe.simcomp.commons.adaptor.registration.exception.ServiceRegistrationFailedException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.ResponseEntity;
-
-import java.util.List;
 
 public interface AdaptorEndpoint {
     ResponseEntity<String> initSession() throws SessionInitializationFailedException;

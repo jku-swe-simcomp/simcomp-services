@@ -1,8 +1,6 @@
 package at.jku.swe.simcomp.commons.adaptor.execution.command;
 
 import at.jku.swe.simcomp.commons.adaptor.dto.*;
-import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.InvalidCommandParametersException;
-import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.CompositeCommandExecutionFailedException;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.NonNull;
@@ -19,11 +17,11 @@ import java.util.List;
         @JsonSubTypes.Type(value = ExecutionCommand.StopCommand.class, name = "STOP"),
         @JsonSubTypes.Type(value = ExecutionCommand.PauseCommand.class, name = "PAUSE"),
         @JsonSubTypes.Type(value = ExecutionCommand.SetOrientationCommand.class, name = "SET_ORIENTATION"),
-        @JsonSubTypes.Type(value = ExecutionCommand.AdjustJointAnglesCommand.class, name = "ADJUST_JOINT_ANGLES"),
+        @JsonSubTypes.Type(value = ExecutionCommand.AdjustJointAngleCommand.class, name = "ADJUST_JOINT_ANGLE"),
         @JsonSubTypes.Type(value = ExecutionCommand.CalibrateCommand.class, name = "CALIBRATE"),
         @JsonSubTypes.Type(value = ExecutionCommand.GrabCommand.class, name = "GRAB"),
         @JsonSubTypes.Type(value = ExecutionCommand.OpenHandCommand.class, name = "OPEN_HAND"),
-        @JsonSubTypes.Type(value = ExecutionCommand.SetJointPositionsCommand.class, name = "SET_JOINT_POSITIONS"),
+        @JsonSubTypes.Type(value = ExecutionCommand.SetJointPositionCommand.class, name = "SET_JOINT_POSITIONS"),
         @JsonSubTypes.Type(value = ExecutionCommand.ResetToHomeCommand.class, name = "RESET_TO_HOME"),
         @JsonSubTypes.Type(value = ExecutionCommand.ToggleGripperModeCommand.class, name = "TOGGLE_GRIPPER_MODE"),
         @JsonSubTypes.Type(value = ExecutionCommand.SetSpeedCommand.class, name = "SET_SPEED"),
@@ -72,7 +70,7 @@ public interface ExecutionCommand {
             return correspondingActionType;
         }
     }
-    public static record AdjustJointAnglesCommand(@NonNull List<JointAngleAdjustmentDTO> jointAngleAdjustments) implements ExecutionCommand {
+    public static record AdjustJointAngleCommand(@NonNull JointAngleAdjustmentDTO jointAngleAdjustment) implements ExecutionCommand {
         private static final ActionType correspondingActionType = ActionType.ADJUST_JOINT_ANGLES;
 
         @Override
@@ -85,7 +83,7 @@ public interface ExecutionCommand {
             return correspondingActionType;
         }
     }
-    public static record SetJointPositionsCommand(@NonNull List<JointPositionDTO> jointPosition) implements ExecutionCommand {
+    public static record SetJointPositionCommand(@NonNull JointPositionDTO jointPosition) implements ExecutionCommand {
         private static final ActionType correspondingActionType = ActionType.SET_JOINT_POSITIONS;
 
         @Override
