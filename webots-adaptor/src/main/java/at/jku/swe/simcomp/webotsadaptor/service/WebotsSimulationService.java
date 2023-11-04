@@ -4,9 +4,11 @@ import at.jku.swe.simcomp.webotsadaptor.domain.simulation.WebotsSimulationConfig
 import at.jku.swe.simcomp.webotsadaptor.domain.simulation.WebotsSimulationRemovalListener;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Service
 public class WebotsSimulationService {
     private static final Set<WebotsSimulationRemovalListener> simulationRemovalListeners = Collections.synchronizedSet(new HashSet<>());
     public static final Set<WebotsSimulationConfig> simulations = Collections.synchronizedSet(new HashSet<>());

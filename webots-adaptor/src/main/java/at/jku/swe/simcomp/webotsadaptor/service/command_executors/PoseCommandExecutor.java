@@ -6,9 +6,11 @@ import at.jku.swe.simcomp.commons.adaptor.dto.RoboStateDTO;
 import at.jku.swe.simcomp.commons.adaptor.execution.command.CommandExecutor;
 import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
 import at.jku.swe.simcomp.webotsadaptor.domain.simulation.WebotsSimulationConfig;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 
+@Service
 public class PoseCommandExecutor implements CommandExecutor<ExecutionCommand.PoseCommand, WebotsSimulationConfig, ExecutionResultDTO> {
 
     @Override

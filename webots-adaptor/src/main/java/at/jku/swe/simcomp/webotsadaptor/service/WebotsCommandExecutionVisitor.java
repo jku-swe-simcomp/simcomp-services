@@ -6,7 +6,9 @@ import at.jku.swe.simcomp.commons.adaptor.execution.command.CommandExecutionVisi
 import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
 import at.jku.swe.simcomp.webotsadaptor.service.command_executors.AdjustJointAnglesCommandExecutor;
 import at.jku.swe.simcomp.webotsadaptor.service.command_executors.PoseCommandExecutor;
+import org.springframework.stereotype.Service;
 
+@Service
 public class WebotsCommandExecutionVisitor extends CommandExecutionVisitor {
     private final WebotsSessionService demoSessionService;
     private final PoseCommandExecutor poseCommandExecutor;
