@@ -10,12 +10,12 @@ public abstract class CommandExecutionVisitor implements ExecutionCommandVisitor
         if(commands.isEmpty()){
             throw new InvalidCommandParametersException("The composite command must contain at least one command.");
         }
+
         ExecutionResultDTO resultDTO = null;
         StringBuilder report = new StringBuilder();
-
         for(var command: commands){
             resultDTO = tryAcceptSubCommand(command, sessionKey, report);
-            report.append(resultDTO.getReport()).append(" \n");
+            report.append(getDecoratedReportForCompositeCommandReport(command, resultDTO.getReport()));
         }
         return setMessageAndReturn(resultDTO, report.toString());
     }
@@ -33,6 +33,10 @@ public abstract class CommandExecutionVisitor implements ExecutionCommandVisitor
                     + "Execution reports up to this point were: \n";
             throw new CompositeCommandExecutionFailedException(compositeCommandFailedPrefix, e, report.toString());
         }
+    }
+
+    private String getDecoratedReportForCompositeCommandReport(ExecutionCommand command, String report){
+       return "The command %s was executed with message: %s. %n".formatted(command.getCorrespondingActionType(), report);
     }
 
     private ExecutionResultDTO setMessageAndReturn(ExecutionResultDTO resultDTO, String message) {

@@ -47,6 +47,10 @@ jobs:
       env:
         ADAPTOR_HOST: not_required_but_cannot_be_null
 
+    - name: Build adaptor-manager
+      working-directory: simcomp-services/manager
+      run: mvn -B package
+
     - name: Publish commons jar
       uses: actions/upload-artifact@v3
       with:
@@ -91,4 +95,12 @@ jobs:
         context: ./simcomp-services/webots-adaptor
         push: true
         tags: ${{ secrets.DOCKER_NAMESPACE }}/webots-adaptor:${{ env.DATE }}
+        labels: ${{ steps.meta.outputs.labels }}
+
+    - name: Build and push manager Docker image
+      uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+      with:
+        context: ./simcomp-services/manager
+        push: true
+        tags: ${{ secrets.DOCKER_NAMESPACE }}/manager:${{ env.DATE }}
         labels: ${{ steps.meta.outputs.labels }}

@@ -50,4 +50,20 @@ When the execution of an operation fails, implementations of the adaptor are enc
 [RoboOperationFailedException](./commons/src/main/java/at/jku/swe/simcomp/commons/adaptor/endpoint/exception/RoboOperationFailedException.java), or a more specific exception for that matter. Adaptors can initialize this exception with the [state](./commons/src/main/java/at/jku/swe/simcomp/commons/adaptor/dto/RoboStateDTO.java) of the roboter-arm in order to return the state and a message if desired.
 This ensures consistent handling also for errors in arbitrary nested composite-commands with expressive error-messages.
 
+## [Webots-Adaptor](./webots-adaptor) 
+The adaptor for webots simulations.
 
+## General Guidelines
+
+### Logging
+To ensure consistent logging across the microservices, we use the default framework of Spring, logback.
+If a project includes lombok, a logger can be added with the @Slf4j annotation.
+```
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+```
+For consistent log messages, a project can create [this](./service-registry/src/main/java/resources/logback.xml) in the resources folder of the Spring Boot project.
+This creates a console appender for the INFO level and a file appender on the DEBUG level.
