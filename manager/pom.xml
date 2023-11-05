@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>at.jku.swe.simcomp</groupId>
-	<artifactId>service-registry</artifactId>
+	<artifactId>manager</artifactId>
 	<version>1.0</version>
-	<name>service-registry</name>
-	<description>The service registry of the system.</description>
+	<name>Adaptor Manager</name>
+	<description>The entrypoint to the system that allows dynamic interaction with various adaptors.</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>
