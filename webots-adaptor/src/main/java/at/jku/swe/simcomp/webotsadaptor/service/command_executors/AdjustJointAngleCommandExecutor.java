@@ -41,7 +41,7 @@ public class AdjustJointAngleCommandExecutor implements CommandExecutor<Executio
             JointAngleAdjustmentDTO movement = command.jointAngleAdjustment(); // now a list is used, maybe change to only send one angle adjustment per command
             json.put("operation", "adjust_axis");
             json.put("axis", movement.getJoint().getIndex());
-            json.put("value", movement.getByDegree());
+            json.put("value", movement.getByRadians());
             out.write(json.toString().getBytes(StandardCharsets.UTF_8));
 
             BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));

@@ -10,7 +10,7 @@ public class RoboJointStateDTO {
     @NonNull
     private RoboJoint joint;
     @NonNull
-    private Double degree;
+    private Double radians;
     @NonNull
     private Double velocity;
     @NonNull

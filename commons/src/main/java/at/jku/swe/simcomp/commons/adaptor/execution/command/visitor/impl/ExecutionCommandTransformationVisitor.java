@@ -17,7 +17,7 @@ public abstract class ExecutionCommandTransformationVisitor implements Execution
                         return c.accept(this,actionTypes);
                     } catch (Exception e) {
                         throw new CommandTransformationFailedException(
-                                "Validation of command %s failed for action-types %s with message: %s.".formatted(c.getCorrespondingActionType(), actionTypes, e.getMessage())
+                                "Transformation of command %s failed for action-types %s with message: %s.".formatted(c.getCorrespondingActionType(), actionTypes, e.getMessage())
                         );
                     }
                 })
