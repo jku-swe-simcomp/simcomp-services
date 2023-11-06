@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class JointPositionDTO {
     RoboJoint joint;
-    Double degree;
+    Double radians;
 }
