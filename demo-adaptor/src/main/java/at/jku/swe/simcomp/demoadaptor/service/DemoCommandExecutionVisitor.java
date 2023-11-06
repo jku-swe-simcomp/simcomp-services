@@ -3,7 +3,7 @@ package at.jku.swe.simcomp.demoadaptor.service;
 import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
 import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
-import at.jku.swe.simcomp.commons.adaptor.execution.command.CommandExecutionVisitor;
+import at.jku.swe.simcomp.commons.adaptor.execution.command.visitor.CommandExecutionVisitor;
 import at.jku.swe.simcomp.demoadaptor.service.command_executors.AdjustJointAngleCommandExecutor;
 import at.jku.swe.simcomp.demoadaptor.service.command_executors.PoseCommandExecutor;
 import org.springframework.stereotype.Service;

@@ -1,63 +1,69 @@
-package at.jku.swe.simcomp.commons.adaptor.execution.command;
+package at.jku.swe.simcomp.commons.adaptor.execution.command.visitor;
+
+import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
 
 public interface ExecutionCommandVisitor<T,P> {
     default T visit(ExecutionCommand.AdjustJointAngleCommand command, P param) throws Exception{
-        throw getUnsupportedOperationException(command);
+        return defaultBehaviour(command, param);
     }
 
     default T visit(ExecutionCommand.CalibrateCommand command, P param) throws Exception{;
-        throw getUnsupportedOperationException(command);
+        return defaultBehaviour(command, param);
     }
 
     default T visit(ExecutionCommand.GrabCommand command, P param) throws Exception{
-        throw getUnsupportedOperationException(command);
+        return defaultBehaviour(command, param);
     }
 
     default T visit(ExecutionCommand.OpenHandCommand command, P param) throws Exception{
-        throw getUnsupportedOperationException(command);
+        return defaultBehaviour(command, param);
     }
 
     default T visit(ExecutionCommand.PauseCommand command, P param) throws Exception{
-        throw getUnsupportedOperationException(command);
+        return defaultBehaviour(command, param);
     }
 
     default T visit(ExecutionCommand.PoseCommand command, P param) throws Exception{
-        throw getUnsupportedOperationException(command);
+        return defaultBehaviour(command, param);
     }
 
     default T visit(ExecutionCommand.ResetToHomeCommand command, P param) throws Exception{
-        throw getUnsupportedOperationException(command);
+        return defaultBehaviour(command, param);
     }
 
     default T visit(ExecutionCommand.ResumeCommand command, P param) throws Exception{
-        throw getUnsupportedOperationException(command);
+        return defaultBehaviour(command, param);
     }
 
     default T visit(ExecutionCommand.SetJointPositionCommand command, P param) throws Exception{
-        throw getUnsupportedOperationException(command);
+        return defaultBehaviour(command, param);
     }
 
     default T visit(ExecutionCommand.SetOrientationCommand command, P param) throws Exception{
-        throw getUnsupportedOperationException(command);
+        return defaultBehaviour(command, param);
     }
 
     default T visit(ExecutionCommand.SetPositionCommand command, P param) throws Exception{
-        throw getUnsupportedOperationException(command);
+        return defaultBehaviour(command, param);
     }
 
     default T visit(ExecutionCommand.SetSpeedCommand command, P param) throws Exception{
-        throw getUnsupportedOperationException(command);
+        return defaultBehaviour(command, param);
     }
 
     default T visit(ExecutionCommand.StopCommand command, P param) throws Exception{
-        throw getUnsupportedOperationException(command);
+        return defaultBehaviour(command, param);
     }
 
     default T visit(ExecutionCommand.ToggleGripperModeCommand command, P param) throws Exception{
-        throw getUnsupportedOperationException(command);
+        return defaultBehaviour(command, param);
     }
 
     default T visit(ExecutionCommand.CompositeCommand command, P param) throws Exception{
+        return defaultBehaviour(command, param);
+    }
+
+    default T defaultBehaviour(ExecutionCommand command, P param) throws Exception{
         throw getUnsupportedOperationException(command);
     }
 
