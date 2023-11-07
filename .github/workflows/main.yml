@@ -104,3 +104,12 @@ jobs:
         push: true
         tags: ${{ secrets.DOCKER_NAMESPACE }}/manager:${{ env.DATE }}
         labels: ${{ steps.meta.outputs.labels }}
+
+    - name: Build and push UI Docker image
+      uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+      with:
+        context: ./simcomp-services/simcomp-ui
+        push: true
+        tags: ${{ secrets.DOCKER_NAMESPACE }}/simcomp-ui:${{ env.DATE }}
+        labels: ${{ steps.meta.outputs.labels }}
+
