@@ -1,7 +1,8 @@
-package at.jku.swe.simcomp.commons.adaptor.execution.command;
+package at.jku.swe.simcomp.commons.adaptor.execution.command.visitor;
 import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.CompositeCommandExecutionFailedException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.InvalidCommandParametersException;
+import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
 
 public abstract class CommandExecutionVisitor implements ExecutionCommandVisitor<ExecutionResultDTO, String> {
     @Override

@@ -6,7 +6,7 @@ import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.RoboOperationFailed
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
 import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
-import at.jku.swe.simcomp.commons.adaptor.execution.command.CommandExecutionVisitor;
+import at.jku.swe.simcomp.commons.adaptor.execution.command.visitor.CommandExecutionVisitor;
 import at.jku.swe.simcomp.commons.adaptor.registration.ServiceRegistryClient;
 import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 import at.jku.swe.simcomp.commons.adaptor.registration.exception.ServiceRegistrationFailedException;
