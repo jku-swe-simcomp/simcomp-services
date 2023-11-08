@@ -8,15 +8,20 @@ import at.jku.swe.simcomp.webotsadaptor.service.WebotsExecutionService;
 import lombok.SneakyThrows;
 import org.json.simple.JSONObject;
 
+public class OpenHandExecutor
+        implements CommandExecutor<ExecutionCommand.OpenHandCommand, WebotsSimulationConfig, ExecutionResultDTO> {
 
-public class PoseCommandExecutor implements CommandExecutor<ExecutionCommand.PoseCommand, WebotsSimulationConfig, ExecutionResultDTO> {
 
     @SneakyThrows
     @Override
-    public ExecutionResultDTO execute(ExecutionCommand.PoseCommand command, WebotsSimulationConfig config) {
+    public ExecutionResultDTO execute(ExecutionCommand.OpenHandCommand command, WebotsSimulationConfig config) {
+
+        System.out.println("Connecting to " + config.getSimulationEndpointUrl() + " on port " + config.getSimulationPort());
 
         JSONObject json = new JSONObject();
-        json.put("operation", "get_position");
+        json.put("operation", "set_axis");
+        json.put("axis", "axis7");
+        json.put("value", 1);
         return WebotsExecutionService.executeCommand(json, config);
     }
 }
