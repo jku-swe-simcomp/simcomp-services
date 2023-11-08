@@ -1,5 +1,6 @@
 import json
 import socket
+import math
 from controller import Robot
 
 """
@@ -83,7 +84,7 @@ def wait_for_connection():
 def get_value(motor):
     motor.getPositionSensor().enable(100)
     value = motor.getPositionSensor().getValue()
-    if not value:
+    if math.isnan(value):
         return 0
     else:
         return value
