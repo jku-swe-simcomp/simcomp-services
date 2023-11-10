@@ -8,13 +8,14 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public interface SessionRepository extends JpaRepository<Session, Long> {
-    Optional<Session> findBySessionKey(String sessionKey);
-    void deleteBySessionKey(String sessionKey);
+    Optional<Session> findBySessionKey(UUID sessionKey);
+    void deleteBySessionKey(UUID sessionKey);
 
     @Transactional
     @Modifying
     @Query("UPDATE Session s SET s.state = :state WHERE s.sessionKey = :sessionKey")
-    void updateSessionStateBySessionKey(String sessionKey, SessionState state);
+    void updateSessionStateBySessionKey(UUID sessionKey, SessionState state);
 }
