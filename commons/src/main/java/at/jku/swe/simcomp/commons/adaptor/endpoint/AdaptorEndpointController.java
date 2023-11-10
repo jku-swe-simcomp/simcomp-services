@@ -65,7 +65,7 @@ public class AdaptorEndpointController implements AdaptorEndpoint{
     }
 
     @Override
-    @PostMapping("/session/{sessionId}/close")
+    @DeleteMapping("/session/{sessionId}/close")
     public ResponseEntity<String> closeSession(@PathVariable String sessionId) throws SessionNotValidException {
         adaptorEndpointService.closeSession(sessionId);
         return ResponseEntity.ok().build();
