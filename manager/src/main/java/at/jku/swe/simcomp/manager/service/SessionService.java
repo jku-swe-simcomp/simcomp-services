@@ -44,7 +44,22 @@ public class SessionService implements SessionRequestVisitor {
     }
 
     public void closeSession(String key) {
+        closeAdaptorSessions(key);
         sessionRepository.updateSessionStateBySessionKey(key, SessionState.CLOSED);
+    }
+
+    private void closeAdaptorSessions(String key) {
+        var adaptorConfigs = getAdaptors();
+        var optionalSession = sessionRepository.findBySessionKey(key);
+        if(optionalSession.isPresent()){
+            var session = optionalSession.get();
+            for(var adaptorSession : session.getAdaptorSessions()){
+                adaptorConfigs.stream()
+                        .filter(config -> config.getName().equals(adaptorSession.getAdaptorName()))
+                        .findFirst()
+                        .ifPresent(serviceRegistrationConfigDTO -> adaptorClient.closeSession(serviceRegistrationConfigDTO, adaptorSession.getSessionKey()));
+            }
+        }
     }
 
     // private region methods

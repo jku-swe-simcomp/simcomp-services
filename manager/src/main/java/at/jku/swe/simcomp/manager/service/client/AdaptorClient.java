@@ -35,8 +35,17 @@ public class AdaptorClient {
                 return Optional.empty();
             }
         } catch (Exception e) {
-            log.error("Error during REST call", e);
+            log.error("Error during REST call to initialize adaptor session.", e);
             return Optional.empty();
+        }
+    }
+
+    public void closeSession(ServiceRegistrationConfigDTO adaptorConfig, String sessionKey){
+        String url = "http://" + adaptorConfig.getHost() + ":" + adaptorConfig.getPort() + AdaptorEndpointConstants.getCloseSessionPathForSessionId(sessionKey);
+        try {
+            restTemplate.delete(url);
+        } catch (Exception e) {
+            log.error("Error during REST call to delete adaptor session.", e);
         }
     }
 }
