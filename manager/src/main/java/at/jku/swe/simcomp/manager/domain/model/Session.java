@@ -32,9 +32,11 @@ public class Session {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<AdaptorSession> adaptorSessions = new ArrayList<>();
 
     @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Execution> executions = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)

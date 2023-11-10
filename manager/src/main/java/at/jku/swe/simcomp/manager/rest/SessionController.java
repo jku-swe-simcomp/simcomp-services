@@ -1,7 +1,6 @@
 package at.jku.swe.simcomp.manager.rest;
 
 import at.jku.swe.simcomp.commons.HttpErrorDTO;
-import at.jku.swe.simcomp.commons.adaptor.endpoint.ExecutionErrorDTO;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
 import at.jku.swe.simcomp.commons.manager.dto.session.SessionRequest;
 import at.jku.swe.simcomp.commons.manager.dto.session.SessionResponseDTO;
@@ -10,9 +9,6 @@ import at.jku.swe.simcomp.manager.domain.model.Session;
 import at.jku.swe.simcomp.manager.service.SessionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/session")
@@ -38,5 +34,11 @@ public class SessionController {
                 .message("Could not initialize session with message: %s".formatted(e.getMessage()))
                 .build();
         return ResponseEntity.internalServerError().body(dto);
+    }
+
+    @DeleteMapping("/{sessionKey}")
+    public ResponseEntity<Void> closeSession(@PathVariable String sessionKey){
+        sessionService.closeSession(sessionKey);
+        return ResponseEntity.ok().build();
     }
 }

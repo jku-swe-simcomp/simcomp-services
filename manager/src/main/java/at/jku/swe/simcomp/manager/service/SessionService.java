@@ -31,34 +31,29 @@ public class SessionService implements SessionRequestVisitor {
     }
 
     @Override
-    public Optional<Session> initSession(SessionRequest.SelectedSimulationSessionRequest request) throws SessionInitializationFailedException {
+    public Session initSession(SessionRequest.SelectedSimulationSessionRequest request) throws SessionInitializationFailedException {
         var adaptorConfigs = getAdaptors().stream()
                 .filter(config -> request.requestedSimulations().contains(config.getName()))
                 .toList();
-        var acquiredSessions = tryObtainAdaptorSessions(adaptorConfigs, Integer.MAX_VALUE);
-        var aggregatedSession = constructAggregatedSession(acquiredSessions);
-        return Optional.of(aggregatedSession);
+        return getAdaptorSessionsAndConstructAndPersistAggregatedSession(adaptorConfigs, Integer.MAX_VALUE);
     }
 
     @Override
-    public Optional<Session> initSession(SessionRequest.AnySimulationSessionRequest request) throws SessionInitializationFailedException {
-        var acquiredSessions = tryObtainAdaptorSessions(getAdaptors(), request.n());
-        var aggregatedSession = constructAggregatedSession(acquiredSessions);
-        return Optional.of(aggregatedSession);
+    public Session initSession(SessionRequest.AnySimulationSessionRequest request) throws SessionInitializationFailedException {
+        return getAdaptorSessionsAndConstructAndPersistAggregatedSession(getAdaptors(), request.n());
     }
 
-    public String deleteSession() {
-        return null;
+    public void closeSession(String key) {
+        sessionRepository.updateSessionStateBySessionKey(key, SessionState.CLOSED);
     }
 
     // private region methods
 
-    private List<ServiceRegistrationConfigDTO> getAdaptors() {
-        return serviceRegistryClient.getRegisteredAdaptors()
-                .stream()
-                .toList();
+    private Session getAdaptorSessionsAndConstructAndPersistAggregatedSession(List<ServiceRegistrationConfigDTO> adaptorConfigs, Integer maximumNumberOfSimulations) throws SessionInitializationFailedException {
+        var acquiredSessions = tryObtainAdaptorSessions(adaptorConfigs, maximumNumberOfSimulations);
+        var aggregatedSession = constructAggregatedSession(acquiredSessions);
+        return sessionRepository.save(aggregatedSession);
     }
-
 
     private List<AdaptorSession> tryObtainAdaptorSessions(List<ServiceRegistrationConfigDTO> requestedSimulations, int maximumSimulations){
         List<AdaptorSession> sessions = new ArrayList<>();
@@ -67,12 +62,10 @@ public class SessionService implements SessionRequestVisitor {
                 break;
 
             Optional<String> sessionKey = adaptorClient.getSession(config);
-            if(sessionKey.isPresent()){
-                sessions.add(AdaptorSession.builder()
-                        .adaptorName(config.getName())
-                        .sessionKey(sessionKey.get())
-                        .build());
-            }
+            sessionKey.ifPresent(s -> sessions.add(AdaptorSession.builder()
+                    .adaptorName(config.getName())
+                    .sessionKey(s)
+                    .build()));
         }
         return sessions;
     }
@@ -87,5 +80,11 @@ public class SessionService implements SessionRequestVisitor {
                 .build();
         adaptorSessions.forEach(session::addAdaptorSession);
         return session;
+    }
+
+    private List<ServiceRegistrationConfigDTO> getAdaptors() {
+        return serviceRegistryClient.getRegisteredAdaptors()
+                .stream()
+                .toList();
     }
 }

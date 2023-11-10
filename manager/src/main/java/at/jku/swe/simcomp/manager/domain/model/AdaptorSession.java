@@ -1,9 +1,7 @@
 package at.jku.swe.simcomp.manager.domain.model;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +10,8 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "adaptor_session")
+@NoArgsConstructor
+@AllArgsConstructor
 public class AdaptorSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

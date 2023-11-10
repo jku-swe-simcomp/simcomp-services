@@ -33,4 +33,8 @@ public class ServiceRegistrationConfigDTO {
      */
     @NonNull
     private Set<ActionType> supportedActions;
+
+    public ServiceRegistrationDisplayDTO viewForDisplay(){
+        return new ServiceRegistrationDisplayDTO(this.name, this.supportedActions);
+    }
 }

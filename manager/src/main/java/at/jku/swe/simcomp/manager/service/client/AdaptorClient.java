@@ -23,7 +23,7 @@ public class AdaptorClient {
     }
 
     public Optional<String> getSession(ServiceRegistrationConfigDTO adaptorConfig) {
-        String url = adaptorConfig.getHost() + ":" + adaptorConfig.getPort() + AdaptorEndpointConstants.INIT_SESSION_PATH;
+        String url = "http://" + adaptorConfig.getHost() + ":" + adaptorConfig.getPort() + AdaptorEndpointConstants.INIT_SESSION_PATH;
         try {
             ResponseEntity<String> response = restTemplate.postForEntity(url, new HttpEntity<>(null), String.class);
 
