@@ -7,8 +7,10 @@ import at.jku.swe.simcomp.webotsadaptor.domain.simulation.WebotsSimulationConfig
 import at.jku.swe.simcomp.webotsadaptor.service.WebotsExecutionService;
 import lombok.SneakyThrows;
 import org.json.simple.JSONObject;
+import org.springframework.stereotype.Service;
 
 
+@Service
 public class PoseCommandExecutor implements CommandExecutor<ExecutionCommand.PoseCommand, WebotsSimulationConfig, ExecutionResultDTO> {
 
     @SneakyThrows
