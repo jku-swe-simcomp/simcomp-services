@@ -35,7 +35,7 @@ public class AdaptorClient {
                 return Optional.empty();
             }
         } catch (Exception e) {
-            log.error("Error during REST call to initialize adaptor session.", e);
+            log.error("Error during REST call to initialize adaptor session. {}", e.getMessage());
             return Optional.empty();
         }
     }
@@ -45,7 +45,7 @@ public class AdaptorClient {
         try {
             restTemplate.delete(url);
         } catch (Exception e) {
-            log.error("Error during REST call to delete adaptor session.", e);
+            log.error("Error during REST call to delete adaptor session. {}", e.getMessage());
         }
     }
 }
