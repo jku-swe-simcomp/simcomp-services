@@ -1,5 +1,7 @@
 package at.jku.swe.simcomp.commons.adaptor.endpoint;
 
+import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeKey;
+import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeValue;
 import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.CompositeCommandExecutionFailedException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.RoboOperationFailedException;
@@ -95,10 +97,10 @@ public class AdaptorEndpointController implements AdaptorEndpoint{
      * @return the attribute
      */
     @Override
-    @GetMapping("/{sessionId}/attribute/{name}")
-    public final ResponseEntity<String> getAttribute(@PathVariable String name, @PathVariable String sessionId) throws SessionNotValidException {
-        String attributeValue = adaptorEndpointService.getAttributeValue(name, sessionId);
-        return ResponseEntity.ok(attributeValue);
+    @GetMapping("/{sessionId}/attribute/{attribute}")
+    public final ResponseEntity<AttributeValue> getAttribute(@PathVariable AttributeKey attribute, @PathVariable String sessionId) throws SessionNotValidException {
+        AttributeValue value = adaptorEndpointService.getAttributeValue(attribute, sessionId);
+        return ResponseEntity.ok(value);
     }
 
     /**

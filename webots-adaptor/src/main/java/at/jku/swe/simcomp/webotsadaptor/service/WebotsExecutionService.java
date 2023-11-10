@@ -38,7 +38,6 @@ public class WebotsExecutionService {
             if(Objects.equals(responseJson.get("result"), "success")) {
                 return ExecutionResultDTO.builder()
                         .report("Success")
-                        .currentState(new RoboStateDTO()) // TODO check with Kevin how RoboState should be returned (information of axis is in the response JSON)
                         .build();
             } else {
                 System.out.println("The movement could not be executed");

@@ -17,13 +17,6 @@ public class PoseCommandExecutor implements CommandExecutor<ExecutionCommand.Pos
     public ExecutionResultDTO execute(ExecutionCommand.PoseCommand command, DemoSimulationConfig config) {
         return ExecutionResultDTO.builder()
                 .report("Pose command executed")
-                .currentState(RoboStateDTO.builder()
-                        .pose(PoseDTO.builder()
-                                .position(command.position())
-                                .orientation(command.orientation())
-                                .build())
-                        .jointStates(new ArrayList<>())
-                        .build())
                 .build();
     }
 }

@@ -15,6 +15,7 @@ public class AdaptorEndpointConstants {
     public static String getGetAttributePathForAttributeName(String sessionId, String name) {
         return GET_ATTRIBUTE_PATH.formatted(sessionId, name);
     }
+
     public static String getExecuteActionPathForSessionId(String sessionId) {
         return EXECUTE_ACTION_PATH.formatted(sessionId);
     }
