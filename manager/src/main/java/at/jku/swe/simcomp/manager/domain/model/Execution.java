@@ -26,6 +26,7 @@ public class Execution {
 
     @ManyToOne
     @JoinColumn(name="session_id", nullable=false)
+    @ToString.Exclude
     private Session session;
 
     @Column(name = "command", nullable = false)
