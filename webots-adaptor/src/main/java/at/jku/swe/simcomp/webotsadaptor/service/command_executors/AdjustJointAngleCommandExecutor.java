@@ -26,9 +26,8 @@ import java.util.Objects;
 @Service
 public class AdjustJointAngleCommandExecutor implements CommandExecutor<ExecutionCommand.AdjustJointAngleCommand, WebotsSimulationConfig, ExecutionResultDTO> {
 
-    @SneakyThrows
     @Override
-    public ExecutionResultDTO execute(ExecutionCommand.AdjustJointAngleCommand command, WebotsSimulationConfig config) {
+    public ExecutionResultDTO execute(ExecutionCommand.AdjustJointAngleCommand command, WebotsSimulationConfig config) throws RoboOperationFailedException, IOException, ParseException {
 
         System.out.println("Connecting to " + config.getSimulationEndpointUrl() + " on port " + config.getSimulationPort());
 
