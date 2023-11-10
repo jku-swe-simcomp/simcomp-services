@@ -113,3 +113,12 @@ jobs:
         tags: ${{ secrets.DOCKER_NAMESPACE }}/simcomp-ui:${{ env.DATE }}
         labels: ${{ steps.meta.outputs.labels }}
 
+    - name: Trigger update of image tags in local-deploy
+      if: success() # Ensure this runs only if the previous steps were successful
+      run: |
+        curl -X POST \
+          -H "Authorization: token ${{ secrets.PERSONAL_ACCESS_TOKEN }}" \
+          -H "Accept: application/vnd.github.v3+json" \
+          "https://api.github.com/repos/jku-swe-simcomp/local-deploy/dispatches" \
+          -d '{"event_type": "image-built", "client_payload": {"tag": "${{ env.DATE }}"}}'
+
