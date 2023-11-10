@@ -5,6 +5,7 @@ import at.jku.swe.simcomp.commons.adaptor.endpoint.AdaptorEndpointConstants;
 import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +17,13 @@ import java.util.Optional;
 @Service
 @Slf4j
 public class AdaptorClient {
-    private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
-    public AdaptorClient() {
-        // TODO Auto-generated constructor stub
+    private final RestTemplate restTemplate;
+    public AdaptorClient(RestTemplateBuilder restTemplateBuilder,
+                         NoExceptionThrowingResponseErrorHandler noExceptionThrowingResponseErrorHandler) {
+        restTemplate = restTemplateBuilder
+                .errorHandler(noExceptionThrowingResponseErrorHandler)
+                .build();
     }
 
     public Optional<String> getSession(ServiceRegistrationConfigDTO adaptorConfig) {
@@ -30,8 +34,7 @@ public class AdaptorClient {
             if (response.getStatusCode() == HttpStatus.OK) {
                 return Optional.ofNullable(response.getBody());
             } else {
-                HttpErrorDTO errorDTO = objectMapper.readValue(response.getBody(), HttpErrorDTO.class);
-                log.info("Non-200 response: {}", errorDTO);
+                log.info("Non-200 response when trying to obtain session for {}: {}", adaptorConfig.getName(), response.getBody());
                 return Optional.empty();
             }
         } catch (Exception e) {
