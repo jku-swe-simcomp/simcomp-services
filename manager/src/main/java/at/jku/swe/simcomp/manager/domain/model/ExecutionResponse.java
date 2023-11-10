@@ -9,6 +9,7 @@ import lombok.*;
 @Table(name = "execution_response")
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class ExecutionResponse {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

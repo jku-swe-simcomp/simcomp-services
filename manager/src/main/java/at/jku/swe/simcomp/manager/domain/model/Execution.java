@@ -15,6 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString
 public class Execution {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
