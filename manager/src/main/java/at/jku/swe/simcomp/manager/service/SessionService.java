@@ -10,6 +10,7 @@ import at.jku.swe.simcomp.manager.domain.model.SessionState;
 import at.jku.swe.simcomp.manager.domain.repository.SessionRepository;
 import at.jku.swe.simcomp.manager.service.client.AdaptorClient;
 import at.jku.swe.simcomp.manager.service.client.ServiceRegistryClient;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class SessionService implements SessionRequestVisitor {
     private final SessionRepository sessionRepository;
     private final ServiceRegistryClient serviceRegistryClient;
@@ -35,6 +37,7 @@ public class SessionService implements SessionRequestVisitor {
         var adaptorConfigs = getAdaptors().stream()
                 .filter(config -> request.requestedSimulations().contains(config.getName()))
                 .toList();
+        log.debug("Filtered list of available adaptors: {}", adaptorConfigs);
         return getAdaptorSessionsAndConstructAndPersistAggregatedSession(adaptorConfigs, Integer.MAX_VALUE);
     }
 
@@ -46,6 +49,7 @@ public class SessionService implements SessionRequestVisitor {
     public void closeSession(UUID key) {
         closeAdaptorSessions(key);
         sessionRepository.updateSessionStateBySessionKey(key, SessionState.CLOSED);
+        log.debug("Closed session {}", key.toString());
     }
 
     // private region methods
@@ -75,11 +79,13 @@ public class SessionService implements SessionRequestVisitor {
         if(adaptorSessions.isEmpty()){
             throw new SessionInitializationFailedException("Could not obtain a single session");
         }
+        log.debug("Aggregating adaptor sessions: {}", adaptorSessions);
         Session session = Session.builder()
                 .sessionKey(UUID.randomUUID())
                 .state(SessionState.OPEN)
                 .build();
         adaptorSessions.forEach(session::addAdaptorSession);
+        log.debug("Aggregated session: {}", session);
         return session;
     }
 

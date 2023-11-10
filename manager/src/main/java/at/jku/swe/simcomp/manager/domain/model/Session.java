@@ -16,6 +16,7 @@ import java.util.UUID;
 @Table(name = "session")
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class Session {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,10 +1,7 @@
 package at.jku.swe.simcomp.manager.domain.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
@@ -24,6 +21,7 @@ public class ExecutionResponse {
 
     @ManyToOne
     @JoinColumn(name="adaptor_session_id", nullable=false)
+    @ToString.Exclude
     private AdaptorSession adaptorSession;
 
     @Column(name = "response_code")

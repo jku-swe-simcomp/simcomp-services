@@ -3,6 +3,7 @@ package at.jku.swe.simcomp.commons.manager.dto.session;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import lombok.ToString;
 
 import java.util.List;
 

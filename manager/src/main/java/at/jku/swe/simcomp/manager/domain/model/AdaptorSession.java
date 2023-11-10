@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Table(name = "adaptor_session")
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class AdaptorSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +24,7 @@ public class AdaptorSession {
 
     @ManyToOne
     @JoinColumn(name = "aggregated_session_id", nullable = false)
+    @ToString.Exclude
     private Session session;
 
     @Column(name = "adaptor_session_key", nullable = false)
