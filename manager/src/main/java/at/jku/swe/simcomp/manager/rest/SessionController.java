@@ -10,6 +10,8 @@ import at.jku.swe.simcomp.manager.service.SessionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/session")
 public class SessionController {
@@ -37,7 +39,7 @@ public class SessionController {
     }
 
     @DeleteMapping("/{sessionKey}")
-    public ResponseEntity<Void> closeSession(@PathVariable String sessionKey){
+    public ResponseEntity<Void> closeSession(@PathVariable UUID sessionKey){
         sessionService.closeSession(sessionKey);
         return ResponseEntity.ok().build();
     }

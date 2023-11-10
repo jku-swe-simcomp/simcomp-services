@@ -43,23 +43,9 @@ public class SessionService implements SessionRequestVisitor {
         return getAdaptorSessionsAndConstructAndPersistAggregatedSession(getAdaptors(), request.n());
     }
 
-    public void closeSession(String key) {
+    public void closeSession(UUID key) {
         closeAdaptorSessions(key);
         sessionRepository.updateSessionStateBySessionKey(key, SessionState.CLOSED);
-    }
-
-    private void closeAdaptorSessions(String key) {
-        var adaptorConfigs = getAdaptors();
-        var optionalSession = sessionRepository.findBySessionKey(key);
-        if(optionalSession.isPresent()){
-            var session = optionalSession.get();
-            for(var adaptorSession : session.getAdaptorSessions()){
-                adaptorConfigs.stream()
-                        .filter(config -> config.getName().equals(adaptorSession.getAdaptorName()))
-                        .findFirst()
-                        .ifPresent(serviceRegistrationConfigDTO -> adaptorClient.closeSession(serviceRegistrationConfigDTO, adaptorSession.getSessionKey()));
-            }
-        }
     }
 
     // private region methods
@@ -102,4 +88,24 @@ public class SessionService implements SessionRequestVisitor {
                 .stream()
                 .toList();
     }
+
+    private void closeAdaptorSessions(UUID key) {
+        var adaptorConfigs = getAdaptors();
+        var optionalSession = sessionRepository.findBySessionKey(key);
+        if(optionalSession.isPresent()){
+            var session = optionalSession.get();
+            for(var adaptorSession : session.getAdaptorSessions()){
+                closeAdaptorSession(adaptorSession, adaptorConfigs);
+            }
+        }
+    }
+
+    private void closeAdaptorSession(AdaptorSession adaptorSession, List<ServiceRegistrationConfigDTO> adaptorConfigs){
+        adaptorConfigs.stream()
+                .filter(config -> config.getName().equals(adaptorSession.getAdaptorName()))
+                .findFirst()
+                .ifPresent(serviceRegistrationConfigDTO -> adaptorClient.closeSession(serviceRegistrationConfigDTO, adaptorSession.getSessionKey()));
+
+    }
+
 }
