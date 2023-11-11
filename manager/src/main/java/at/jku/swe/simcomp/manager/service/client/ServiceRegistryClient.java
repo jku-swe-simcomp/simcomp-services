@@ -19,6 +19,7 @@ public class ServiceRegistryClient {
         log.debug("Fetching available adaptors...");
         ServiceRegistrationConfigDTO[] configs = restTemplate.getForObject(System.getenv("SERVICE_REGISTRY_ENDPOINT"),
                 ServiceRegistrationConfigDTO[].class);
+        log.debug("Available adaptor configurations: {}", configs);
         return Arrays.asList(configs);
     }
 }

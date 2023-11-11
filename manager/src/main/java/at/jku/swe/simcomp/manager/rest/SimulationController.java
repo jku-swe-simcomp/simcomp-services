@@ -26,7 +26,7 @@ public class SimulationController {
                 .stream()
                 .map(ServiceRegistrationConfigDTO::viewForDisplay)
                 .toList();
-        log.info("Simulations: {}", simulations);
+        log.info("Available simulations: {}", simulations);
         return ResponseEntity.ok(new AvailableServicesDTO(simulations));
     }
 }

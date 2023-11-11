@@ -3,10 +3,11 @@ package at.jku.swe.simcomp.manager.service;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
 import at.jku.swe.simcomp.commons.manager.dto.session.SessionRequest;
 import at.jku.swe.simcomp.commons.manager.dto.session.SessionRequestVisitor;
+import at.jku.swe.simcomp.commons.manager.dto.session.SessionState;
+import at.jku.swe.simcomp.commons.manager.dto.session.SessionStateDTO;
 import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 import at.jku.swe.simcomp.manager.domain.model.AdaptorSession;
 import at.jku.swe.simcomp.manager.domain.model.Session;
-import at.jku.swe.simcomp.manager.domain.model.SessionState;
 import at.jku.swe.simcomp.manager.domain.repository.SessionRepository;
 import at.jku.swe.simcomp.manager.service.client.AdaptorClient;
 import at.jku.swe.simcomp.manager.service.client.ServiceRegistryClient;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -46,10 +48,18 @@ public class SessionService implements SessionRequestVisitor {
         return getAdaptorSessionsAndConstructAndPersistAggregatedSession(getAdaptors(), request.n());
     }
 
-    public void closeSession(UUID key) {
-        closeAdaptorSessions(key);
-        sessionRepository.updateSessionStateBySessionKey(key, SessionState.CLOSED);
-        log.debug("Closed session {}", key.toString());
+    public void closeSession(UUID aggregatedSessionKey) {
+        closeAdaptorSessions(aggregatedSessionKey);
+        sessionRepository.updateSessionStateBySessionKey(aggregatedSessionKey, SessionState.CLOSED);
+        log.debug("Closed session {}", aggregatedSessionKey.toString());
+    }
+
+    public SessionStateDTO getSessionState(UUID sessionKey) {
+        Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionKey);
+        return new SessionStateDTO(session.getSessionKey().toString(), session.getState(),
+                session.getAdaptorSessions().stream()
+                        .collect(Collectors.toMap(AdaptorSession::getAdaptorName, AdaptorSession::getState, (state1, state2) -> state1)));
+
     }
 
     // private region methods
@@ -70,6 +80,7 @@ public class SessionService implements SessionRequestVisitor {
             sessionKey.ifPresent(s -> sessions.add(AdaptorSession.builder()
                     .adaptorName(config.getName())
                     .sessionKey(s)
+                    .state(SessionState.OPEN)
                     .build()));
         }
         return sessions;
@@ -90,19 +101,14 @@ public class SessionService implements SessionRequestVisitor {
     }
 
     private List<ServiceRegistrationConfigDTO> getAdaptors() {
-        return serviceRegistryClient.getRegisteredAdaptors()
-                .stream()
-                .toList();
+        return serviceRegistryClient.getRegisteredAdaptors();
     }
 
-    private void closeAdaptorSessions(UUID key) {
+    private void closeAdaptorSessions(UUID aggregatedSessionKey) {
         var adaptorConfigs = getAdaptors();
-        var optionalSession = sessionRepository.findBySessionKey(key);
-        if(optionalSession.isPresent()){
-            var session = optionalSession.get();
-            for(var adaptorSession : session.getAdaptorSessions()){
-                closeAdaptorSession(adaptorSession, adaptorConfigs);
-            }
+        var session = sessionRepository.findBySessionKeyOrElseThrow(aggregatedSessionKey);
+        for(var adaptorSession : session.getAdaptorSessions()){
+            closeAdaptorSession(adaptorSession, adaptorConfigs);
         }
     }
 
@@ -110,7 +116,11 @@ public class SessionService implements SessionRequestVisitor {
         adaptorConfigs.stream()
                 .filter(config -> config.getName().equals(adaptorSession.getAdaptorName()))
                 .findFirst()
-                .ifPresent(serviceRegistrationConfigDTO -> adaptorClient.closeSession(serviceRegistrationConfigDTO, adaptorSession.getSessionKey()));
+                .ifPresent(serviceRegistrationConfigDTO -> {
+                    adaptorClient.closeSession(serviceRegistrationConfigDTO, adaptorSession.getSessionKey());
+                    sessionRepository.updateAdaptorSessionStateBySessionKey(adaptorSession.getSessionKey(), SessionState.CLOSED);
+                }
+                );
 
     }
 

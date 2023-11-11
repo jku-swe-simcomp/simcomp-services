@@ -32,7 +32,7 @@ public class AdaptorClient {
             ResponseEntity<String> response = restTemplate.postForEntity(url, new HttpEntity<>(null), String.class);
 
             if (response.getStatusCode() == HttpStatus.OK) {
-                log.debug("Obtained adaptor session for {} with key {}", adaptorConfig.getName(), response.getBody());
+                log.info("Obtained adaptor session for {} with key {}", adaptorConfig.getName(), response.getBody());
                 return Optional.ofNullable(response.getBody());
             } else {
                 log.info("Non-200 response when trying to obtain session for {}: {}", adaptorConfig.getName(), response.getBody());
