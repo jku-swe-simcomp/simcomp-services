@@ -1,12 +1,12 @@
 package at.jku.swe.simcomp.manager.domain.model;
 
+import at.jku.swe.simcomp.commons.manager.dto.session.SessionState;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Getter

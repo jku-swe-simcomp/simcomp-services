@@ -1,5 +1,6 @@
 package at.jku.swe.simcomp.manager.domain.model;
 
+import at.jku.swe.simcomp.commons.manager.dto.session.SessionState;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,6 +33,11 @@ public class AdaptorSession {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "state", nullable = false)
+
+    private SessionState state;
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
