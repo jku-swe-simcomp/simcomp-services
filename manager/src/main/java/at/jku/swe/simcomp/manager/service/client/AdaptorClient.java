@@ -17,7 +17,6 @@ import java.util.Optional;
 @Service
 @Slf4j
 public class AdaptorClient {
-    private final ObjectMapper objectMapper = new ObjectMapper();
     private final RestTemplate restTemplate;
     public AdaptorClient(RestTemplateBuilder restTemplateBuilder,
                          NoExceptionThrowingResponseErrorHandler noExceptionThrowingResponseErrorHandler) {
