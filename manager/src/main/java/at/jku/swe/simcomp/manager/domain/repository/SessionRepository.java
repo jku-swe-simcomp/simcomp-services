@@ -25,7 +25,7 @@ public interface SessionRepository extends JpaRepository<Session, Long> {
     @Query("UPDATE AdaptorSession s SET s.state = :state WHERE s.sessionKey = :sessionKey")
     void updateAdaptorSessionStateBySessionKey(String sessionKey, SessionState state);
 
-    default Session findBySessionKeyOrElseThrow(UUID sessionKey){
+    default Session findBySessionKeyOrElseThrow(UUID sessionKey) throws NotFoundException{
         return findBySessionKey(sessionKey).orElseThrow(() ->new NotFoundException("Session with key %s not found.".formatted(sessionKey)));
     }
 }
