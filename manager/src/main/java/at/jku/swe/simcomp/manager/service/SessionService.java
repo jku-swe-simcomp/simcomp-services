@@ -87,6 +87,7 @@ public class SessionService implements SessionRequestVisitor {
 
         AdaptorSession adaptorSession = initAdaptorSession(optAdaptorSessionKey.get(), adaptorName);
         session.addAdaptorSession(adaptorSession);
+        sessionRepository.save(session);
     }
 
     public void closeAdaptorSessionOfAggregateSession(UUID sessionKey, String adaptorName) throws BadRequestException {
@@ -165,9 +166,7 @@ public class SessionService implements SessionRequestVisitor {
         adaptorConfigs.stream()
                 .filter(config -> config.getName().equals(adaptorSession.getAdaptorName()))
                 .findFirst()
-                .ifPresent(serviceRegistrationConfigDTO -> {
-                    adaptorClient.closeSession(serviceRegistrationConfigDTO, adaptorSession.getSessionKey());
-                }
+                .ifPresent(serviceRegistrationConfigDTO -> adaptorClient.closeSession(serviceRegistrationConfigDTO, adaptorSession.getSessionKey())
                 );
         sessionRepository.updateAdaptorSessionStateBySessionKey(adaptorSession.getSessionKey(), SessionState.CLOSED);
     }
