@@ -55,6 +55,7 @@ public class SessionService implements SessionRequestVisitor {
         closeAdaptorSessions(aggregatedSessionKey);
         sessionRepository.updateSessionStateBySessionKey(aggregatedSessionKey, SessionState.CLOSED);
         log.debug("Closed session {}", aggregatedSessionKey.toString());
+        sessionRepository.flush();
     }
 
     public SessionStateDTO getSessionState(UUID sessionKey) throws NotFoundException{
@@ -88,6 +89,7 @@ public class SessionService implements SessionRequestVisitor {
         AdaptorSession adaptorSession = initAdaptorSession(optAdaptorSessionKey.get(), adaptorName);
         session.addAdaptorSession(adaptorSession);
         sessionRepository.save(session);
+        sessionRepository.flush();
     }
 
     public void closeAdaptorSessionOfAggregateSession(UUID sessionKey, String adaptorName) throws BadRequestException, NotFoundException {
@@ -132,6 +134,7 @@ public class SessionService implements SessionRequestVisitor {
         adaptorSession.setSessionKey(optAdaptorSessionKey.get());
         adaptorSession.setState(SessionState.OPEN);
         sessionRepository.save(session);
+        sessionRepository.flush();
     }
     // private region methods
 
