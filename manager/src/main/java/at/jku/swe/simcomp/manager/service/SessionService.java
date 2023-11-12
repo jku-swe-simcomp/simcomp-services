@@ -9,10 +9,12 @@ import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 import at.jku.swe.simcomp.manager.domain.model.AdaptorSession;
 import at.jku.swe.simcomp.manager.domain.model.Session;
 import at.jku.swe.simcomp.manager.domain.repository.SessionRepository;
+import at.jku.swe.simcomp.manager.rest.exception.BadRequestException;
 import at.jku.swe.simcomp.manager.service.client.AdaptorClient;
 import at.jku.swe.simcomp.manager.service.client.ServiceRegistryClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,18 +50,53 @@ public class SessionService implements SessionRequestVisitor {
         return getAdaptorSessionsAndConstructAndPersistAggregatedSession(getRegisteredAdaptors(), request.n());
     }
 
-    public void closeSession(UUID aggregatedSessionKey) {
+    public void closeSession(UUID aggregatedSessionKey) throws NotFoundException{
+        sessionRepository.findBySessionKeyOrElseThrow(aggregatedSessionKey);
         closeAdaptorSessions(aggregatedSessionKey);
         sessionRepository.updateSessionStateBySessionKey(aggregatedSessionKey, SessionState.CLOSED);
         log.debug("Closed session {}", aggregatedSessionKey.toString());
     }
 
-    public SessionStateDTO getSessionState(UUID sessionKey) {
+    public SessionStateDTO getSessionState(UUID sessionKey) throws NotFoundException{
         Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionKey);
         return new SessionStateDTO(session.getSessionKey().toString(), session.getState(),
                 session.getAdaptorSessions().stream()
                         .collect(Collectors.toMap(AdaptorSession::getAdaptorName, AdaptorSession::getState, (state1, state2) -> state1)));
 
+    }
+
+    public void addAdaptorSessionToSession(UUID sessionKey, String adaptorName) throws BadRequestException, NotFoundException, SessionInitializationFailedException {
+        Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionKey);
+        if(session.getAdaptorSessions().stream().map(AdaptorSession::getAdaptorName).anyMatch(name -> name.equals(adaptorName))){
+            throw new BadRequestException("Simulation %s already part of session %s".formatted(adaptorName, sessionKey));
+        }
+
+        var adaptorConfigs = getRegisteredAdaptors().stream()
+                .filter(config -> config.getName().equals(adaptorName))
+                .toList();
+
+        if(adaptorConfigs.isEmpty()) {
+            throw new NotFoundException("Simulation %s not registered".formatted(adaptorName));
+        }
+
+        var optAdaptorSessionKey = adaptorClient.getSession(adaptorConfigs.get(0));
+
+        if(optAdaptorSessionKey.isEmpty()){
+            throw new SessionInitializationFailedException("Could not obtain session for simulation %s".formatted(adaptorName));
+        }
+
+        AdaptorSession adaptorSession = initAdaptorSession(optAdaptorSessionKey.get(), adaptorName);
+        session.addAdaptorSession(adaptorSession);
+    }
+
+    public void closeAdaptorSessionOfAggregateSession(UUID sessionKey, String adaptorName) throws BadRequestException {
+        Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionKey);
+        AdaptorSession adaptorSession = session.getAdaptorSessions().stream()
+                .filter(adaptorSession1 -> adaptorSession1.getAdaptorName().equals(adaptorName))
+                .findFirst()
+                .orElseThrow(() -> new BadRequestException("Simulation %s not part of session %s".formatted(adaptorName, sessionKey)));
+
+        closeAdaptorSession(adaptorSession, getRegisteredAdaptors());
     }
 
     // private region methods
@@ -83,11 +120,7 @@ public class SessionService implements SessionRequestVisitor {
 
     private void tryAddAdaptorSession(ServiceRegistrationConfigDTO config, List<AdaptorSession> sessions) {
         Optional<String> sessionKey = adaptorClient.getSession(config);
-        sessionKey.ifPresent(s -> sessions.add(AdaptorSession.builder()
-                .adaptorName(config.getName())
-                .sessionKey(s)
-                .state(SessionState.OPEN)
-                .build()));
+        sessionKey.ifPresent(s -> sessions.add(initAdaptorSession(s, config.getName())));
     }
 
     private Session constructAggregatedSession(List<AdaptorSession> adaptorSessions) throws SessionInitializationFailedException {
@@ -95,15 +128,23 @@ public class SessionService implements SessionRequestVisitor {
             throw new SessionInitializationFailedException("Could not obtain a single session");
         }
         log.debug("Aggregating adaptor sessions: {}", adaptorSessions);
-        Session session = getNewOpenSessionWithUUID();
+        Session session = initNewSessionWithUUID();
         adaptorSessions.forEach(session::addAdaptorSession);
         log.debug("Aggregated session: {}", session);
         return session;
     }
 
-    private Session getNewOpenSessionWithUUID() {
+    private Session initNewSessionWithUUID() {
         return Session.builder()
                 .sessionKey(UUID.randomUUID())
+                .state(SessionState.OPEN)
+                .build();
+    }
+
+    private AdaptorSession initAdaptorSession(String key, String name){
+        return AdaptorSession.builder()
+                .sessionKey(key)
+                .adaptorName(name)
                 .state(SessionState.OPEN)
                 .build();
     }
@@ -126,10 +167,8 @@ public class SessionService implements SessionRequestVisitor {
                 .findFirst()
                 .ifPresent(serviceRegistrationConfigDTO -> {
                     adaptorClient.closeSession(serviceRegistrationConfigDTO, adaptorSession.getSessionKey());
-                    sessionRepository.updateAdaptorSessionStateBySessionKey(adaptorSession.getSessionKey(), SessionState.CLOSED);
                 }
                 );
-
+        sessionRepository.updateAdaptorSessionStateBySessionKey(adaptorSession.getSessionKey(), SessionState.CLOSED);
     }
-
 }

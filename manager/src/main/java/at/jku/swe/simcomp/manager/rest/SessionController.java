@@ -7,6 +7,7 @@ import at.jku.swe.simcomp.commons.manager.dto.session.SessionResponseDTO;
 import at.jku.swe.simcomp.commons.manager.dto.session.SessionStateDTO;
 import at.jku.swe.simcomp.manager.domain.model.AdaptorSession;
 import at.jku.swe.simcomp.manager.domain.model.Session;
+import at.jku.swe.simcomp.manager.rest.exception.BadRequestException;
 import at.jku.swe.simcomp.manager.service.SessionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +36,24 @@ public class SessionController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/{sessionKey}/{adaptorName}")
+    public ResponseEntity<SessionStateDTO> addSimulationToAggregateSession(@PathVariable UUID sessionKey, @PathVariable String adaptorName) throws BadRequestException, SessionInitializationFailedException {
+        log.info("Request to add {} to session {}.", adaptorName, sessionKey);
+        sessionService.addAdaptorSessionToSession(sessionKey, adaptorName);
+        log.info("Added {}.", adaptorName);
+
+        return ResponseEntity.ok(sessionService.getSessionState(sessionKey));
+    }
+
+    @DeleteMapping("/{sessionKey}/{adaptorName}")
+    public ResponseEntity<SessionStateDTO> closeAdaptorSessionOfAggregateSession(@PathVariable UUID sessionKey, @PathVariable String adaptorName) throws BadRequestException, SessionInitializationFailedException {
+        log.info("Request to close {} from session {}.", adaptorName, sessionKey);
+        sessionService.closeAdaptorSessionOfAggregateSession(sessionKey, adaptorName);
+        log.info("Removed {}.", adaptorName);
+
+        return ResponseEntity.ok(sessionService.getSessionState(sessionKey));
+    }
+
     @GetMapping("/{sessionKey}")
     public ResponseEntity<SessionStateDTO> getSessionState(@PathVariable UUID sessionKey){
         log.info("Get Session State Request: {}", sessionKey);
@@ -61,7 +80,20 @@ public class SessionController {
     }
 
     @ExceptionHandler
-    public ResponseEntity<Void> handleNotFound(NotFoundException e){
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<HttpErrorDTO> handleNotFound(NotFoundException e){
+        HttpErrorDTO dto = HttpErrorDTO.builder()
+                .status(404)
+                .message(e.getMessage())
+                .build();
+        return ResponseEntity.status(404).body(dto);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<HttpErrorDTO> handleBadRequest(BadRequestException e){
+        HttpErrorDTO dto = HttpErrorDTO.builder()
+                .status(400)
+                .message(e.getMessage())
+                .build();
+        return ResponseEntity.status(400).body(dto);
     }
 }
