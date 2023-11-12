@@ -68,7 +68,7 @@ public class SessionService implements SessionRequestVisitor {
     public void addAdaptorSessionToAggregatedSession(UUID sessionKey, String adaptorName) throws BadRequestException, NotFoundException, SessionInitializationFailedException {
         Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionKey);
         if(session.getAdaptorSessions().stream().map(AdaptorSession::getAdaptorName).anyMatch(name -> name.equals(adaptorName))){
-            throw new BadRequestException("Simulation %s already part of session %s".formatted(adaptorName, sessionKey));
+            throw new BadRequestException("Simulation %s already part of session %s. You can manually close and reopen the simulation-session to initialize a new simulation-session".formatted(adaptorName, sessionKey));
         }
 
         var adaptorConfigs = getRegisteredAdaptors().stream()
@@ -87,6 +87,7 @@ public class SessionService implements SessionRequestVisitor {
 
         AdaptorSession adaptorSession = initAdaptorSession(optAdaptorSessionKey.get(), adaptorName);
         session.addAdaptorSession(adaptorSession);
+        sessionRepository.save(session);
     }
 
     public void closeAdaptorSessionOfAggregateSession(UUID sessionKey, String adaptorName) throws BadRequestException, NotFoundException {
@@ -110,7 +111,7 @@ public class SessionService implements SessionRequestVisitor {
                 .orElseThrow(() -> new BadRequestException("Simulation %s not part of session %s".formatted(adaptorName, sessionKey)));
 
         if(adaptorSession.getState().equals(SessionState.OPEN)){
-            throw new BadRequestException("Simulation %s already open".formatted(adaptorName));
+            throw new BadRequestException("Simulation %s already open. Close it before trying to reopen a new one".formatted(adaptorName));
         }
 
         var adaptorConfigs = getRegisteredAdaptors().stream()
