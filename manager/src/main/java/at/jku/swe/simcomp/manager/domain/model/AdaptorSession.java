@@ -34,6 +34,9 @@ public class AdaptorSession {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "state", nullable = false)
 
@@ -41,5 +44,13 @@ public class AdaptorSession {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+        updatedAt = createdAt;
     }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+createdAt = LocalDateTime.now();
+    }
+
 }

@@ -65,7 +65,7 @@ public class SessionService implements SessionRequestVisitor {
 
     }
 
-    public void addAdaptorSessionToSession(UUID sessionKey, String adaptorName) throws BadRequestException, NotFoundException, SessionInitializationFailedException {
+    public void addAdaptorSessionToAggregatedSession(UUID sessionKey, String adaptorName) throws BadRequestException, NotFoundException, SessionInitializationFailedException {
         Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionKey);
         if(session.getAdaptorSessions().stream().map(AdaptorSession::getAdaptorName).anyMatch(name -> name.equals(adaptorName))){
             throw new BadRequestException("Simulation %s already part of session %s".formatted(adaptorName, sessionKey));
@@ -89,16 +89,48 @@ public class SessionService implements SessionRequestVisitor {
         session.addAdaptorSession(adaptorSession);
     }
 
-    public void closeAdaptorSessionOfAggregateSession(UUID sessionKey, String adaptorName) throws BadRequestException {
+    public void closeAdaptorSessionOfAggregateSession(UUID sessionKey, String adaptorName) throws BadRequestException, NotFoundException {
         Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionKey);
         AdaptorSession adaptorSession = session.getAdaptorSessions().stream()
                 .filter(adaptorSession1 -> adaptorSession1.getAdaptorName().equals(adaptorName))
                 .findFirst()
                 .orElseThrow(() -> new BadRequestException("Simulation %s not part of session %s".formatted(adaptorName, sessionKey)));
 
+        if(adaptorSession.getState() == SessionState.CLOSED){
+            throw new BadRequestException("Simulation %s already closed".formatted(adaptorName));
+        }
         closeAdaptorSession(adaptorSession, getRegisteredAdaptors());
     }
 
+    public void reopenAdaptorSessionOfAggregateSession(UUID sessionKey, String adaptorName) throws BadRequestException, SessionInitializationFailedException {
+        Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionKey);
+        AdaptorSession adaptorSession = session.getAdaptorSessions().stream()
+                .filter(adaptorSession1 -> adaptorSession1.getAdaptorName().equals(adaptorName))
+                .findFirst()
+                .orElseThrow(() -> new BadRequestException("Simulation %s not part of session %s".formatted(adaptorName, sessionKey)));
+
+        if(adaptorSession.getState().equals(SessionState.OPEN)){
+            throw new BadRequestException("Simulation %s already open".formatted(adaptorName));
+        }
+
+        var adaptorConfigs = getRegisteredAdaptors().stream()
+                .filter(config -> config.getName().equals(adaptorName))
+                .toList();
+
+        if(adaptorConfigs.isEmpty()) {
+            throw new SessionInitializationFailedException("Simulation %s not registered".formatted(adaptorName));
+        }
+
+        var optAdaptorSessionKey = adaptorClient.getSession(adaptorConfigs.get(0));
+
+        if(optAdaptorSessionKey.isEmpty()){
+            throw new SessionInitializationFailedException("Could not obtain a session for simulation %s".formatted(adaptorName));
+        }
+
+        adaptorSession.setSessionKey(optAdaptorSessionKey.get());
+        adaptorSession.setState(SessionState.OPEN);
+        sessionRepository.save(session);
+    }
     // private region methods
 
     private Session getAdaptorSessionsAndConstructAndPersistAggregatedSession(List<ServiceRegistrationConfigDTO> adaptorConfigs, Integer maximumNumberOfSimulations) throws SessionInitializationFailedException {
@@ -165,10 +197,8 @@ public class SessionService implements SessionRequestVisitor {
         adaptorConfigs.stream()
                 .filter(config -> config.getName().equals(adaptorSession.getAdaptorName()))
                 .findFirst()
-                .ifPresent(serviceRegistrationConfigDTO -> {
-                    adaptorClient.closeSession(serviceRegistrationConfigDTO, adaptorSession.getSessionKey());
-                }
-                );
+                .ifPresent(serviceRegistrationConfigDTO -> adaptorClient.closeSession(serviceRegistrationConfigDTO, adaptorSession.getSessionKey()));
         sessionRepository.updateAdaptorSessionStateBySessionKey(adaptorSession.getSessionKey(), SessionState.CLOSED);
     }
+
 }
