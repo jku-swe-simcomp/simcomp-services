@@ -101,6 +101,7 @@ public class SessionService implements SessionRequestVisitor {
             throw new BadRequestException("Simulation %s already closed".formatted(adaptorName));
         }
         closeAdaptorSession(adaptorSession, getRegisteredAdaptors());
+        sessionRepository.flush();
     }
 
     public void reopenAdaptorSessionOfAggregateSession(UUID sessionKey, String adaptorName) throws BadRequestException, SessionInitializationFailedException {
