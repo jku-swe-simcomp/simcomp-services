@@ -37,31 +37,31 @@ public class SessionController {
     }
 
     @PostMapping("/{sessionKey}/{adaptorName}")
-    public ResponseEntity<SessionStateDTO> addAdaptorSessionToAggregateSession(@PathVariable UUID sessionKey, @PathVariable String adaptorName) throws BadRequestException, SessionInitializationFailedException, NotFoundException {
+    public ResponseEntity<Void> addAdaptorSessionToAggregateSession(@PathVariable UUID sessionKey, @PathVariable String adaptorName) throws BadRequestException, SessionInitializationFailedException, NotFoundException {
         log.info("Request to add {} to session {}.", adaptorName, sessionKey);
         sessionService.addAdaptorSessionToAggregatedSession(sessionKey, adaptorName);
         log.info("Added {}.", adaptorName);
 
-        return ResponseEntity.ok(sessionService.getSessionState(sessionKey));
+        return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/{sessionKey}/{adaptorName}/reopen")
-    public ResponseEntity<SessionStateDTO> reopenAdaptorSessionOfAggregateSession(@PathVariable UUID sessionKey, @PathVariable String adaptorName) throws BadRequestException, SessionInitializationFailedException, NotFoundException {
+    public ResponseEntity<Void> reopenAdaptorSessionOfAggregateSession(@PathVariable UUID sessionKey, @PathVariable String adaptorName) throws BadRequestException, SessionInitializationFailedException, NotFoundException {
         log.info("Request to reopen {} from session {}.", adaptorName, sessionKey);
         sessionService.reopenAdaptorSessionOfAggregateSession(sessionKey, adaptorName);
         log.info("Reopened {}.", adaptorName);
 
-        return ResponseEntity.ok(sessionService.getSessionState(sessionKey));
+        return ResponseEntity.ok().build();
 
     }
 
     @PatchMapping("/{sessionKey}/{adaptorName}/close")
-    public ResponseEntity<SessionStateDTO> closeAdaptorSessionOfAggregateSession(@PathVariable UUID sessionKey, @PathVariable String adaptorName) throws BadRequestException, NotFoundException {
+    public ResponseEntity<Void> closeAdaptorSessionOfAggregateSession(@PathVariable UUID sessionKey, @PathVariable String adaptorName) throws BadRequestException, NotFoundException {
         log.info("Request to close {} from session {}.", adaptorName, sessionKey);
         sessionService.closeAdaptorSessionOfAggregateSession(sessionKey, adaptorName);
         log.info("Removed {}.", adaptorName);
 
-        return ResponseEntity.ok(sessionService.getSessionState(sessionKey));
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{sessionKey}")
@@ -73,7 +73,7 @@ public class SessionController {
     }
 
     @PatchMapping("/{sessionKey}/close")
-    public ResponseEntity<Void> closeSession(@PathVariable UUID sessionKey) throws NotFoundException {
+    public ResponseEntity<Void> closeSession(@PathVariable UUID sessionKey) throws NotFoundException, BadRequestException {
         log.info("Close Session Request: {}", sessionKey);
         sessionService.closeSession(sessionKey);
         return ResponseEntity.ok().build();
@@ -87,23 +87,5 @@ public class SessionController {
                 .message("Could not initialize session with message: %s".formatted(e.getMessage()))
                 .build();
         return ResponseEntity.internalServerError().body(dto);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<HttpErrorDTO> handleNotFound(NotFoundException e){
-        HttpErrorDTO dto = HttpErrorDTO.builder()
-                .status(404)
-                .message(e.getMessage())
-                .build();
-        return ResponseEntity.status(404).body(dto);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<HttpErrorDTO> handleBadRequest(BadRequestException e){
-        HttpErrorDTO dto = HttpErrorDTO.builder()
-                .status(400)
-                .message(e.getMessage())
-                .build();
-        return ResponseEntity.status(400).body(dto);
     }
 }

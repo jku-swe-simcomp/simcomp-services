@@ -8,10 +8,12 @@ import at.jku.swe.simcomp.commons.manager.dto.session.SessionStateDTO;
 import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 import at.jku.swe.simcomp.manager.domain.model.AdaptorSession;
 import at.jku.swe.simcomp.manager.domain.model.Session;
+import at.jku.swe.simcomp.manager.domain.repository.AdaptorSessionRepository;
 import at.jku.swe.simcomp.manager.domain.repository.SessionRepository;
 import at.jku.swe.simcomp.manager.rest.exception.BadRequestException;
 import at.jku.swe.simcomp.manager.service.client.AdaptorClient;
 import at.jku.swe.simcomp.manager.service.client.ServiceRegistryClient;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
@@ -26,14 +28,17 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SessionService implements SessionRequestVisitor {
     private final SessionRepository sessionRepository;
+    private final AdaptorSessionRepository adaptorSessionRepository;
     private final ServiceRegistryClient serviceRegistryClient;
     private final AdaptorClient adaptorClient;
     public SessionService(SessionRepository sessionRepository,
                           AdaptorClient adaptorClient,
-                          ServiceRegistryClient serviceRegistryClient) {
+                          ServiceRegistryClient serviceRegistryClient,
+                          AdaptorSessionRepository adaptorSessionRepository) {
         this.sessionRepository = sessionRepository;
         this.serviceRegistryClient = serviceRegistryClient;
         this.adaptorClient = adaptorClient;
+        this.adaptorSessionRepository = adaptorSessionRepository;
     }
 
     @Override
@@ -50,12 +55,14 @@ public class SessionService implements SessionRequestVisitor {
         return getAdaptorSessionsAndConstructAndPersistAggregatedSession(getRegisteredAdaptors(), request.n());
     }
 
-    public void closeSession(UUID aggregatedSessionKey) throws NotFoundException{
-        sessionRepository.findBySessionKeyOrElseThrow(aggregatedSessionKey);
+    public void closeSession(UUID aggregatedSessionKey) throws NotFoundException, BadRequestException {
+        Session session = sessionRepository.findBySessionKeyOrElseThrow(aggregatedSessionKey);
+        if(session.getState().equals(SessionState.CLOSED)){
+            throw new BadRequestException("Session %s already closed".formatted(aggregatedSessionKey));
+        }
         closeAdaptorSessions(aggregatedSessionKey);
         sessionRepository.updateSessionStateBySessionKey(aggregatedSessionKey, SessionState.CLOSED);
         log.debug("Closed session {}", aggregatedSessionKey.toString());
-        sessionRepository.flush();
     }
 
     public SessionStateDTO getSessionState(UUID sessionKey) throws NotFoundException{
@@ -68,6 +75,9 @@ public class SessionService implements SessionRequestVisitor {
 
     public void addAdaptorSessionToAggregatedSession(UUID sessionKey, String adaptorName) throws BadRequestException, NotFoundException, SessionInitializationFailedException {
         Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionKey);
+        if(session.getState().equals(SessionState.CLOSED)){
+            throw new BadRequestException("Session %s already closed".formatted(sessionKey));
+        }
         if(session.getAdaptorSessions().stream().map(AdaptorSession::getAdaptorName).anyMatch(name -> name.equals(adaptorName))){
             throw new BadRequestException("Simulation %s already part of session %s. You can manually close and reopen the simulation-session to initialize a new simulation-session".formatted(adaptorName, sessionKey));
         }
@@ -89,11 +99,13 @@ public class SessionService implements SessionRequestVisitor {
         AdaptorSession adaptorSession = initAdaptorSession(optAdaptorSessionKey.get(), adaptorName);
         session.addAdaptorSession(adaptorSession);
         sessionRepository.save(session);
-        sessionRepository.flush();
     }
 
     public void closeAdaptorSessionOfAggregateSession(UUID sessionKey, String adaptorName) throws BadRequestException, NotFoundException {
         Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionKey);
+        if(session.getState().equals(SessionState.CLOSED)){
+            throw new BadRequestException("Session %s already closed".formatted(sessionKey));
+        }
         AdaptorSession adaptorSession = session.getAdaptorSessions().stream()
                 .filter(adaptorSession1 -> adaptorSession1.getAdaptorName().equals(adaptorName))
                 .findFirst()
@@ -103,11 +115,13 @@ public class SessionService implements SessionRequestVisitor {
             throw new BadRequestException("Simulation %s already closed".formatted(adaptorName));
         }
         closeAdaptorSession(adaptorSession, getRegisteredAdaptors());
-        sessionRepository.flush();
     }
 
     public void reopenAdaptorSessionOfAggregateSession(UUID sessionKey, String adaptorName) throws BadRequestException, SessionInitializationFailedException {
         Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionKey);
+        if(session.getState().equals(SessionState.CLOSED)){
+            throw new BadRequestException("Session %s already closed".formatted(sessionKey));
+        }
         AdaptorSession adaptorSession = session.getAdaptorSessions().stream()
                 .filter(adaptorSession1 -> adaptorSession1.getAdaptorName().equals(adaptorName))
                 .findFirst()
@@ -134,7 +148,6 @@ public class SessionService implements SessionRequestVisitor {
         adaptorSession.setSessionKey(optAdaptorSessionKey.get());
         adaptorSession.setState(SessionState.OPEN);
         sessionRepository.save(session);
-        sessionRepository.flush();
     }
     // private region methods
 
@@ -192,8 +205,7 @@ public class SessionService implements SessionRequestVisitor {
 
     private void closeAdaptorSessions(UUID aggregatedSessionKey) {
         var adaptorConfigs = getRegisteredAdaptors();
-        var session = sessionRepository.findBySessionKeyOrElseThrow(aggregatedSessionKey);
-        for(var adaptorSession : session.getAdaptorSessions()){
+        for(var adaptorSession : adaptorSessionRepository.findBySessionSessionKey(aggregatedSessionKey)){
             closeAdaptorSession(adaptorSession, adaptorConfigs);
         }
     }
@@ -203,7 +215,7 @@ public class SessionService implements SessionRequestVisitor {
                 .filter(config -> config.getName().equals(adaptorSession.getAdaptorName()))
                 .findFirst()
                 .ifPresent(serviceRegistrationConfigDTO -> adaptorClient.closeSession(serviceRegistrationConfigDTO, adaptorSession.getSessionKey()));
-        sessionRepository.updateAdaptorSessionStateBySessionKey(adaptorSession.getSessionKey(), SessionState.CLOSED);
+        adaptorSessionRepository.updateSessionStateBySessionKey(adaptorSession.getId(), SessionState.CLOSED);
     }
 
 }

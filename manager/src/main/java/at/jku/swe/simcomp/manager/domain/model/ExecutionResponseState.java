@@ -4,5 +4,6 @@ public enum ExecutionResponseState {
     SUCCESS,
     ERROR,
     TIMEOUT,
-    RUNNING
+    RUNNING,
+    WAITING
 }
