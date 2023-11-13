@@ -30,7 +30,7 @@ public class Execution {
     @ToString.Exclude
     private Session session;
 
-    @Column(name = "command", nullable = false)
+    @Column(name = "command", length=5000)
     private String command;
 
     @OneToMany(mappedBy = "execution", cascade = CascadeType.ALL, orphanRemoval = true)

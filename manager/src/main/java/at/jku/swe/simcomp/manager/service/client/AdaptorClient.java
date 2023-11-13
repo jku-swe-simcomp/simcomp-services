@@ -1,8 +1,12 @@
 package at.jku.swe.simcomp.manager.service.client;
 
 import at.jku.swe.simcomp.commons.HttpErrorDTO;
+import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.AdaptorEndpointConstants;
+import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
 import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
+import at.jku.swe.simcomp.manager.rest.exception.CommandExecutionFailedException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -18,6 +22,7 @@ import java.util.Optional;
 @Slf4j
 public class AdaptorClient {
     private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper = new ObjectMapper();
     public AdaptorClient(RestTemplateBuilder restTemplateBuilder,
                          NoExceptionThrowingResponseErrorHandler noExceptionThrowingResponseErrorHandler) {
         restTemplate = restTemplateBuilder
@@ -49,6 +54,28 @@ public class AdaptorClient {
             restTemplate.delete(url);
         } catch (Exception e) {
             log.error("Error during REST call to delete adaptor session. {}", e.getMessage());
+        }
+    }
+
+    public ExecutionResultDTO executeCommand(ServiceRegistrationConfigDTO adaptorConfig, ExecutionCommand command, String adaptorSessionKey) throws CommandExecutionFailedException {
+        String url = "http://" + adaptorConfig.getHost() + ":" + adaptorConfig.getPort() + AdaptorEndpointConstants.getExecuteActionPathForSessionId(adaptorSessionKey);
+        ResponseEntity<String> response = restTemplate.postForEntity(url, new HttpEntity<>(command, null), String.class);
+
+        if (response.getStatusCode() == HttpStatus.OK) {
+            log.info("Executed command for adaptor {}: {}", adaptorConfig.getName(), response.getBody());
+            try {
+                return objectMapper.readValue(response.getBody(), ExecutionResultDTO.class);
+            } catch (JsonProcessingException e) {
+                throw new CommandExecutionFailedException("Could not deserialize response %s from %s".formatted(response.getBody(), adaptorConfig.getName()), 500);
+            }
+        } else {
+            log.info("Non-200 response when trying to execute command for adaptor {}: {}", adaptorConfig.getName(), response.getBody());
+            try {
+                HttpErrorDTO error = objectMapper.readValue(response.getBody(), HttpErrorDTO.class);
+                throw new CommandExecutionFailedException(error.getMessage(), (int) error.getStatus());
+            } catch (JsonProcessingException e) {
+                throw new CommandExecutionFailedException("Could not deserialize response %s from %s".formatted(response.getBody(), adaptorConfig.getName()), 500);
+            }
         }
     }
 }

@@ -12,6 +12,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class ServiceRegistrationConfigDTO {
     /**
      * The name of the adaptor, has to be unique (is ID for registry).

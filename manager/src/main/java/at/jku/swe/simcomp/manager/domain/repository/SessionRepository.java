@@ -13,17 +13,12 @@ import java.util.UUID;
 
 public interface SessionRepository extends JpaRepository<Session, Long> {
     Optional<Session> findBySessionKey(UUID sessionKey);
-    void deleteBySessionKey(UUID sessionKey);
 
     @Transactional
     @Modifying
     @Query("UPDATE Session s SET s.state = :state WHERE s.sessionKey = :sessionKey")
     void updateSessionStateBySessionKey(UUID sessionKey, SessionState state);
 
-    @Transactional
-    @Modifying
-    @Query("UPDATE AdaptorSession s SET s.state = :state WHERE s.sessionKey = :sessionKey")
-    void updateAdaptorSessionStateBySessionKey(String sessionKey, SessionState state);
 
     default Session findBySessionKeyOrElseThrow(UUID sessionKey) throws NotFoundException{
         return findBySessionKey(sessionKey).orElseThrow(() ->new NotFoundException("Session with key %s not found.".formatted(sessionKey)));
