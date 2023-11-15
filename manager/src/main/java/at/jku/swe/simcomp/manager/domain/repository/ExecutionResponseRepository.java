@@ -1,7 +1,7 @@
 package at.jku.swe.simcomp.manager.domain.repository;
 
+import at.jku.swe.simcomp.commons.manager.dto.execution.ExecutionResponseState;
 import at.jku.swe.simcomp.manager.domain.model.ExecutionResponse;
-import at.jku.swe.simcomp.manager.domain.model.ExecutionResponseState;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

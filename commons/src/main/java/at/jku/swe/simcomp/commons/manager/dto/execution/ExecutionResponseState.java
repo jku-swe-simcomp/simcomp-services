@@ -1,4 +1,4 @@
-package at.jku.swe.simcomp.manager.domain.model;
+package at.jku.swe.simcomp.commons.manager.dto.execution;
 
 public enum ExecutionResponseState {
     SUCCESS,

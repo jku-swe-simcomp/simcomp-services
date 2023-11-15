@@ -1,6 +1,9 @@
 package at.jku.swe.simcomp.manager.service;
 
 import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
+import at.jku.swe.simcomp.commons.manager.dto.execution.ExecutionDTO;
+import at.jku.swe.simcomp.commons.manager.dto.execution.ExecutionResponseDTO;
+import at.jku.swe.simcomp.commons.manager.dto.execution.ExecutionResponseState;
 import at.jku.swe.simcomp.commons.manager.dto.session.SessionState;
 import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 import at.jku.swe.simcomp.manager.domain.model.*;
@@ -53,7 +56,23 @@ public class ExecutionService {
         return execution.getExecutionId();
     }
 
+    public ExecutionDTO getExecution(UUID executionId) {
+        Execution execution = executionRepository.findByExecutionUUIDOrElseThrow(executionId);
+        return fromModel(execution);
+    }
+
+
     // private region methods
+    private ExecutionDTO fromModel(Execution execution) {
+        return new ExecutionDTO(execution.getExecutionId().toString(),
+                execution.getSession().getSessionKey().toString(),
+                execution.getCommand(),
+                execution.getCreatedAt(),
+                execution.getResponses().stream()
+                        .map(r -> new ExecutionResponseDTO(r.getAdaptorSession().getAdaptorName(), r.getResponseCode(), r.getState(), r.getReport())).toList()
+                );
+    }
+
     private Execution initExecution(ExecutionCommand command, @NonNull UUID sessionId) {
         String commandJson = null;
         try {
