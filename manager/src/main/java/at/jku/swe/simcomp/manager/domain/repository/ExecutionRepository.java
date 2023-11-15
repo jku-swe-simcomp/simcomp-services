@@ -1,11 +1,7 @@
 package at.jku.swe.simcomp.manager.domain.repository;
 
 import at.jku.swe.simcomp.manager.domain.model.Execution;
-import at.jku.swe.simcomp.manager.domain.model.ExecutionResponseState;
-import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
 import org.webjars.NotFoundException;
 
 import java.util.Optional;

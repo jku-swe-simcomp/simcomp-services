@@ -1,5 +1,6 @@
 package at.jku.swe.simcomp.manager.domain.model;
 
+import at.jku.swe.simcomp.commons.manager.dto.execution.ExecutionResponseState;
 import jakarta.persistence.*;
 import lombok.*;
 

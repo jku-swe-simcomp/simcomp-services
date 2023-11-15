@@ -2,6 +2,7 @@ package at.jku.swe.simcomp.commons.adaptor.execution.command;
 
 import at.jku.swe.simcomp.commons.adaptor.dto.*;
 import at.jku.swe.simcomp.commons.adaptor.execution.command.visitor.ExecutionCommandVisitor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.NonNull;
@@ -30,6 +31,7 @@ import java.util.List;
 })
 public interface ExecutionCommand {
     <T,P> T accept(ExecutionCommandVisitor<T,P> visitor, P param) throws Exception;
+    @JsonIgnore
     ActionType getCorrespondingActionType();
     public static record PoseCommand(@NonNull PositionDTO position, @NonNull QuaternionDTO orientation) implements ExecutionCommand {
         private static final ActionType correspondingActionType = ActionType.POSE;
