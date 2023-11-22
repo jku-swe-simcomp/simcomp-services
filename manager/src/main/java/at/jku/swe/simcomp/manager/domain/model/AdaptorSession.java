@@ -1,10 +1,13 @@
 package at.jku.swe.simcomp.manager.domain.model;
 
+import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeValue;
 import at.jku.swe.simcomp.commons.manager.dto.session.SessionState;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -40,7 +43,17 @@ public class AdaptorSession {
     @Enumerated(EnumType.STRING)
     @Column(name = "state", nullable = false)
 
+    @Builder.Default
+    @OneToMany(mappedBy = "adaptorSession", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<JointPositions> jointPositions = new ArrayList<>();
+
     private SessionState state;
+
+    public void addJointPositions(JointPositions j){
+        j.setAdaptorSession(this);
+        jointPositions.add(j);
+    }
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
@@ -50,7 +63,6 @@ public class AdaptorSession {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
-createdAt = LocalDateTime.now();
     }
 
 }

@@ -1,5 +1,7 @@
 package at.jku.swe.simcomp.commons.adaptor.endpoint;
 
+import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeKey;
+
 public class AdaptorEndpointConstants {
     public static final String HEALTH_CHECK_PATH="/health";
     public static final String INIT_SESSION_PATH="/session/init";
@@ -12,8 +14,8 @@ public class AdaptorEndpointConstants {
     private AdaptorEndpointConstants(){
         // empty for constants class
     }
-    public static String getGetAttributePathForAttributeName(String sessionId, String name) {
-        return GET_ATTRIBUTE_PATH.formatted(sessionId, name);
+    public static String getGetAttributePathForAttributeName(String sessionId, AttributeKey key) {
+        return GET_ATTRIBUTE_PATH.formatted(sessionId, key);
     }
 
     public static String getExecuteActionPathForSessionId(String sessionId) {

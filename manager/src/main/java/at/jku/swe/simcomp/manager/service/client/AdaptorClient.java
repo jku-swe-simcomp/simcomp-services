@@ -1,6 +1,8 @@
 package at.jku.swe.simcomp.manager.service.client;
 
 import at.jku.swe.simcomp.commons.HttpErrorDTO;
+import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeKey;
+import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeValue;
 import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.AdaptorEndpointConstants;
 import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
@@ -76,6 +78,19 @@ public class AdaptorClient {
             } catch (JsonProcessingException e) {
                 throw new CommandExecutionFailedException("Could not deserialize response %s from %s".formatted(response.getBody(), adaptorConfig.getName()), 500);
             }
+        }
+    }
+
+    public Optional<AttributeValue> getAttributeValue(String sessionId, AttributeKey attributeKey, ServiceRegistrationConfigDTO config){
+        String url = "http://" + config.getHost() + ":" + config.getPort() + AdaptorEndpointConstants.getGetAttributePathForAttributeName(sessionId, attributeKey);
+        ResponseEntity<AttributeValue> responseEntity = restTemplate.getForEntity(url, AttributeValue.class);
+
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            log.debug("Obtained attribute value for adaptor session {} of {} with key {}: {}", sessionId, config.getName(), attributeKey, responseEntity.getBody());
+            return Optional.ofNullable(responseEntity.getBody());
+        }else{
+            log.warn("Non-2xx response when trying to obtain attribute value for adaptor session {} of {}: {}", sessionId, config.getName(), responseEntity.getBody());
+            return Optional.empty();
         }
     }
 }

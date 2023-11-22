@@ -1,6 +1,7 @@
 package at.jku.swe.simcomp.manager.service;
 
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
+import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
 import at.jku.swe.simcomp.commons.manager.dto.session.SessionRequest;
 import at.jku.swe.simcomp.commons.manager.dto.session.SessionRequestVisitor;
 import at.jku.swe.simcomp.commons.manager.dto.session.SessionState;
@@ -148,6 +149,7 @@ public class SessionService implements SessionRequestVisitor {
         adaptorSession.setSessionKey(optAdaptorSessionKey.get());
         adaptorSession.setState(SessionState.OPEN);
         sessionRepository.save(session);
+        // TODO: reconstruct latest known state of adaptor session
     }
     // private region methods
 
