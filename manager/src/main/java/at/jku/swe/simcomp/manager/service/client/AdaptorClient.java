@@ -5,6 +5,7 @@ import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeKey;
 import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeValue;
 import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.AdaptorEndpointConstants;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.simulation.SimulationInstanceConfig;
 import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
 import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 import at.jku.swe.simcomp.manager.rest.exception.CommandExecutionFailedException;
@@ -12,12 +13,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -92,5 +96,33 @@ public class AdaptorClient {
             log.warn("Non-2xx response when trying to obtain attribute value for adaptor session {} of {}: {}", sessionId, config.getName(), responseEntity.getBody());
             return Optional.empty();
         }
+    }
+
+    public void registerSimulationInstanceForAdaptor(ServiceRegistrationConfigDTO serviceRegistrationConfigDTO, SimulationInstanceConfig config) {
+        String url = "http://" + serviceRegistrationConfigDTO.getHost() + ":" + serviceRegistrationConfigDTO.getPort() + AdaptorEndpointConstants.SIMULATION_INSTANCE_ENDPOINT;
+        HttpEntity<SimulationInstanceConfig> requestEntity = new HttpEntity<>(config, null);
+        restTemplate.postForObject(url, requestEntity, Void.class);
+    }
+
+    public List<SimulationInstanceConfig> getSimulationInstances(ServiceRegistrationConfigDTO config) {
+        String url = "http://" + config.getHost() + ":" + config.getPort() + AdaptorEndpointConstants.SIMULATION_INSTANCE_ENDPOINT;
+        ResponseEntity<List<SimulationInstanceConfig>> responseEntity = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<SimulationInstanceConfig>>() {}
+        );
+        return responseEntity.getBody();
+    }
+
+    public void deleteSimulationInstance(ServiceRegistrationConfigDTO serviceRegistrationConfigDTO, SimulationInstanceConfig config){
+        String url = "http://" + serviceRegistrationConfigDTO.getHost() + ":" + serviceRegistrationConfigDTO.getPort() + AdaptorEndpointConstants.SIMULATION_INSTANCE_ENDPOINT;
+        HttpEntity<SimulationInstanceConfig> requestEntity = new HttpEntity<>(config, null);
+        restTemplate.exchange(
+                url,
+                HttpMethod.DELETE,
+                requestEntity,
+                Void.class
+        );
     }
 }

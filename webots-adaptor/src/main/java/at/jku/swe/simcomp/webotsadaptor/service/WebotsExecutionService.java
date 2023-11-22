@@ -1,10 +1,8 @@
 package at.jku.swe.simcomp.webotsadaptor.service;
 
 import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
-import at.jku.swe.simcomp.commons.adaptor.dto.JointAngleAdjustmentDTO;
-import at.jku.swe.simcomp.commons.adaptor.dto.RoboStateDTO;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.RoboOperationFailedException;
-import at.jku.swe.simcomp.webotsadaptor.domain.simulation.WebotsSimulationConfig;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.simulation.SimulationInstanceConfig;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -19,7 +17,7 @@ import java.util.Objects;
 
 public class WebotsExecutionService {
 
-    public static ExecutionResultDTO executeCommand(JSONObject command, WebotsSimulationConfig config) throws RoboOperationFailedException, IOException, ParseException {
+    public static ExecutionResultDTO executeCommand(JSONObject command, SimulationInstanceConfig config) throws RoboOperationFailedException, IOException, ParseException {
         System.out.println("Connecting to " + config.getSimulationEndpointUrl() + " on port " + config.getSimulationPort());
         Socket client;
         DataOutputStream out;

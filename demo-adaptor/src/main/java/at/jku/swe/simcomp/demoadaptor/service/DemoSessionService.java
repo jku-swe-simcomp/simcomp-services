@@ -2,7 +2,7 @@ package at.jku.swe.simcomp.demoadaptor.service;
 
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
-import at.jku.swe.simcomp.demoadaptor.domain.simulation.DemoSimulationConfig;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.simulation.SimulationInstanceConfig;
 import at.jku.swe.simcomp.demoadaptor.domain.simulation.DemoSimulationRemovalListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
 @Service
 @Slf4j
 public class DemoSessionService implements DemoSimulationRemovalListener {
-    private static final ConcurrentHashMap<String, DemoSimulationConfig> currentSessions = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, SimulationInstanceConfig> currentSessions = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, Thread> sessionTerminationThreads = new ConcurrentHashMap<>();
     private static final ExecutorService sessionTerminationExecutor = Executors.newFixedThreadPool(10);
     private static final Long sessionTerminateAfter = 600_000L;
@@ -26,7 +26,7 @@ public class DemoSessionService implements DemoSimulationRemovalListener {
     }
 
     public synchronized String initializeSession() throws SessionInitializationFailedException {
-        Optional<DemoSimulationConfig> config = getAvailableSimulation();
+        Optional<SimulationInstanceConfig> config = getAvailableSimulation();
         if(config.isEmpty()){
             throw new SessionInitializationFailedException("No simulation available");
         }
@@ -38,7 +38,7 @@ public class DemoSessionService implements DemoSimulationRemovalListener {
         return sessionKey;
     }
 
-    public synchronized DemoSimulationConfig renewSession(String sessionKey) throws SessionNotValidException {
+    public synchronized SimulationInstanceConfig renewSession(String sessionKey) throws SessionNotValidException {
         if(!currentSessions.containsKey(sessionKey))
             throw new SessionNotValidException("Session %s not valid".formatted(sessionKey));
 
@@ -66,7 +66,7 @@ public class DemoSessionService implements DemoSimulationRemovalListener {
     }
 
     @Override
-    public synchronized void onSimulationRemoved(DemoSimulationConfig config) {
+    public synchronized void onSimulationRemoved(SimulationInstanceConfig config) {
         log.info("Received notification about removal of simulation: {}", config);
         for(var entry : currentSessions.entrySet()){
             if(entry.getValue().equals(config)){
@@ -95,7 +95,7 @@ public class DemoSessionService implements DemoSimulationRemovalListener {
         });
     }
 
-    private Optional<DemoSimulationConfig> getAvailableSimulation() {
+    private Optional<SimulationInstanceConfig> getAvailableSimulation() {
         return DemoSimulationService.simulations.stream()
                 .filter(simulation -> !currentSessions.containsValue(simulation))
                 .findFirst();

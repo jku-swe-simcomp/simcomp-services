@@ -11,8 +11,8 @@ import java.util.List;
 
 @Service
 public class WebotsAdaptorEndpointService implements AdaptorEndpointService {
-    private final WebotsSessionService demoSessionService;
-    public WebotsAdaptorEndpointService(WebotsSessionService demoSessionService) {
+    private final SessionService demoSessionService;
+    public WebotsAdaptorEndpointService(SessionService demoSessionService) {
         this.demoSessionService = demoSessionService;
     }
 

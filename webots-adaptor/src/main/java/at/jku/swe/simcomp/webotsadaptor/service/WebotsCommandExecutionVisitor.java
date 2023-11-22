@@ -14,12 +14,12 @@ import java.io.IOException;
 
 @Service
 public class WebotsCommandExecutionVisitor extends CommandExecutionVisitor {
-    private final WebotsSessionService demoSessionService;
+    private final SessionService demoSessionService;
     private final PoseCommandExecutor poseCommandExecutor;
     private final AdjustJointAngleCommandExecutor adjustJointAngleCommandExecutor;
-    public WebotsCommandExecutionVisitor(WebotsSessionService demoSessionService,
-                                       PoseCommandExecutor poseCommandExecutor,
-                                       AdjustJointAngleCommandExecutor adjustJointAngleCommandExecutor){
+    public WebotsCommandExecutionVisitor(SessionService demoSessionService,
+                                         PoseCommandExecutor poseCommandExecutor,
+                                         AdjustJointAngleCommandExecutor adjustJointAngleCommandExecutor){
         this.demoSessionService = demoSessionService;
         this.adjustJointAngleCommandExecutor = adjustJointAngleCommandExecutor;
         this.poseCommandExecutor = poseCommandExecutor;
