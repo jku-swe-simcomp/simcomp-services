@@ -20,7 +20,7 @@ import java.util.List;
         @JsonSubTypes.Type(value = AttributeValue.Orientation.class, name = "ORIENTATION"),
 })
 public interface AttributeValue {
-    record JointPositions(List<String> jointPositions) implements AttributeValue{}
+    record JointPositions(List<Double> jointPositions) implements AttributeValue{}
     record JointStates(List<RoboJointStateDTO> jointStates) implements AttributeValue{}
 
     record Pose(PoseDTO pose) implements AttributeValue{}

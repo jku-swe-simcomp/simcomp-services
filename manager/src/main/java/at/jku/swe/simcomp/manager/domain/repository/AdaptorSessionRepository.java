@@ -17,4 +17,6 @@ public interface AdaptorSessionRepository extends JpaRepository<AdaptorSession, 
     void updateSessionStateBySessionKey(Long id, SessionState state);
 
     List<AdaptorSession> findBySessionSessionKey(UUID sessionKey);
+
+    List<AdaptorSession> findByState(SessionState state);
 }
