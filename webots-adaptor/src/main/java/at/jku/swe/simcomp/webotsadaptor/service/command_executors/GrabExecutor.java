@@ -8,9 +8,11 @@ import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
 import at.jku.swe.simcomp.webotsadaptor.service.WebotsExecutionService;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
+@Service
 public class GrabExecutor
         implements CommandExecutor<ExecutionCommand.GrabCommand, ExecutionResultDTO> {
 

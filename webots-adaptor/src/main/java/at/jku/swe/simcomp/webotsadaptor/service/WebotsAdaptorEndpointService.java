@@ -3,10 +3,13 @@ package at.jku.swe.simcomp.webotsadaptor.service;
 import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeKey;
 import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeValue;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.AdaptorEndpointService;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.RoboOperationFailedException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
+import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -31,7 +34,13 @@ public class WebotsAdaptorEndpointService implements AdaptorEndpointService {
         demoSessionService.renewSession(sessionId);
         // Note: can add more cases for different attributes
         return switch(attributeKey){
-            case JOINT_POSITIONS -> new AttributeValue.JointPositions(List.of()); // TODO: implement logic to fetch positions
+            case JOINT_POSITIONS -> {
+                try {
+                    yield new AttributeValue.JointPositions(WebotsExecutionService.getPositions(sessionId));
+                } catch (Exception e) {
+                    throw new SessionNotValidException(e.getMessage());
+                }
+            } // TODO: implement logic to fetch positions
             case JOINT_STATES -> new AttributeValue.JointPositions(List.of()); // TODO: implement logic to fetch states
             default -> throw new UnsupportedOperationException("Attribute %s not supported by this service".formatted(attributeKey));
         };
