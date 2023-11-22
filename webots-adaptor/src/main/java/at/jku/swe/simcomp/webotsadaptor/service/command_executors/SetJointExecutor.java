@@ -10,9 +10,11 @@ import at.jku.swe.simcomp.webotsadaptor.service.WebotsExecutionService;
 import lombok.NonNull;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
+@Service
 public class SetJointExecutor
         implements CommandExecutor<ExecutionCommand.SetJointPositionCommand, ExecutionResultDTO> {
 

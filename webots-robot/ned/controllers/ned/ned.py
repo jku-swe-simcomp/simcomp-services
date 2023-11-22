@@ -52,7 +52,7 @@ def initial_position():
         "axis6": 0
     }
     print('Setting all positions to 0')
-    return json.dumps(json_result)+'\n'
+    return '{"result": "success}"\n'
 
 
 initial_position()
@@ -106,7 +106,7 @@ def set_axis(set_axis_input):
     except ValueError:
         print("Invalid position value received.")
         return '{"result":"The axis could not be set"}\n'
-    return get_position_json()
+    return '{"result": "success}"\n'
 
 
 def adjust_axis(adjust_axis_input):
@@ -141,7 +141,7 @@ def adjust_axis(adjust_axis_input):
     except ValueError:
         print("Invalid position value received.")
         return '{"result":"The axis could not be adjusted"}\n'
-    return get_position_json()
+    return '{"result": "success}"\n'
 
 
 def get_position_json():
@@ -151,14 +151,10 @@ def get_position_json():
     val4 = get_value(m4)
     val5 = get_value(m5)
     val6 = get_value(m6)
+    positions = [val1, val2, val3, val4, val5, val6]
     json_result = {
         "result": "success",
-        "axis1": val1,
-        "axis2": val2,
-        "axis3": val3,
-        "axis4": val4,
-        "axis5": val5,
-        "axis6": val6
+        "positions": positions
     }
     result = json.dumps(json_result)+'\n'
     print(f'Returning: {result}')
@@ -190,6 +186,8 @@ while robot.step(timestep) != -1:
             response = set_axis(json_data)
         elif operation == 'initial_position':
             response = initial_position()
+        elif operation == 'get_position':
+            response = get_position_json()
 
     except json.JSONDecodeError as e:
         print('json could not be pared')
