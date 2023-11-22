@@ -23,19 +23,8 @@ public class WebotsExecutionService {
 
     public static ExecutionResultDTO executeCommand(JSONObject command, SimulationInstanceConfig config) throws RoboOperationFailedException, IOException, ParseException {
         System.out.println("Connecting to " + config.getSimulationEndpointUrl() + " on port " + config.getSimulationPort());
-        Socket client;
-        DataOutputStream out;
         try {
-            client = new Socket(config.getSimulationEndpointUrl(), config.getSimulationPort());
-            out = new DataOutputStream(client.getOutputStream());
-            System.out.println("Connected to " + client.getRemoteSocketAddress());
-
-            out.write(command.toString().getBytes(StandardCharsets.UTF_8));
-
-            BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-            String response = in.readLine();
-            JSONParser parser = new JSONParser();
-            JSONObject responseJson = (JSONObject) parser.parse(response);
+            JSONObject responseJson = accessWebots(command);
 
             if(Objects.equals(responseJson.get("result"), "success")) {
                 return ExecutionResultDTO.builder()
@@ -54,21 +43,10 @@ public class WebotsExecutionService {
 
     public static List<Double> getPositions(String sessionID) throws RoboOperationFailedException, IOException, ParseException {
         System.out.println("Connecting to session " +sessionID);
-        Socket client;
-        DataOutputStream out;
         try {
-            client = new Socket("endpointURL", 1111);
-            out = new DataOutputStream(client.getOutputStream());
-            System.out.println("Connected to " + client.getRemoteSocketAddress());
-
             JSONObject json = new JSONObject();
             json.put("operation", "get_position");
-            out.write(json.toString().getBytes(StandardCharsets.UTF_8));
-
-            BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-            String response = in.readLine();
-            JSONParser parser = new JSONParser();
-            JSONObject responseJson = (JSONObject) parser.parse(response);
+            JSONObject responseJson = accessWebots(json);
 
             if(Objects.equals(responseJson.get("result"), "success")) {
                 JSONArray jsonArray = (JSONArray) responseJson.get("positions");
@@ -87,5 +65,18 @@ public class WebotsExecutionService {
             System.out.println(e.getMessage());
             throw e;
         }
+    }
+
+    private static JSONObject accessWebots(JSONObject input) throws IOException, ParseException {
+        Socket client = new Socket("endpointURL", 1111);
+        DataOutputStream out = new DataOutputStream(client.getOutputStream());
+        System.out.println("Connected to " + client.getRemoteSocketAddress());
+
+        out.write(input.toString().getBytes(StandardCharsets.UTF_8));
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+        String response = in.readLine();
+        JSONParser parser = new JSONParser();
+        return (JSONObject) parser.parse(response);
     }
 }
