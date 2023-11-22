@@ -24,7 +24,7 @@ public class WebotsExecutionService {
     public static ExecutionResultDTO executeCommand(JSONObject command, SimulationInstanceConfig config) throws RoboOperationFailedException, IOException, ParseException {
         System.out.println("Connecting to " + config.getSimulationEndpointUrl() + " on port " + config.getSimulationPort());
         try {
-            JSONObject responseJson = accessWebots(command);
+            JSONObject responseJson = accessWebots(command, config);
 
             if(Objects.equals(responseJson.get("result"), "success")) {
                 return ExecutionResultDTO.builder()
@@ -41,12 +41,13 @@ public class WebotsExecutionService {
         }
     }
 
-    public static List<Double> getPositions(String sessionID) throws RoboOperationFailedException, IOException, ParseException {
-        System.out.println("Connecting to session " +sessionID);
+    public static List<Double> getPositions(SimulationInstanceConfig config) throws RoboOperationFailedException, IOException, ParseException {
+        System.out.println("Connecting to " + config.getSimulationEndpointUrl() + " on port "
+                + config.getSimulationPort() + " to get the current position");
         try {
             JSONObject json = new JSONObject();
             json.put("operation", "get_position");
-            JSONObject responseJson = accessWebots(json);
+            JSONObject responseJson = accessWebots(json, config);
 
             if(Objects.equals(responseJson.get("result"), "success")) {
                 JSONArray jsonArray = (JSONArray) responseJson.get("positions");
@@ -67,8 +68,8 @@ public class WebotsExecutionService {
         }
     }
 
-    private static JSONObject accessWebots(JSONObject input) throws IOException, ParseException {
-        Socket client = new Socket("endpointURL", 1111);
+    private static JSONObject accessWebots(JSONObject input, SimulationInstanceConfig config) throws IOException, ParseException {
+        Socket client = new Socket(config.getSimulationEndpointUrl(), config.getSimulationPort());
         DataOutputStream out = new DataOutputStream(client.getOutputStream());
         System.out.println("Connected to " + client.getRemoteSocketAddress());
 
