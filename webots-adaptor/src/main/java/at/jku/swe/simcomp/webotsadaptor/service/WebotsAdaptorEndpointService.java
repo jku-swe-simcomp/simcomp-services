@@ -30,17 +30,11 @@ public class WebotsAdaptorEndpointService implements AdaptorEndpointService {
     }
 
     @Override
-    public AttributeValue getAttributeValue(AttributeKey attributeKey, String sessionId) throws SessionNotValidException {
+    public AttributeValue getAttributeValue(AttributeKey attributeKey, String sessionId) throws SessionNotValidException, RoboOperationFailedException, IOException, ParseException {
         demoSessionService.renewSession(sessionId);
         // Note: can add more cases for different attributes
         return switch(attributeKey){
-            case JOINT_POSITIONS -> {
-                try {
-                    yield new AttributeValue.JointPositions(WebotsExecutionService.getPositions(sessionId));
-                } catch (Exception e) {
-                    throw new SessionNotValidException(e.getMessage());
-                }
-            } // TODO: implement logic to fetch positions
+            case JOINT_POSITIONS ->  new AttributeValue.JointPositions(WebotsExecutionService.getPositions(sessionId));
             case JOINT_STATES -> new AttributeValue.JointPositions(List.of()); // TODO: implement logic to fetch states
             default -> throw new UnsupportedOperationException("Attribute %s not supported by this service".formatted(attributeKey));
         };

@@ -17,7 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PreDestroy;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
+import org.json.simple.parser.ParseException;
 
 /**
  * Class for endpoints acting as adaptors for simulations.
@@ -98,7 +100,7 @@ public class AdaptorEndpointController implements AdaptorEndpoint{
      */
     @Override
     @GetMapping("/{sessionId}/attribute/{attribute}")
-    public final ResponseEntity<AttributeValue> getAttribute(@PathVariable AttributeKey attribute, @PathVariable String sessionId) throws SessionNotValidException {
+    public final ResponseEntity<AttributeValue> getAttribute(@PathVariable AttributeKey attribute, @PathVariable String sessionId) throws SessionNotValidException, RoboOperationFailedException, IOException, ParseException {
         AttributeValue value = adaptorEndpointService.getAttributeValue(attribute, sessionId);
         return ResponseEntity.ok(value);
     }
