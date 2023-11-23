@@ -25,6 +25,11 @@ public class WebotsAdaptorEndpointService implements AdaptorEndpointService {
     }
 
     @Override
+    public String initSession(String instanceId) throws SessionInitializationFailedException {
+        return sessionService.initializeSession(instanceId);
+    }
+
+    @Override
     public void closeSession(String sessionId) throws SessionNotValidException {
         sessionService.closeSession(sessionId);
     }

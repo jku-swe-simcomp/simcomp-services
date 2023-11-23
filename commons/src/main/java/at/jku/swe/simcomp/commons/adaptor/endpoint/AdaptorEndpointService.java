@@ -12,5 +12,6 @@ import org.json.simple.parser.ParseException;
 public interface AdaptorEndpointService {
     AttributeValue getAttributeValue(AttributeKey attribute, String sessionId) throws SessionNotValidException, RoboOperationFailedException, IOException, ParseException;
     String initSession() throws SessionInitializationFailedException;
+    String initSession(String instanceId) throws SessionInitializationFailedException;
     void closeSession(String sessionId) throws SessionNotValidException;
 }

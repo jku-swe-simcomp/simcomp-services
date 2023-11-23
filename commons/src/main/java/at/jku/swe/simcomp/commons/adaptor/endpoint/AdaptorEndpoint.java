@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.text.ParseException;
 
 public interface AdaptorEndpoint {
-    ResponseEntity<String> initSession() throws SessionInitializationFailedException;
+    ResponseEntity<String> initSession(String instanceId) throws SessionInitializationFailedException;
     ResponseEntity<String> closeSession(String sessionId) throws SessionNotValidException;
     ResponseEntity<ExecutionResultDTO> executeAction(ExecutionCommand executionCommand, String sessionId) throws Exception;
     ResponseEntity<AttributeValue> getAttribute(AttributeKey attribute, String sessionId) throws SessionNotValidException, RoboOperationFailedException, IOException, ParseException, org.json.simple.parser.ParseException;

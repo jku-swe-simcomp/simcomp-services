@@ -98,31 +98,28 @@ public class AdaptorClient {
         }
     }
 
-    public void registerSimulationInstanceForAdaptor(ServiceRegistrationConfigDTO serviceRegistrationConfigDTO, SimulationInstanceConfig config) {
-        String url = "http://" + serviceRegistrationConfigDTO.getHost() + ":" + serviceRegistrationConfigDTO.getPort() + AdaptorEndpointConstants.SIMULATION_INSTANCE_ENDPOINT;
+    public void registerSimulationInstanceForAdaptor(ServiceRegistrationConfigDTO serviceRegistrationConfigDTO, SimulationInstanceConfig config) throws Exception {
+        String url = "http://" + serviceRegistrationConfigDTO.getHost() + ":" + serviceRegistrationConfigDTO.getPort() + AdaptorEndpointConstants.SIMULATION_INSTANCE_PATH;
         HttpEntity<SimulationInstanceConfig> requestEntity = new HttpEntity<>(config, null);
-        restTemplate.postForObject(url, requestEntity, Void.class);
+        var response = restTemplate.postForEntity(url, requestEntity, Void.class);
+        if(!response.getStatusCode().is2xxSuccessful()){
+            throw new Exception("Could not register simulation instance %s for adaptor %s with message %s".formatted(config, serviceRegistrationConfigDTO.getName(), response.getBody()));
+        }
     }
 
     public List<SimulationInstanceConfig> getSimulationInstances(ServiceRegistrationConfigDTO config) {
-        String url = "http://" + config.getHost() + ":" + config.getPort() + AdaptorEndpointConstants.SIMULATION_INSTANCE_ENDPOINT;
+        String url = "http://" + config.getHost() + ":" + config.getPort() + AdaptorEndpointConstants.SIMULATION_INSTANCE_PATH;
         ResponseEntity<List<SimulationInstanceConfig>> responseEntity = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<List<SimulationInstanceConfig>>() {}
+                new ParameterizedTypeReference<>() {}
         );
         return responseEntity.getBody();
     }
 
-    public void deleteSimulationInstance(ServiceRegistrationConfigDTO serviceRegistrationConfigDTO, SimulationInstanceConfig config){
-        String url = "http://" + serviceRegistrationConfigDTO.getHost() + ":" + serviceRegistrationConfigDTO.getPort() + AdaptorEndpointConstants.SIMULATION_INSTANCE_ENDPOINT;
-        HttpEntity<SimulationInstanceConfig> requestEntity = new HttpEntity<>(config, null);
-        restTemplate.exchange(
-                url,
-                HttpMethod.DELETE,
-                requestEntity,
-                Void.class
-        );
+    public void deleteSimulationInstance(ServiceRegistrationConfigDTO serviceRegistrationConfigDTO, String instanceId){
+        String url = "http://" + serviceRegistrationConfigDTO.getHost() + ":" + serviceRegistrationConfigDTO.getPort() + AdaptorEndpointConstants.getDeleteSimulationInstancePathForInstanceId(instanceId);
+        restTemplate.delete(url);
     }
 }

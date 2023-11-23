@@ -22,7 +22,7 @@ import java.util.Objects;
 public class WebotsExecutionService {
 
     public static ExecutionResultDTO executeCommand(JSONObject command, SimulationInstanceConfig config) throws RoboOperationFailedException, IOException, ParseException {
-        System.out.println("Connecting to " + config.getSimulationEndpointUrl() + " on port " + config.getSimulationPort());
+        System.out.println("Connecting to " + config.getInstanceHost() + " on port " + config.getInstancePort());
         try {
             JSONObject responseJson = accessWebots(command, config);
 
@@ -42,8 +42,8 @@ public class WebotsExecutionService {
     }
 
     public static List<Double> getPositions(SimulationInstanceConfig config) throws RoboOperationFailedException, IOException, ParseException {
-        System.out.println("Connecting to " + config.getSimulationEndpointUrl() + " on port "
-                + config.getSimulationPort() + " to get the current position");
+        System.out.println("Connecting to " + config.getInstanceHost() + " on port "
+                + config.getInstancePort() + " to get the current position");
         try {
             JSONObject json = new JSONObject();
             json.put("operation", "get_position");
@@ -69,7 +69,7 @@ public class WebotsExecutionService {
     }
 
     private static JSONObject accessWebots(JSONObject input, SimulationInstanceConfig config) throws IOException, ParseException {
-        Socket client = new Socket(config.getSimulationEndpointUrl(), config.getSimulationPort());
+        Socket client = new Socket(config.getInstanceHost(), config.getInstancePort());
         DataOutputStream out = new DataOutputStream(client.getOutputStream());
         System.out.println("Connected to " + client.getRemoteSocketAddress());
 

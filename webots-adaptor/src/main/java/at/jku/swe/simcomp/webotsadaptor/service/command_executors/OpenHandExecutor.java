@@ -20,7 +20,7 @@ public class OpenHandExecutor
     @Override
     public ExecutionResultDTO execute(ExecutionCommand.OpenHandCommand command, SimulationInstanceConfig config) throws RoboOperationFailedException, IOException, ParseException {
 
-        System.out.println("Connecting to " + config.getSimulationEndpointUrl() + " on port " + config.getSimulationPort());
+        System.out.println("Connecting to " + config.getInstanceHost() + " on port " + config.getInstancePort());
 
         JSONObject json = new JSONObject();
         json.put("operation", "set_axis");

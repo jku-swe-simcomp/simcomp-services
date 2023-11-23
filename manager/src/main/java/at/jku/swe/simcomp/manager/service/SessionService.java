@@ -1,5 +1,6 @@
 package at.jku.swe.simcomp.manager.service;
 
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.BadRequestException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
 import at.jku.swe.simcomp.commons.manager.dto.session.SessionRequest;
 import at.jku.swe.simcomp.commons.manager.dto.session.SessionRequestVisitor;
@@ -10,7 +11,6 @@ import at.jku.swe.simcomp.manager.domain.model.AdaptorSession;
 import at.jku.swe.simcomp.manager.domain.model.Session;
 import at.jku.swe.simcomp.manager.domain.repository.AdaptorSessionRepository;
 import at.jku.swe.simcomp.manager.domain.repository.SessionRepository;
-import at.jku.swe.simcomp.manager.rest.exception.BadRequestException;
 import at.jku.swe.simcomp.manager.service.client.AdaptorClient;
 import at.jku.swe.simcomp.manager.service.client.ServiceRegistryClient;
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +52,12 @@ public class SessionService implements SessionRequestVisitor {
     @Override
     public Session initSession(SessionRequest.AnySimulationSessionRequest request) throws SessionInitializationFailedException {
         return requestAdaptorSessionsAndConstructAndPersistAggregatedSession(getRegisteredAdaptors(), request.n());
+    }
+
+    @Override
+    public Session initSession(SessionRequest.SelectedSimulationInstanceSessionRequest request) throws SessionInitializationFailedException {
+        // TODO: implement
+       throw new RuntimeException("Not implemented");
     }
 
     public void closeSession(UUID aggregatedSessionKey) throws NotFoundException, BadRequestException {

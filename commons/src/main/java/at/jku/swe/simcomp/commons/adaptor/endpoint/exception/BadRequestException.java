@@ -1,4 +1,4 @@
-package at.jku.swe.simcomp.manager.rest.exception;
+package at.jku.swe.simcomp.commons.adaptor.endpoint.exception;
 
 public class BadRequestException extends Exception{
     public BadRequestException(String message) {

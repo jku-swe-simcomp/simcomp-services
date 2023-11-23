@@ -5,4 +5,5 @@ import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializati
 public interface SessionRequestVisitor {
     Object initSession(SessionRequest.SelectedSimulationSessionRequest request) throws SessionInitializationFailedException;
     Object initSession(SessionRequest.AnySimulationSessionRequest request) throws SessionInitializationFailedException;
+    Object initSession(SessionRequest.SelectedSimulationInstanceSessionRequest request) throws SessionInitializationFailedException;
 }

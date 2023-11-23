@@ -22,6 +22,11 @@ public class DemoAdaptorEndpointService implements AdaptorEndpointService {
     }
 
     @Override
+    public String initSession(String instanceId) throws SessionInitializationFailedException {
+        return demoSessionService.initializeSession(instanceId);
+    }
+
+    @Override
     public void closeSession(String sessionId) throws SessionNotValidException {
         demoSessionService.closeSession(sessionId);
     }

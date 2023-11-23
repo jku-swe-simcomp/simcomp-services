@@ -1,10 +1,8 @@
 package at.jku.swe.simcomp.manager.rest;
 
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.BadRequestException;
 import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
 import at.jku.swe.simcomp.commons.manager.dto.execution.ExecutionDTO;
-import at.jku.swe.simcomp.commons.manager.dto.execution.ExecutionResponseDTO;
-import at.jku.swe.simcomp.commons.manager.dto.execution.ExecutionResponseState;
-import at.jku.swe.simcomp.manager.rest.exception.BadRequestException;
 import at.jku.swe.simcomp.manager.service.ExecutionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

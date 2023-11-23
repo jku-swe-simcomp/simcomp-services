@@ -1,7 +1,7 @@
 package at.jku.swe.simcomp.manager.rest;
 
 import at.jku.swe.simcomp.commons.HttpErrorDTO;
-import at.jku.swe.simcomp.manager.rest.exception.BadRequestException;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.BadRequestException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -25,5 +25,13 @@ public class ErrorHandler {
                 .message(e.getMessage())
                 .build();
         return ResponseEntity.status(400).body(dto);
+    }
+    @ExceptionHandler
+    public ResponseEntity<HttpErrorDTO> handleException(Exception e){
+        HttpErrorDTO dto = HttpErrorDTO.builder()
+                .status(500)
+                .message(e.getMessage())
+                .build();
+        return ResponseEntity.status(500).body(dto);
     }
 }
