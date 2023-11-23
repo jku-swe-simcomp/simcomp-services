@@ -1,7 +1,6 @@
 package at.jku.swe.simcomp.manager.service;
 
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
-import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
 import at.jku.swe.simcomp.commons.manager.dto.session.SessionRequest;
 import at.jku.swe.simcomp.commons.manager.dto.session.SessionRequestVisitor;
 import at.jku.swe.simcomp.commons.manager.dto.session.SessionState;
@@ -14,7 +13,6 @@ import at.jku.swe.simcomp.manager.domain.repository.SessionRepository;
 import at.jku.swe.simcomp.manager.rest.exception.BadRequestException;
 import at.jku.swe.simcomp.manager.service.client.AdaptorClient;
 import at.jku.swe.simcomp.manager.service.client.ServiceRegistryClient;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
@@ -48,12 +46,12 @@ public class SessionService implements SessionRequestVisitor {
                 .filter(config -> request.requestedSimulations().contains(config.getName()))
                 .toList();
         log.debug("Filtered list of available adaptors: {}", adaptorConfigs);
-        return getAdaptorSessionsAndConstructAndPersistAggregatedSession(adaptorConfigs, Integer.MAX_VALUE);
+        return requestAdaptorSessionsAndConstructAndPersistAggregatedSession(adaptorConfigs, Integer.MAX_VALUE);
     }
 
     @Override
     public Session initSession(SessionRequest.AnySimulationSessionRequest request) throws SessionInitializationFailedException {
-        return getAdaptorSessionsAndConstructAndPersistAggregatedSession(getRegisteredAdaptors(), request.n());
+        return requestAdaptorSessionsAndConstructAndPersistAggregatedSession(getRegisteredAdaptors(), request.n());
     }
 
     public void closeSession(UUID aggregatedSessionKey) throws NotFoundException, BadRequestException {
@@ -153,7 +151,7 @@ public class SessionService implements SessionRequestVisitor {
     }
     // private region methods
 
-    private Session getAdaptorSessionsAndConstructAndPersistAggregatedSession(List<ServiceRegistrationConfigDTO> adaptorConfigs, Integer maximumNumberOfSimulations) throws SessionInitializationFailedException {
+    private Session requestAdaptorSessionsAndConstructAndPersistAggregatedSession(List<ServiceRegistrationConfigDTO> adaptorConfigs, Integer maximumNumberOfSimulations) throws SessionInitializationFailedException {
         var acquiredSessions = tryObtainAdaptorSessions(adaptorConfigs, maximumNumberOfSimulations);
         var aggregatedSession = constructAggregatedSession(acquiredSessions);
         return sessionRepository.save(aggregatedSession);

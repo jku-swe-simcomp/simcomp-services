@@ -51,6 +51,12 @@ public class SessionService implements SimulationRemovalListener {
         log.info("Session {} renewed", sessionKey);
         return currentSessions.get(sessionKey);
     }
+    public SimulationInstanceConfig getConfigForSession(String sessionKey) throws SessionNotValidException {
+        if(!currentSessions.containsKey(sessionKey))
+            throw new SessionNotValidException("Session %s not valid".formatted(sessionKey));
+
+        return currentSessions.get(sessionKey);
+    }
 
     public synchronized void closeSession (String sessionKey) throws SessionNotValidException {
         if(sessionTerminationThreads.containsKey(sessionKey)) {
