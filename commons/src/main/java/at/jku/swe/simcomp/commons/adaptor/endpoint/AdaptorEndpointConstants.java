@@ -1,6 +1,7 @@
 package at.jku.swe.simcomp.commons.adaptor.endpoint;
 
 import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeKey;
+import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 
 public class AdaptorEndpointConstants {
     public static final String HEALTH_CHECK_PATH="/health";
@@ -15,8 +16,16 @@ public class AdaptorEndpointConstants {
     private AdaptorEndpointConstants(){
         // empty for constants class
     }
+
+    public static String getDomain(ServiceRegistrationConfigDTO configDTO){
+        return "http://" + configDTO.getHost() + ":" + configDTO.getPort();
+    }
     public static String getGetAttributePathForAttributeName(String sessionId, AttributeKey key) {
         return GET_ATTRIBUTE_PATH.formatted(sessionId, key);
+    }
+
+    public static String getInitSessionPathWithInstanceId(String instanceId) {
+        return INIT_SESSION_PATH + "?instanceId=" + instanceId;
     }
 
     public static String getDeleteSimulationInstancePathForInstanceId(String instanceId) {

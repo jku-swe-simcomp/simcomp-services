@@ -7,10 +7,10 @@ import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
 import org.springframework.stereotype.Service;
 
 @Service
-public class PoseCommandExecutor implements CommandExecutor<ExecutionCommand.PoseCommand, ExecutionResultDTO> {
+public class JointPositionCommandExecutor implements CommandExecutor<ExecutionCommand.SetJointPositionCommand, ExecutionResultDTO> {
 
     @Override
-    public ExecutionResultDTO execute(ExecutionCommand.PoseCommand command, SimulationInstanceConfig config) {
+    public ExecutionResultDTO execute(ExecutionCommand.SetJointPositionCommand command, SimulationInstanceConfig config) {
         return ExecutionResultDTO.builder()
                 .report("Pose command executed")
                 .build();

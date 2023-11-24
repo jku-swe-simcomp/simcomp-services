@@ -23,6 +23,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Optional;
+import static at.jku.swe.simcomp.commons.adaptor.endpoint.AdaptorEndpointConstants.*;
 
 @Service
 @Slf4j
@@ -37,12 +38,12 @@ public class AdaptorClient {
     }
 
     public Optional<String> getSession(ServiceRegistrationConfigDTO adaptorConfig) {
-        String url = "http://" + adaptorConfig.getHost() + ":" + adaptorConfig.getPort() + AdaptorEndpointConstants.INIT_SESSION_PATH;
+        String url = getDomain(adaptorConfig) + INIT_SESSION_PATH;
         try {
             ResponseEntity<String> response = restTemplate.postForEntity(url, new HttpEntity<>(null), String.class);
 
             if (response.getStatusCode() == HttpStatus.OK) {
-                log.info("Obtained adaptor session for {} with key {}", adaptorConfig.getName(), response.getBody());
+                log.info("Obtained adaptor session of {} with key {}", adaptorConfig.getName(), response.getBody());
                 return Optional.ofNullable(response.getBody());
             } else {
                 log.info("Non-200 response when trying to obtain session for {}: {}", adaptorConfig.getName(), response.getBody());
@@ -54,8 +55,26 @@ public class AdaptorClient {
         }
     }
 
+    public Optional<String> getSession(ServiceRegistrationConfigDTO adaptorConfig, String instanceId) {
+        String url = getDomain(adaptorConfig) + getInitSessionPathWithInstanceId(instanceId);
+        try {
+            ResponseEntity<String> response = restTemplate.postForEntity(url, new HttpEntity<>(null), String.class);
+
+            if (response.getStatusCode() == HttpStatus.OK) {
+                log.info("Obtained adaptor session for simulation {}, instance {} with key {}", adaptorConfig.getName(), instanceId, response.getBody());
+                return Optional.ofNullable(response.getBody());
+            } else {
+                log.info("Non-200 response when trying to obtain instance {} of {} session: {}", instanceId, adaptorConfig.getName(), response.getBody());
+                return Optional.empty();
+            }
+        } catch (Exception e) {
+            log.error("Error during REST call to initialize adaptor session for instance {} of {}. {}", instanceId, adaptorConfig.getName(), e.getMessage());
+            return Optional.empty();
+        }
+    }
+
     public void closeSession(ServiceRegistrationConfigDTO adaptorConfig, String sessionKey){
-        String url = "http://" + adaptorConfig.getHost() + ":" + adaptorConfig.getPort() + AdaptorEndpointConstants.getCloseSessionPathForSessionId(sessionKey);
+        String url = getDomain(adaptorConfig) + getCloseSessionPathForSessionId(sessionKey);
         try {
             restTemplate.delete(url);
         } catch (Exception e) {
@@ -64,7 +83,7 @@ public class AdaptorClient {
     }
 
     public ExecutionResultDTO executeCommand(ServiceRegistrationConfigDTO adaptorConfig, ExecutionCommand command, String adaptorSessionKey) throws CommandExecutionFailedException {
-        String url = "http://" + adaptorConfig.getHost() + ":" + adaptorConfig.getPort() + AdaptorEndpointConstants.getExecuteActionPathForSessionId(adaptorSessionKey);
+        String url = getDomain(adaptorConfig) + getExecuteActionPathForSessionId(adaptorSessionKey);
         ResponseEntity<String> response = restTemplate.postForEntity(url, new HttpEntity<>(command, null), String.class);
 
         if (response.getStatusCode() == HttpStatus.OK) {
@@ -86,12 +105,17 @@ public class AdaptorClient {
     }
 
     public Optional<AttributeValue> getAttributeValue(String sessionId, AttributeKey attributeKey, ServiceRegistrationConfigDTO config){
-        String url = "http://" + config.getHost() + ":" + config.getPort() + AdaptorEndpointConstants.getGetAttributePathForAttributeName(sessionId, attributeKey);
-        ResponseEntity<AttributeValue> responseEntity = restTemplate.getForEntity(url, AttributeValue.class);
+        String url = getDomain(config) + getGetAttributePathForAttributeName(sessionId, attributeKey);
+        ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
 
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             log.debug("Obtained attribute value for adaptor session {} of {} with key {}: {}", sessionId, config.getName(), attributeKey, responseEntity.getBody());
-            return Optional.ofNullable(responseEntity.getBody());
+            try {
+                return Optional.ofNullable(objectMapper.readValue(responseEntity.getBody(), AttributeValue.class));
+            } catch (JsonProcessingException e) {
+                log.warn("Could not deserialize response {} from {}", responseEntity.getBody(), config.getName());
+                return Optional.empty();
+            }
         }else{
             log.warn("Non-2xx response when trying to obtain attribute value for adaptor session {} of {}: {}", sessionId, config.getName(), responseEntity.getBody());
             return Optional.empty();
@@ -99,7 +123,7 @@ public class AdaptorClient {
     }
 
     public void registerSimulationInstanceForAdaptor(ServiceRegistrationConfigDTO serviceRegistrationConfigDTO, SimulationInstanceConfig config) throws Exception {
-        String url = "http://" + serviceRegistrationConfigDTO.getHost() + ":" + serviceRegistrationConfigDTO.getPort() + AdaptorEndpointConstants.SIMULATION_INSTANCE_PATH;
+        String url = getDomain(serviceRegistrationConfigDTO) + SIMULATION_INSTANCE_PATH;
         HttpEntity<SimulationInstanceConfig> requestEntity = new HttpEntity<>(config, null);
         var response = restTemplate.postForEntity(url, requestEntity, Void.class);
         if(!response.getStatusCode().is2xxSuccessful()){
@@ -108,7 +132,7 @@ public class AdaptorClient {
     }
 
     public List<SimulationInstanceConfig> getSimulationInstances(ServiceRegistrationConfigDTO config) {
-        String url = "http://" + config.getHost() + ":" + config.getPort() + AdaptorEndpointConstants.SIMULATION_INSTANCE_PATH;
+        String url = getDomain(config) + SIMULATION_INSTANCE_PATH;
         ResponseEntity<List<SimulationInstanceConfig>> responseEntity = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
@@ -119,7 +143,7 @@ public class AdaptorClient {
     }
 
     public void deleteSimulationInstance(ServiceRegistrationConfigDTO serviceRegistrationConfigDTO, String instanceId){
-        String url = "http://" + serviceRegistrationConfigDTO.getHost() + ":" + serviceRegistrationConfigDTO.getPort() + AdaptorEndpointConstants.getDeleteSimulationInstancePathForInstanceId(instanceId);
+        String url = getDomain(serviceRegistrationConfigDTO)+ getDeleteSimulationInstancePathForInstanceId(instanceId);
         restTemplate.delete(url);
     }
 }

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,9 +42,9 @@ public class SessionService implements SessionRequestVisitor {
     }
 
     @Override
-    public Session initSession(SessionRequest.SelectedSimulationSessionRequest request) throws SessionInitializationFailedException {
+    public Session initSession(SessionRequest.SelectedSimulationTypesSessionRequest request) throws SessionInitializationFailedException {
         var adaptorConfigs = getRegisteredAdaptors().stream()
-                .filter(config -> request.requestedSimulations().contains(config.getName()))
+                .filter(config -> request.requestedSimulationTypes().contains(config.getName()))
                 .toList();
         log.debug("Filtered list of available adaptors: {}", adaptorConfigs);
         return requestAdaptorSessionsAndConstructAndPersistAggregatedSession(adaptorConfigs, Integer.MAX_VALUE);
@@ -55,9 +56,22 @@ public class SessionService implements SessionRequestVisitor {
     }
 
     @Override
-    public Session initSession(SessionRequest.SelectedSimulationInstanceSessionRequest request) throws SessionInitializationFailedException {
-        // TODO: implement
-       throw new RuntimeException("Not implemented");
+    public Session initSession(SessionRequest.SelectedSimulationInstancesSessionRequest request) throws SessionInitializationFailedException {
+        var adaptorConfigsToRequestedInstanceId = getRegisteredAdaptors().stream()
+                .filter(config -> request.requestedSimulationInstances().containsKey(config.getName()))
+                .collect(Collectors.toMap(Function.identity(), config -> request.requestedSimulationInstances().get(config.getName())));
+
+        List<AdaptorSession> sessions = new ArrayList<>();
+        for(var entry : adaptorConfigsToRequestedInstanceId.entrySet()){
+            Optional<String> sessionKey = adaptorClient.getSession(entry.getKey(), entry.getValue());
+            sessionKey.ifPresent(s -> sessions.add(initAdaptorSession(s, entry.getKey().getName(), entry.getValue())));
+        }
+
+        if(sessions.isEmpty()){
+            throw new SessionInitializationFailedException("Could not obtain a single session.");
+        }
+        var aggregatedSession = constructAggregatedSession(sessions);
+        return sessionRepository.save(aggregatedSession);
     }
 
     public void closeSession(UUID aggregatedSessionKey) throws NotFoundException, BadRequestException {
@@ -68,6 +82,7 @@ public class SessionService implements SessionRequestVisitor {
         closeAdaptorSessions(aggregatedSessionKey);
         sessionRepository.updateSessionStateBySessionKey(aggregatedSessionKey, SessionState.CLOSED);
         log.debug("Closed session {}", aggregatedSessionKey.toString());
+        //TODO: RESET_TO_HOME before closing adaptor-sessions? Or responsibility of the adaptor?
     }
 
     public SessionStateDTO getSessionState(UUID sessionKey) throws NotFoundException{
@@ -101,7 +116,7 @@ public class SessionService implements SessionRequestVisitor {
             throw new SessionInitializationFailedException("Could not obtain session for simulation %s".formatted(adaptorName));
         }
 
-        AdaptorSession adaptorSession = initAdaptorSession(optAdaptorSessionKey.get(), adaptorName);
+        AdaptorSession adaptorSession = initAdaptorSession(optAdaptorSessionKey.get(), adaptorName, null);
         session.addAdaptorSession(adaptorSession);
         sessionRepository.save(session);
     }
@@ -144,10 +159,15 @@ public class SessionService implements SessionRequestVisitor {
             throw new SessionInitializationFailedException("Simulation %s not registered".formatted(adaptorName));
         }
 
-        var optAdaptorSessionKey = adaptorClient.getSession(adaptorConfigs.get(0));
+        Optional<String> optAdaptorSessionKey = Optional.empty();
+        if(adaptorSession.getInstanceId() != null){
+            optAdaptorSessionKey = adaptorClient.getSession(adaptorConfigs.get(0), adaptorSession.getInstanceId());
+        }else{
+            optAdaptorSessionKey = adaptorClient.getSession(adaptorConfigs.get(0));
+        }
 
         if(optAdaptorSessionKey.isEmpty()){
-            throw new SessionInitializationFailedException("Could not obtain a session for simulation %s".formatted(adaptorName));
+            throw new SessionInitializationFailedException("Could not obtain session for instance %s of simulation %s".formatted(adaptorSession.getInstanceId(), adaptorName));
         }
 
         adaptorSession.setSessionKey(optAdaptorSessionKey.get());
@@ -176,7 +196,7 @@ public class SessionService implements SessionRequestVisitor {
 
     private void tryAddAdaptorSession(ServiceRegistrationConfigDTO config, List<AdaptorSession> sessions) {
         Optional<String> sessionKey = adaptorClient.getSession(config);
-        sessionKey.ifPresent(s -> sessions.add(initAdaptorSession(s, config.getName())));
+        sessionKey.ifPresent(s -> sessions.add(initAdaptorSession(s, config.getName(), null)));
     }
 
     private Session constructAggregatedSession(List<AdaptorSession> adaptorSessions) throws SessionInitializationFailedException {
@@ -197,10 +217,11 @@ public class SessionService implements SessionRequestVisitor {
                 .build();
     }
 
-    private AdaptorSession initAdaptorSession(String key, String name){
+    private AdaptorSession initAdaptorSession(String key, String name, String instanceId){
         return AdaptorSession.builder()
                 .sessionKey(key)
                 .adaptorName(name)
+                .instanceId(instanceId)
                 .state(SessionState.OPEN)
                 .build();
     }
