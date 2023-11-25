@@ -52,7 +52,7 @@ def initial_position():
         "axis6": 0
     }
     print('Setting all positions to 0')
-    return '{"result": "success}"\n'
+    return '{"result": "success"}\n'
 
 
 initial_position()
@@ -92,7 +92,9 @@ def set_axis(set_axis_input):
         position = float(set_axis_input.get("value"))
         print(f'Setting axis {axis} to value {position}')
         if axis == 1:
+            print('test')
             m1.setPosition(position)
+            print('test')
         elif axis == 2:
             m2.setPosition(position)
         elif axis == 3:
@@ -106,7 +108,7 @@ def set_axis(set_axis_input):
     except ValueError:
         print("Invalid position value received.")
         return '{"result":"The axis could not be set"}\n'
-    return '{"result": "success}"\n'
+    return '{"result": "success"}\n'
 
 
 def adjust_axis(adjust_axis_input):
@@ -141,7 +143,7 @@ def adjust_axis(adjust_axis_input):
     except ValueError:
         print("Invalid position value received.")
         return '{"result":"The axis could not be adjusted"}\n'
-    return '{"result": "success}"\n'
+    return '{"result": "success"}\n'
 
 
 def get_position_json():
@@ -194,6 +196,7 @@ while robot.step(timestep) != -1:
         print(e.msg)
         response = '{"result":"The JSON file could not be parsed"}\n'
 
+    print('Returning response: ' + response)
     con.sendall(response.encode('utf-8'))
 
 print('Ending client connection ', client)
