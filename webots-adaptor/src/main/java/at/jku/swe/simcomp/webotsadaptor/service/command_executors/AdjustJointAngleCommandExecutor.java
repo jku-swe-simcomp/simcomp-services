@@ -24,7 +24,7 @@ public class AdjustJointAngleCommandExecutor implements CommandExecutor<Executio
 
         JSONObject json = new JSONObject();
         JointAngleAdjustmentDTO movement = command.jointAngleAdjustment(); // now a list is used, maybe change to only send one angle adjustment per command
-        json.put("operation", "set_axis");
+        json.put("operation", "adjust_axis");
         json.put("axis", movement.getJoint().getIndex());
         json.put("value", movement.getByRadians());
         return WebotsExecutionService.executeCommand(json, config);
