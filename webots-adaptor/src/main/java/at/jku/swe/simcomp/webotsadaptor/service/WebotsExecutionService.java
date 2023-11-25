@@ -26,6 +26,8 @@ public class WebotsExecutionService {
         try {
             JSONObject responseJson = accessWebots(command, config);
 
+            System.out.println("Simulation Response: " + responseJson.toString());
+
             if(Objects.equals(responseJson.get("result"), "success")) {
                 return ExecutionResultDTO.builder()
                         .report("Success")
@@ -75,8 +77,10 @@ public class WebotsExecutionService {
 
         out.write(input.toString().getBytes(StandardCharsets.UTF_8));
 
+        System.out.println("Command sent to simulation: " + input);
         BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
         String response = in.readLine();
+        System.out.println("Response in plain text: " + response);
         JSONParser parser = new JSONParser();
         return (JSONObject) parser.parse(response);
     }
