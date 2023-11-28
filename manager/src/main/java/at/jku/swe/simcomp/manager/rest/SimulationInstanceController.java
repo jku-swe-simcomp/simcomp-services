@@ -35,21 +35,21 @@ public class SimulationInstanceController {
 
     @PostMapping("/instance")
     public ResponseEntity<Void> registerSimulationInstanceForAdaptor(@RequestBody SimulationInstanceConfig config) throws Exception {
-        log.info("Request to register simulation instance {} for simulation {} received.", config);
+        log.info("Request to register simulation instance {} for simulation {} received.", config.getInstanceId(), config.getSimulationType());
         service.registerSimulationInstanceForAdaptor(config);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/{name}/instance")
-    public ResponseEntity<List<SimulationInstanceConfig>> getSimulationInstances(@PathVariable String name){
-        log.info("Request to return available simulation instances of simulation {} received.", name);
-        return ResponseEntity.ok(service.getSimulationInstances(name));
+    @GetMapping("/{type}/instance")
+    public ResponseEntity<List<SimulationInstanceConfig>> getSimulationInstances(@PathVariable String type){
+        log.info("Request to return available simulation instances of simulation {} received.", type);
+        return ResponseEntity.ok(service.getSimulationInstances(type));
     }
 
-    @DeleteMapping("/{simulationName}/instance/{instanceId}")
-    public ResponseEntity<Void> deleteSimulationInstance(@PathVariable String simulationName, @PathVariable String instanceId){
-        log.info("Request to delete simulation instance {} of simulation {} received.", instanceId, simulationName);
-        service.deleteSimulationInstance(simulationName, instanceId);
+    @DeleteMapping("/{type}/instance/{instanceId}")
+    public ResponseEntity<Void> deleteSimulationInstance(@PathVariable String type, @PathVariable String instanceId){
+        log.info("Request to delete simulation instance {} of simulation {} received.", instanceId, type);
+        service.deleteSimulationInstance(type, instanceId);
         return ResponseEntity.ok().build();
     }
 }

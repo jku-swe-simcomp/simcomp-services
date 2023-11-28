@@ -36,30 +36,30 @@ public class SessionController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/{sessionKey}/{simulationName}")
-    public ResponseEntity<Void> addAdaptorSessionToAggregateSession(@PathVariable UUID sessionKey, @PathVariable String simulationName) throws BadRequestException, SessionInitializationFailedException, NotFoundException {
-        log.info("Request to add {} to session {}.", simulationName, sessionKey);
-        sessionService.addAdaptorSessionToAggregatedSession(sessionKey, simulationName);
-        log.info("Added {}.", simulationName);
+    @PostMapping("/{sessionKey}/{simulationType}")
+    public ResponseEntity<Void> addAdaptorSessionToAggregateSession(@PathVariable UUID sessionKey, @PathVariable String simulationType) throws BadRequestException, SessionInitializationFailedException, NotFoundException {
+        log.info("Request to add {} to session {}.", simulationType, sessionKey);
+        sessionService.addAdaptorSessionToAggregatedSession(sessionKey, simulationType);
+        log.info("Added {}.", simulationType);
 
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/{sessionKey}/{simulationName}/reopen")
-    public ResponseEntity<Void> reopenAdaptorSessionOfAggregateSession(@PathVariable UUID sessionKey, @PathVariable String simulationName) throws BadRequestException, SessionInitializationFailedException, NotFoundException {
-        log.info("Request to reopen {} from session {}.", simulationName, sessionKey);
-        sessionService.reopenAdaptorSessionOfAggregateSession(sessionKey, simulationName);
-        log.info("Reopened {}.", simulationName);
+    @PatchMapping("/{sessionKey}/{simulationType}/reopen")
+    public ResponseEntity<Void> reopenAdaptorSessionOfAggregateSession(@PathVariable UUID sessionKey, @PathVariable String simulationType) throws BadRequestException, SessionInitializationFailedException, NotFoundException {
+        log.info("Request to reopen {} from session {}.", simulationType, sessionKey);
+        sessionService.reopenAdaptorSessionOfAggregateSession(sessionKey, simulationType);
+        log.info("Reopened {}.", simulationType);
 
         return ResponseEntity.ok().build();
 
     }
 
-    @PatchMapping("/{sessionKey}/{simulationName}/close")
-    public ResponseEntity<Void> closeAdaptorSessionOfAggregateSession(@PathVariable UUID sessionKey, @PathVariable String simulationName) throws BadRequestException, NotFoundException {
-        log.info("Request to close {} from session {}.", simulationName, sessionKey);
-        sessionService.closeAdaptorSessionOfAggregateSession(sessionKey, simulationName);
-        log.info("Removed {}.", simulationName);
+    @PatchMapping("/{sessionKey}/{simulationType}/close")
+    public ResponseEntity<Void> closeAdaptorSessionOfAggregateSession(@PathVariable UUID sessionKey, @PathVariable String simulationType) throws BadRequestException, NotFoundException {
+        log.info("Request to close {} from session {}.", simulationType, sessionKey);
+        sessionService.closeAdaptorSessionOfAggregateSession(sessionKey, simulationType);
+        log.info("Removed {}.", simulationType);
 
         return ResponseEntity.ok().build();
     }

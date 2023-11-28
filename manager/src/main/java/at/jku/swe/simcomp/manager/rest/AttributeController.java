@@ -1,8 +1,17 @@
 package at.jku.swe.simcomp.manager.rest;
 
+import at.jku.swe.simcomp.commons.HttpErrorDTO;
 import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeKey;
 import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeValue;
 import at.jku.swe.simcomp.manager.service.AttributeService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,15 +25,37 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/session/{sessionId}/attribute/{attributeKey}")
 @Slf4j
+@Tag(name = "Attribute Controller", description = "Endpoints for managing attributes")
 public class AttributeController {
-
    private final AttributeService attributeService;
    public AttributeController(AttributeService attributeService){
        this.attributeService = attributeService;
     }
 
     @GetMapping
-    public ResponseEntity<Map<String, AttributeValue>> getAttributes(@PathVariable UUID sessionId, @PathVariable AttributeKey attributeKey){
+    @Operation(summary = "Get Attributes", description = "Retrieve attribute values from all simulation instances associated with this session. " +
+            "The attribute values returned by the simulation instances are merged into a single map." +
+            "The type of the simulation instance is used as key for the map, the fetched attribute value is used as value for the map."+
+            "The matching of the requested attribute key to the type is not enforced by the manager; i.e. if the simulation instance does not provide the requested attribute, it is still included."+
+            "If any error occurs while fetching an attribute value from a simulation instance, or no attribute value is returned by a simulation instance, the value is set to null.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Attributes retrieved successfully",
+                    content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = AttributeValue.class))),
+            @ApiResponse(responseCode = "404",
+                    description = "No session with given id found",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = HttpErrorDTO.class))),
+            @ApiResponse(responseCode = "500",
+                    description = "Internal server error",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = HttpErrorDTO.class)))
+    })
+    public ResponseEntity<Map<String, AttributeValue>> getAttributes(
+            @Parameter(description = "ID of the session", in = ParameterIn.PATH, required = true) @PathVariable UUID sessionId,
+            @Parameter(description = "The key of the requested attribute. Must be one of: JOINT_POSITIONS, JOINT_STATES, POSITION, POSE, ORIENTATION",
+                    in = ParameterIn.PATH, required = true) @PathVariable AttributeKey attributeKey){
         log.info("Request to fetch attribute {} for session {}", attributeKey, sessionId);
         return ResponseEntity.ok(attributeService.getAttributeValues(sessionId, attributeKey));
     }

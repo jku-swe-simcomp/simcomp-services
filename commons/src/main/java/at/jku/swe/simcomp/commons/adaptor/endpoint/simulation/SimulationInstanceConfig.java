@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 public class SimulationInstanceConfig {
     @NonNull
-    private String simulationName;
+    private String simulationType;
     @NonNull
     private String instanceId;
     @NonNull

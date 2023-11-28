@@ -6,6 +6,9 @@ import at.jku.swe.simcomp.commons.adaptor.dto.QuaternionDTO;
 import at.jku.swe.simcomp.commons.adaptor.dto.RoboJointStateDTO;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.jsonschema.JsonSerializableSchema;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.NonNull;
 
 import java.util.List;
 
@@ -20,10 +23,12 @@ import java.util.List;
         @JsonSubTypes.Type(value = AttributeValue.Orientation.class, name = "ORIENTATION"),
 })
 public interface AttributeValue {
-    record JointPositions(List<Double> jointPositions) implements AttributeValue{}
-    record JointStates(List<RoboJointStateDTO> jointStates) implements AttributeValue{}
+    @Schema(description = "The key of the attribute",
+            example = "JOINT_POSITIONS")
+    record JointPositions(@NonNull List<Double> jointPositions) implements AttributeValue{}
+    record JointStates(@NonNull List<RoboJointStateDTO> jointStates) implements AttributeValue{}
 
-    record Pose(PoseDTO pose) implements AttributeValue{}
-    record Position(PositionDTO position) implements AttributeValue{}
-    record Orientation(QuaternionDTO orientation) implements AttributeValue{}
+    record Pose(@NonNull PoseDTO pose) implements AttributeValue{}
+    record Position(@NonNull PositionDTO position) implements AttributeValue{}
+    record Orientation(@NonNull QuaternionDTO orientation) implements AttributeValue{}
 }

@@ -31,13 +31,13 @@ public class SimulationInstanceService {
 
     public void registerSimulationInstanceForAdaptor(SimulationInstanceConfig config) throws Exception {
         Optional<ServiceRegistrationConfigDTO> adaptorConfig = serviceRegistryClient.getRegisteredAdaptors().stream()
-                .filter(ac -> ac.getName().equals(config.getSimulationName()))
+                .filter(ac -> ac.getName().equals(config.getSimulationType()))
                         .findFirst();
 
         if(adaptorConfig.isPresent()){
             adaptorClient.registerSimulationInstanceForAdaptor(adaptorConfig.get(), config);
         }else{
-            throw new NotFoundException("Simulation with name " + config.getSimulationName() + " not found.");
+            throw new NotFoundException("Simulation with name " + config.getSimulationType() + " not found.");
         }
     }
 
