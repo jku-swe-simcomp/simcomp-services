@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import at.jku.swe.simcomp.commons.adaptor.endpoint.ExecutionErrorDTO;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,6 +22,8 @@ import lombok.NoArgsConstructor;
         @JsonSubTypes.Type(value = ExecutionErrorDTO.class, name = "EXECUTION_ERROR"),
 })
 public class HttpErrorDTO {
+    @Schema(description = "The error status", example = "404")
     private long status;
+    @Schema(description = "The error message", example = "Unknown error.")
     private String message;
 }

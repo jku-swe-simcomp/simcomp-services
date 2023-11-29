@@ -23,7 +23,7 @@ public class DemoSimulationInstanceService implements SimulationInstanceService 
 
     @Override
     public void addSimulationInstance(SimulationInstanceConfig config) throws BadRequestException {
-        if(!config.getSimulationName().equals(this.adaptorName)){
+        if(!config.getSimulationType().equals(this.adaptorName)){
             throw new BadRequestException("Simulation name does not match the name of this adaptor");
         }
         if(instances.stream().anyMatch(instance -> instance.getInstanceHost().equals(config.getInstanceHost()) &&
