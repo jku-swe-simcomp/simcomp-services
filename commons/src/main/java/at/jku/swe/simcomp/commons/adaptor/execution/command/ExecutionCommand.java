@@ -5,6 +5,7 @@ import at.jku.swe.simcomp.commons.adaptor.execution.command.visitor.ExecutionCom
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.NonNull;
 
 import java.util.List;
@@ -23,12 +24,13 @@ import java.util.List;
         @JsonSubTypes.Type(value = ExecutionCommand.CalibrateCommand.class, name = "CALIBRATE"),
         @JsonSubTypes.Type(value = ExecutionCommand.GrabCommand.class, name = "GRAB"),
         @JsonSubTypes.Type(value = ExecutionCommand.OpenHandCommand.class, name = "OPEN_HAND"),
-        @JsonSubTypes.Type(value = ExecutionCommand.SetJointPositionCommand.class, name = "SET_JOINT_POSITIONS"),
+        @JsonSubTypes.Type(value = ExecutionCommand.SetJointPositionCommand.class, name = "SET_JOINT_POSITION"),
         @JsonSubTypes.Type(value = ExecutionCommand.ResetToHomeCommand.class, name = "RESET_TO_HOME"),
         @JsonSubTypes.Type(value = ExecutionCommand.ToggleGripperModeCommand.class, name = "TOGGLE_GRIPPER_MODE"),
         @JsonSubTypes.Type(value = ExecutionCommand.SetSpeedCommand.class, name = "SET_SPEED"),
         @JsonSubTypes.Type(value = ExecutionCommand.CompositeCommand.class, name = "COMPOSITE"),
 })
+@Schema(description = "A command to be executed.")
 public interface ExecutionCommand {
     <T,P> T accept(ExecutionCommandVisitor<T,P> visitor, P param) throws Exception;
     @JsonIgnore

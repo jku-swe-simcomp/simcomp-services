@@ -6,7 +6,7 @@ import at.jku.swe.simcomp.commons.adaptor.dto.QuaternionDTO;
 import at.jku.swe.simcomp.commons.adaptor.dto.RoboJointStateDTO;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.jsonschema.JsonSerializableSchema;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.NonNull;
 
@@ -22,13 +22,17 @@ import java.util.List;
         @JsonSubTypes.Type(value = AttributeValue.Pose.class, name = "POSE"),
         @JsonSubTypes.Type(value = AttributeValue.Orientation.class, name = "ORIENTATION"),
 })
+@Schema(description = "Marker interface with different subclasses representing attribute values.",
+        example = "{ \"key\": \"JOINT_POSITIONS\", \"jointPositions\": [0.0,0.0,0.0,0.0,0.0,0.0]")
 public interface AttributeValue {
-    @Schema(description = "The key of the attribute",
-            example = "JOINT_POSITIONS")
+    @Schema(description = "An array with 6 entries describing the positions of the joints in radians.",example = "{\"jointPositions\": [0.0,0.0,0.0,0.0,0.0,0.0]")
     record JointPositions(@NonNull List<Double> jointPositions) implements AttributeValue{}
+    @Schema(description = "An array with 6 entries describing the state of the joints.")
     record JointStates(@NonNull List<RoboJointStateDTO> jointStates) implements AttributeValue{}
-
+    @Schema(description = "The position and orientation of the end-effector.")
     record Pose(@NonNull PoseDTO pose) implements AttributeValue{}
+    @Schema(description = "The position of the end-effector.")
     record Position(@NonNull PositionDTO position) implements AttributeValue{}
+    @Schema(description = "The orientation of the end-effector as quaternion.")
     record Orientation(@NonNull QuaternionDTO orientation) implements AttributeValue{}
 }
