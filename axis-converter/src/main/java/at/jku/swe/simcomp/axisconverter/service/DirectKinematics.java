@@ -1,9 +1,9 @@
 package at.jku.swe.simcomp.axisconverter.service;
 
 import at.jku.swe.simcomp.commons.adaptor.dto.JointAngleAdjustmentDTO;
+import at.jku.swe.simcomp.commons.adaptor.dto.OrientationDTO;
 import at.jku.swe.simcomp.commons.adaptor.dto.PoseDTO;
 import at.jku.swe.simcomp.commons.adaptor.dto.PositionDTO;
-import at.jku.swe.simcomp.commons.adaptor.dto.QuaternionDTO;
 
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ public class DirectKinematics {
         double[] orientation = getOrientation(totalTMatrix);
 
         PositionDTO positionDTO = new PositionDTO(coords[0], coords[1], coords[2]);
-        QuaternionDTO orientationDTO = new QuaternionDTO(orientation[0], orientation[1], orientation[2]);
+        OrientationDTO orientationDTO = new OrientationDTO(orientation[0], orientation[1], orientation[2]);
         return new PoseDTO(positionDTO, orientationDTO);
     }
 

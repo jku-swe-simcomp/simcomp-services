@@ -2,7 +2,7 @@ package at.jku.swe.simcomp.commons.adaptor.attribute;
 
 import at.jku.swe.simcomp.commons.adaptor.dto.PoseDTO;
 import at.jku.swe.simcomp.commons.adaptor.dto.PositionDTO;
-import at.jku.swe.simcomp.commons.adaptor.dto.QuaternionDTO;
+import at.jku.swe.simcomp.commons.adaptor.dto.OrientationDTO;
 import at.jku.swe.simcomp.commons.adaptor.dto.RoboJointStateDTO;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -25,5 +25,5 @@ public interface AttributeValue {
 
     record Pose(PoseDTO pose) implements AttributeValue{}
     record Position(PositionDTO position) implements AttributeValue{}
-    record Orientation(QuaternionDTO orientation) implements AttributeValue{}
+    record Orientation(OrientationDTO orientation) implements AttributeValue{}
 }

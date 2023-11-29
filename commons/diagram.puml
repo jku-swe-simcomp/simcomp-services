@@ -50,7 +50,7 @@ class at.jku.swe.simcomp.commons.adaptor.dto.RoboStateDTO {
 - PoseDTO pose
 - List<RoboJointStateDTO> targetJoints
 }
-class at.jku.swe.simcomp.commons.adaptor.dto.QuaternionDTO {
+class at.jku.swe.simcomp.commons.adaptor.dto.OrientationDTO {
 - double x
 - double y
 - double z

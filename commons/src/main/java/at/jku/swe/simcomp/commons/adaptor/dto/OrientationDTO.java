@@ -6,13 +6,11 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class QuaternionDTO {
+public class OrientationDTO {
     @NonNull
     private Double x;
     @NonNull
     private Double y;
     @NonNull
     private Double z;
-    @NonNull
-    private Double w;
 }
