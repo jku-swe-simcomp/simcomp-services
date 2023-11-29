@@ -22,6 +22,11 @@ public class DemoAdaptorEndpointService implements AdaptorEndpointService {
     }
 
     @Override
+    public String initSession(String instanceId) throws SessionInitializationFailedException {
+        return demoSessionService.initializeSession(instanceId);
+    }
+
+    @Override
     public void closeSession(String sessionId) throws SessionNotValidException {
         demoSessionService.closeSession(sessionId);
     }
@@ -31,8 +36,7 @@ public class DemoAdaptorEndpointService implements AdaptorEndpointService {
         demoSessionService.renewSession(sessionId);
         // Note: can add more cases for different attributes
         return switch(attributeKey){
-            case JOINT_POSITIONS -> new AttributeValue.JointPositions(List.of(0.0,0.0,0.0,0.0,0.0,0.0)); // TODO: implement logic to fetch positions
-            case JOINT_STATES -> new AttributeValue.JointStates(List.of()); // TODO: implement logic to fetch states
+            case JOINT_POSITIONS -> new AttributeValue.JointPositions(DemoCommandExecutionVisitor.currentJointPositions);
             default -> throw new UnsupportedOperationException("Attribute %s not supported by this service".formatted(attributeKey));
         };
     }

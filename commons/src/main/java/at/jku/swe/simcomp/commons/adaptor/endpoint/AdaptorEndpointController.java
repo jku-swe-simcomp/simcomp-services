@@ -61,8 +61,12 @@ public class AdaptorEndpointController implements AdaptorEndpoint{
 
     @Override
     @PostMapping("/session/init")
-    public ResponseEntity<String> initSession() throws SessionInitializationFailedException {
-        String sessionId = adaptorEndpointService.initSession();
+    public ResponseEntity<String> initSession(@RequestParam(required = false) String instanceId) throws SessionInitializationFailedException {
+        if(instanceId == null){
+            String sessionId = adaptorEndpointService.initSession();
+            return ResponseEntity.ok(sessionId);
+        }
+        String sessionId = adaptorEndpointService.initSession(instanceId);
         return ResponseEntity.ok(sessionId);
     }
 

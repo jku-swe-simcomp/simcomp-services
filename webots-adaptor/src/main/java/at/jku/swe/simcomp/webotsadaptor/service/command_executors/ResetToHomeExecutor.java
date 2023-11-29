@@ -18,7 +18,7 @@ public class ResetToHomeExecutor implements CommandExecutor<ExecutionCommand.Res
     @Override
     public ExecutionResultDTO execute(ExecutionCommand.ResetToHomeCommand command, SimulationInstanceConfig config) throws RoboOperationFailedException, IOException, ParseException {
 
-        System.out.println("Connecting to " + config.getSimulationEndpointUrl() + " on port " + config.getSimulationPort());
+        System.out.println("Connecting to " + config.getInstanceHost() + " on port " + config.getInstancePort());
 
         JSONObject json = new JSONObject();
         json.put("operation", "initial_position");

@@ -1,13 +1,13 @@
 package at.jku.swe.simcomp.manager.rest;
 
 import at.jku.swe.simcomp.commons.HttpErrorDTO;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.BadRequestException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
 import at.jku.swe.simcomp.commons.manager.dto.session.SessionRequest;
 import at.jku.swe.simcomp.commons.manager.dto.session.SessionResponseDTO;
 import at.jku.swe.simcomp.commons.manager.dto.session.SessionStateDTO;
 import at.jku.swe.simcomp.manager.domain.model.AdaptorSession;
 import at.jku.swe.simcomp.manager.domain.model.Session;
-import at.jku.swe.simcomp.manager.rest.exception.BadRequestException;
 import at.jku.swe.simcomp.manager.service.SessionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

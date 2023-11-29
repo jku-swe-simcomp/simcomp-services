@@ -26,6 +26,9 @@ public class AdaptorSession {
     @Column(name = "adaptor_name", nullable = false)
     private String adaptorName;
 
+    @Column(name = "instance_id", nullable = true)
+    private String instanceId;
+
     @ManyToOne
     @JoinColumn(name = "aggregated_session_id", nullable = false)
     @ToString.Exclude

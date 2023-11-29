@@ -1,16 +1,15 @@
 package at.jku.swe.simcomp.manager.service;
 
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.BadRequestException;
 import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
 import at.jku.swe.simcomp.commons.manager.dto.execution.ExecutionDTO;
 import at.jku.swe.simcomp.commons.manager.dto.execution.ExecutionResponseDTO;
-import at.jku.swe.simcomp.commons.manager.dto.execution.ExecutionResponseState;
 import at.jku.swe.simcomp.commons.manager.dto.session.SessionState;
 import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 import at.jku.swe.simcomp.manager.domain.model.*;
 import at.jku.swe.simcomp.manager.domain.repository.AdaptorSessionRepository;
 import at.jku.swe.simcomp.manager.domain.repository.ExecutionRepository;
 import at.jku.swe.simcomp.manager.domain.repository.SessionRepository;
-import at.jku.swe.simcomp.manager.rest.exception.BadRequestException;
 import at.jku.swe.simcomp.manager.service.client.ServiceRegistryClient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

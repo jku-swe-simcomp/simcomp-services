@@ -21,14 +21,23 @@ public class DemoSessionService implements DemoSimulationRemovalListener {
     private static final ExecutorService sessionTerminationExecutor = Executors.newFixedThreadPool(10);
     private static final Long sessionTerminateAfter = 600_000L;
 
-    public DemoSessionService(DemoSimulationService demoSimulationService){
-        demoSimulationService.addSimulationRemovalListener(this);
+    public DemoSessionService(DemoSimulationInstanceService demoSimulationInstanceService){
+        demoSimulationInstanceService.addSimulationRemovalListener(this);
     }
 
     public synchronized String initializeSession() throws SessionInitializationFailedException {
-        Optional<SimulationInstanceConfig> config = getAvailableSimulation();
+        Optional<SimulationInstanceConfig> config = getAvailableInstance();
+        return initializeSession(config);
+    }
+
+    public synchronized String initializeSession(String instanceId) throws SessionInitializationFailedException {
+        Optional<SimulationInstanceConfig> config = getInstance(instanceId);
+        return initializeSession(config);
+    }
+
+    public synchronized String initializeSession(Optional<SimulationInstanceConfig> config) throws SessionInitializationFailedException {
         if(config.isEmpty()){
-            throw new SessionInitializationFailedException("No simulation available");
+            throw new SessionInitializationFailedException("Simulation instance not available");
         }
 
         String sessionKey =  UUID.randomUUID().toString();
@@ -95,9 +104,15 @@ public class DemoSessionService implements DemoSimulationRemovalListener {
         });
     }
 
-    private Optional<SimulationInstanceConfig> getAvailableSimulation() {
-        return DemoSimulationService.simulations.stream()
+    private Optional<SimulationInstanceConfig> getAvailableInstance() {
+        return DemoSimulationInstanceService.instances.stream()
                 .filter(simulation -> !currentSessions.containsValue(simulation))
+                .findFirst();
+    }
+
+    private Optional<SimulationInstanceConfig> getInstance(String instanceId) {
+        return DemoSimulationInstanceService.instances.stream()
+                .filter(simulation -> !currentSessions.containsValue(simulation) && simulation.getInstanceId().equals(instanceId))
                 .findFirst();
     }
 
