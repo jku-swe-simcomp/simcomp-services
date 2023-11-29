@@ -21,7 +21,7 @@ public class SetJointExecutor
     @Override
     public ExecutionResultDTO execute(ExecutionCommand.SetJointPositionCommand command, SimulationInstanceConfig config) throws RoboOperationFailedException, IOException, ParseException {
 
-        System.out.println("Connecting to " + config.getSimulationEndpointUrl() + " on port " + config.getSimulationPort());
+        System.out.println("Connecting to " + config.getInstanceHost() + " on port " + config.getInstancePort());
 
         JSONObject json = new JSONObject();
         @NonNull JointPositionDTO movement = command.jointPosition(); // now a list is used, maybe change to only send one angle adjustment per command

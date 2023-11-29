@@ -16,18 +16,18 @@ public class SimulationInstanceController {
 
     @PostMapping
     public ResponseEntity<Void> addSimulationInstance(@RequestBody SimulationInstanceConfig config) throws Exception {
-        simulationService.addSimulation(config);
+        simulationService.addSimulationInstance(config);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping
-    public ResponseEntity<Void> removeSimulationInstance(@RequestBody SimulationInstanceConfig config) throws Exception {
-        simulationService.removeSimulation(config);
+    @DeleteMapping("/{instanceId}")
+    public ResponseEntity<Void> removeSimulationInstance(@PathVariable String instanceId) throws Exception {
+        simulationService.removeSimulationInstance(instanceId);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping
     public ResponseEntity<Set<SimulationInstanceConfig>> getSimulationInstance() throws Exception {
-        return ResponseEntity.ok().body(simulationService.getSimulationInstance());
+        return ResponseEntity.ok().body(simulationService.getSimulationInstances());
     }
 }

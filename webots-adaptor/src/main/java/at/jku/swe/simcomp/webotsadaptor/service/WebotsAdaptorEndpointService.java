@@ -11,33 +11,35 @@ import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.List;
 
 @Service
 public class WebotsAdaptorEndpointService implements AdaptorEndpointService {
-    private final SessionService demoSessionService;
-    public WebotsAdaptorEndpointService(SessionService demoSessionService) {
-        this.demoSessionService = demoSessionService;
+    private final SessionService sessionService;
+    public WebotsAdaptorEndpointService(SessionService sessionService) {
+        this.sessionService = sessionService;
     }
 
     @Override
     public String initSession() throws SessionInitializationFailedException {
-        return demoSessionService.initializeSession();
+        return sessionService.initializeSession();
+    }
+
+    @Override
+    public String initSession(String instanceId) throws SessionInitializationFailedException {
+        return sessionService.initializeSession(instanceId);
     }
 
     @Override
     public void closeSession(String sessionId) throws SessionNotValidException {
-        demoSessionService.closeSession(sessionId);
+        sessionService.closeSession(sessionId);
     }
 
     @Override
     public AttributeValue getAttributeValue(AttributeKey attributeKey, String sessionId) throws SessionNotValidException, RoboOperationFailedException, IOException, ParseException {
-        demoSessionService.renewSession(sessionId);
-        SimulationInstanceConfig config = demoSessionService.renewSession(sessionId);
+        SimulationInstanceConfig config = sessionService.getConfigForSession(sessionId);
         // Note: can add more cases for different attributes
         return switch(attributeKey){
             case JOINT_POSITIONS ->  new AttributeValue.JointPositions(WebotsExecutionService.getPositions(config));
-            case JOINT_STATES -> new AttributeValue.JointPositions(List.of()); // TODO: implement logic to fetch states
             default -> throw new UnsupportedOperationException("Attribute %s not supported by this service".formatted(attributeKey));
         };
     }

@@ -30,7 +30,7 @@ public class ServiceRegistrationConfig {
                 .name(name)
                 .host(host)
                 .port(port)
-                .supportedActions(Set.of(ActionType.POSE,
+                .supportedActions(Set.of(ActionType.SET_JOINT_POSITION,
                         ActionType.ADJUST_JOINT_ANGLE))
                 .build();
     }

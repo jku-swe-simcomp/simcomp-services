@@ -1,24 +1,24 @@
-package at.jku.swe.simcomp.webotsadaptor.service;
+package at.jku.swe.simcomp.demoadaptor.service;
 
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.BadRequestException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.simulation.SimulationInstanceConfig;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.simulation.SimulationInstanceService;
-import at.jku.swe.simcomp.webotsadaptor.domain.simulation.SimulationInstanceRemovalListener;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import at.jku.swe.simcomp.demoadaptor.domain.simulation.DemoSimulationRemovalListener;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
-public class WebotsSimulationInstanceService implements SimulationInstanceService {
-    private static final Logger log = LogManager.getLogger();
-    private static final Set<SimulationInstanceRemovalListener> SIMULATION_INSTANCE_REMOVAL_LISTENERS = Collections.synchronizedSet(new HashSet<>());
+@Slf4j
+public class DemoSimulationInstanceService implements SimulationInstanceService {
+    private static final Set<DemoSimulationRemovalListener> simulationInstanceRemovalListeners = Collections.synchronizedSet(new HashSet<>());
     public static final Set<SimulationInstanceConfig> instances = Collections.synchronizedSet(new HashSet<>());
+
     private final String adaptorName;
-    public WebotsSimulationInstanceService(@Value("${adaptor.endpoint.name}") String adaptorName) {
-       this.adaptorName = adaptorName;
+    public DemoSimulationInstanceService(@Value("${adaptor.endpoint.name}") String adaptorName) {
+        this.adaptorName = adaptorName;
     }
 
     @Override
@@ -31,7 +31,7 @@ public class WebotsSimulationInstanceService implements SimulationInstanceServic
             throw new BadRequestException("Simulation instance with same host and port already exists");
         }
         instances.add(config);
-        log.info("Added simulation instance: {}", config);
+        log.info("Added simulation: {}", config);
     }
 
     @Override
@@ -51,13 +51,13 @@ public class WebotsSimulationInstanceService implements SimulationInstanceServic
         return instances;
     }
 
-    public void addSimulationRemovalListener(SimulationInstanceRemovalListener listener) {
-        SIMULATION_INSTANCE_REMOVAL_LISTENERS.add(listener);
-        log.info("Added simulation instance removal listener: {}", listener);
+    public void addSimulationRemovalListener(DemoSimulationRemovalListener listener) {
+        simulationInstanceRemovalListeners.add(listener);
+        log.info("Added simulation removal listener: {}", listener);
     }
 
     public void notifySimulationRemovalListeners(SimulationInstanceConfig config) {
-        SIMULATION_INSTANCE_REMOVAL_LISTENERS.forEach(listener -> listener.onSimulationRemoved(config));
+        simulationInstanceRemovalListeners.forEach(listener -> listener.onSimulationRemoved(config));
         log.info("Notified simulation instance removal listeners about removal of: {}", config);
     }
 }

@@ -3,7 +3,7 @@ package at.jku.swe.simcomp.webotsadaptor.service;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.simulation.SimulationInstanceConfig;
-import at.jku.swe.simcomp.webotsadaptor.domain.simulation.SimulationRemovalListener;
+import at.jku.swe.simcomp.webotsadaptor.domain.simulation.SimulationInstanceRemovalListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
 
 @Service
 @Slf4j
-public class SessionService implements SimulationRemovalListener {
+public class SessionService implements SimulationInstanceRemovalListener {
     private static final ConcurrentHashMap<String, SimulationInstanceConfig> currentSessions = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, Thread> sessionTerminationThreads = new ConcurrentHashMap<>();
     private static final ExecutorService sessionTerminationExecutor = Executors.newFixedThreadPool(10);
@@ -26,9 +26,18 @@ public class SessionService implements SimulationRemovalListener {
     }
 
     public synchronized String initializeSession() throws SessionInitializationFailedException {
-        Optional<SimulationInstanceConfig> config = getAvailableSimulation();
+        Optional<SimulationInstanceConfig> config = getAvailableInstance();
+        return initializeSession(config);
+    }
+
+    public synchronized String initializeSession(String instanceId) throws SessionInitializationFailedException {
+        Optional<SimulationInstanceConfig> config = getInstance(instanceId);
+        return initializeSession(config);
+    }
+
+    public synchronized String initializeSession(Optional<SimulationInstanceConfig> config) throws SessionInitializationFailedException {
         if(config.isEmpty()){
-            throw new SessionInitializationFailedException("No simulation available");
+            throw new SessionInitializationFailedException("No simulation instance available");
         }
 
         String sessionKey =  UUID.randomUUID().toString();
@@ -49,6 +58,12 @@ public class SessionService implements SimulationRemovalListener {
         startSessionTerminationThread(sessionKey);
 
         log.info("Session {} renewed", sessionKey);
+        return currentSessions.get(sessionKey);
+    }
+    public SimulationInstanceConfig getConfigForSession(String sessionKey) throws SessionNotValidException {
+        if(!currentSessions.containsKey(sessionKey))
+            throw new SessionNotValidException("Session %s not valid".formatted(sessionKey));
+
         return currentSessions.get(sessionKey);
     }
 
@@ -95,10 +110,15 @@ public class SessionService implements SimulationRemovalListener {
         });
     }
 
-    private Optional<SimulationInstanceConfig> getAvailableSimulation() {
-        return WebotsSimulationInstanceService.simulations.stream()
-                .filter(simulation -> !currentSessions.containsValue(simulation))
+    private Optional<SimulationInstanceConfig> getAvailableInstance() {
+        return WebotsSimulationInstanceService.instances.stream()
+                .filter(instance -> !currentSessions.containsValue(instance))
                 .findFirst();
     }
 
+    private Optional<SimulationInstanceConfig> getInstance(String instanceId) {
+        return WebotsSimulationInstanceService.instances.stream()
+                .filter(instance -> !currentSessions.containsValue(instance) && instance.getInstanceId().equals(instanceId))
+                .findFirst();
+    }
 }

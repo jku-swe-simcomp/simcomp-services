@@ -1,11 +1,7 @@
 package at.jku.swe.simcomp.commons.adaptor.endpoint;
 
 import at.jku.swe.simcomp.commons.HttpErrorDTO;
-import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.InvalidCommandParametersException;
-import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.RoboOperationFailedException;
-import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
-import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
-import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.CompositeCommandExecutionFailedException;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.*;
 import at.jku.swe.simcomp.commons.adaptor.registration.exception.ServiceRegistrationFailedException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +14,15 @@ public class AdaptorEndpointExceptionHandler {
         HttpErrorDTO result = HttpErrorDTO.builder()
                 .status(401)
                 .message("Session not valid with message: %s".formatted(e.getMessage()))
+                .build();
+        return ResponseEntity.status(400).body(result);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<HttpErrorDTO> handleBadRequest(BadRequestException e){
+        HttpErrorDTO result = HttpErrorDTO.builder()
+                .status(401)
+                .message("Bad Request: %s".formatted(e.getMessage()))
                 .build();
         return ResponseEntity.status(400).body(result);
     }
