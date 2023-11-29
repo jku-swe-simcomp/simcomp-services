@@ -10,5 +10,5 @@ public class PoseDTO {
     @NonNull
     private PositionDTO position;
     @NonNull
-    private QuaternionDTO orientation;
+    private OrientationDTO orientation;
 }

@@ -35,7 +35,7 @@ public interface ExecutionCommand {
     <T,P> T accept(ExecutionCommandVisitor<T,P> visitor, P param) throws Exception;
     @JsonIgnore
     ActionType getCorrespondingActionType();
-    public static record PoseCommand(@NonNull PositionDTO position, @NonNull QuaternionDTO orientation) implements ExecutionCommand {
+    public static record PoseCommand(@NonNull PositionDTO position, @NonNull OrientationDTO orientation) implements ExecutionCommand {
         private static final ActionType correspondingActionType = ActionType.POSE;
 
         @Override
@@ -62,7 +62,7 @@ public interface ExecutionCommand {
             return correspondingActionType;
         }
     }
-    public static record SetOrientationCommand(@NonNull QuaternionDTO orientation) implements ExecutionCommand {
+    public static record SetOrientationCommand(@NonNull OrientationDTO orientation) implements ExecutionCommand {
         private static final ActionType correspondingActionType = ActionType.SET_ORIENTATION;
 
         @Override

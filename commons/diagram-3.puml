@@ -29,7 +29,7 @@ class at.jku.swe.simcomp.commons.adaptor.dto.AnomalyDetectionDTO {
 - String description
 - List<RoboStateDTO> roboStates
 }
-class at.jku.swe.simcomp.commons.adaptor.dto.QuaternionDTO {
+class at.jku.swe.simcomp.commons.adaptor.dto.OrientationDTO {
 - double x
 - double y
 - double z
