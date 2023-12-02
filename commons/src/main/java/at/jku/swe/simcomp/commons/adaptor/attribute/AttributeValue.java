@@ -34,5 +34,5 @@ public interface AttributeValue {
     @Schema(description = "The position of the end-effector.")
     record Position(@NonNull PositionDTO position) implements AttributeValue{}
     @Schema(description = "The orientation of the end-effector as quaternion.")
-    record Orientation(@NonNull QuaternionDTO orientation) implements AttributeValue{}
+    record Orientation(@NonNull OrientationDTO orientation) implements AttributeValue{}
 }
