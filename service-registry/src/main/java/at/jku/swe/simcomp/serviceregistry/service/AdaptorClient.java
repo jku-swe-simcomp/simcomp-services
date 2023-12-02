@@ -2,6 +2,7 @@ package at.jku.swe.simcomp.serviceregistry.service;
 
 import at.jku.swe.simcomp.commons.adaptor.endpoint.AdaptorEndpointConstants;
 import at.jku.swe.simcomp.serviceregistry.domain.model.Adaptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -9,8 +10,8 @@ import org.springframework.web.client.RestTemplate;
 public class AdaptorClient {
     private final RestTemplate restTemplate;
 
-    public AdaptorClient() {
-        this.restTemplate = new RestTemplate();
+    public AdaptorClient(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
     }
 
     public boolean isHealthy(Adaptor adaptor){
