@@ -67,3 +67,7 @@ If a project includes lombok, a logger can be added with the @Slf4j annotation.
 ```
 For consistent log messages, a project can create [this](./service-registry/src/main/java/resources/logback.xml) in the resources folder of the Spring Boot project.
 This creates a console appender for the INFO level and a file appender on the DEBUG level.
+
+### Tests
+Coverage reports are published on [github-pages](https://jku-swe-simcomp.github.io/simcomp-services/).
+To add a report for a new Spring Boot project, include the jacoco-plugin (see [here](./manager/pom.xml) for an example), include the generated report in the [Github actions workflow](./.github/workflows/main.yaml) and add a link to the [index.html](./.github/index.html).
