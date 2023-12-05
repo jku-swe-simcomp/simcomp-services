@@ -57,17 +57,19 @@ jobs:
         name: commons-jar
         path: simcomp-services/commons/target/*.jar
 
-    - name: Deploy Manager Coverage to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-        publish_dir: ./simcomp-services/manager/target/site/jacoco
+    - name: Consolidate Coverage Reports
+      run: |
+        mkdir -p ./simcomp-services/coverage-reports/manager
+        mkdir -p ./simcomp-services/coverage-reports/registry
 
-    - name: Deploy Registry Coverage to GitHub Pages
+        cp -R ./simcomp-services/manager/target/site/jacoco/* ./simcomp-services/coverage-reports/manager
+        cp -R ./simcomp-services/service-registry/target/site/jacoco/* ./simcomp-services/coverage-reports/registry
+
+    - name: Deploy Coverage Reports to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-        publish_dir: ./simcomp-services/service-registry/target/site/jacoco
+        publish_dir: ./simcomp-services/coverage-reports
 
     - name: Log in to the Docker Hub
       uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
