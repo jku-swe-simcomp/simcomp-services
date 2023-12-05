@@ -61,9 +61,12 @@ jobs:
       run: |
         mkdir -p ./simcomp-services/coverage-reports/manager
         mkdir -p ./simcomp-services/coverage-reports/registry
+        mkdir -p ./simcomp-services/coverage-reports/webots-adaptor
 
         cp -R ./simcomp-services/manager/target/site/jacoco/* ./simcomp-services/coverage-reports/manager
+        cp -R ./simcomp-services/webots-adaptor/target/site/jacoco/* ./simcomp-services/coverage-reports/webots-adaptor
         cp -R ./simcomp-services/service-registry/target/site/jacoco/* ./simcomp-services/coverage-reports/registry
+        cp ./simcomp-services/.github/index.html ./simcomp-services/coverage-reports/index.html
 
     - name: Deploy Coverage Reports to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
