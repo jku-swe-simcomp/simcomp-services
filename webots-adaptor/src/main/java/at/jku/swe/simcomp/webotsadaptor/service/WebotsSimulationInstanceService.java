@@ -30,6 +30,9 @@ public class WebotsSimulationInstanceService implements SimulationInstanceServic
                 instance.getInstancePort().equals(config.getInstancePort()))){
             throw new BadRequestException("Simulation instance with same host and port already exists");
         }
+        if(instances.stream().anyMatch(instance -> instance.getInstanceId().equals(config.getInstanceId()))){
+            throw new BadRequestException("Simulation instance with same id already exists");
+        }
         instances.add(config);
         log.info("Added simulation instance: {}", config);
     }

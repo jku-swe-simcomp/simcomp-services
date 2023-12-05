@@ -14,6 +14,7 @@ import at.jku.swe.simcomp.manager.domain.repository.ExecutionRepository;
 import at.jku.swe.simcomp.manager.domain.repository.ExecutionResponseRepository;
 import at.jku.swe.simcomp.manager.rest.exception.CommandExecutionFailedException;
 import at.jku.swe.simcomp.manager.service.client.AdaptorClient;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -41,10 +42,10 @@ public class AsyncCommandDistributionService {
         this.executionCommandValidationVisitor = executionCommandValidationVisitor;
     }
     @Async
-    public void distributeCommand(Long adaptorSessionId,
-                                  UUID executionId,
-                                  ServiceRegistrationConfigDTO serviceRegistrationConfig,
-                                  ExecutionCommand command) {
+    public void distributeCommand(@NonNull Long adaptorSessionId,
+                                  @NonNull UUID executionId,
+                                  @NonNull ServiceRegistrationConfigDTO serviceRegistrationConfig,
+                                  @NonNull ExecutionCommand command) {
         AdaptorSession adaptorSession = adaptorSessionRepository.findById(adaptorSessionId)
                 .orElseThrow();
 

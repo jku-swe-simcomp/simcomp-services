@@ -33,7 +33,8 @@ public class ExecutionService {
     public ExecutionService(SessionRepository sessionRepository,
                             ObjectMapper objectMapper,
                             ExecutionRepository executionRepository,
-                            AsyncCommandDistributionService commandDistributionService, ServiceRegistryClient serviceRegistryClient,
+                            AsyncCommandDistributionService commandDistributionService,
+                            ServiceRegistryClient serviceRegistryClient,
                             AdaptorSessionRepository adaptorSessionRepository) {
         this.sessionRepository = sessionRepository;
         this.objectMapper = objectMapper;
@@ -88,7 +89,7 @@ public class ExecutionService {
         execution.setSession(sessionRepository.findBySessionKeyOrElseThrow(sessionId));
         executionRepository.save(execution);
         executionRepository.flush();
-        return  execution;
+        return execution;
     }
 
     private void distributeCommands(UUID sessionId,
@@ -97,6 +98,10 @@ public class ExecutionService {
         log.info("Starting to distribute commands..");
         List<ServiceRegistrationConfigDTO> serviceRegistrationConfigs = serviceRegistryClient.getRegisteredAdaptors();
         for(AdaptorSession adaptorSession : adaptorSessionRepository.findBySessionSessionKey(sessionId)){
+            if(adaptorSession.getState().equals(SessionState.CLOSED)){
+                log.info("Ignoring closed adaptor-session {}", adaptorSession.getId());
+                return;
+            }
             serviceRegistrationConfigs.stream()
                     .filter(s -> s.getName().equals(adaptorSession.getAdaptorName()))
                     .findFirst()
