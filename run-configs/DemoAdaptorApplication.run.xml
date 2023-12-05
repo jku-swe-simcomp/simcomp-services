@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="DemoAdaptorApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+    <envs>
+      <env name="SERVICE_REGISTRY_ENDPOINT" value="http://localhost:8085/api/registration" />
+      <env name="ADAPTOR_HOST" value="localhost" />
+    </envs>
+    <module name="demo-adaptor" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="at.jku.swe.simcomp.demoadaptor.DemoAdaptorApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

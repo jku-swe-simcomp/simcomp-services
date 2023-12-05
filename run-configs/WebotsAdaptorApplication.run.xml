@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="WebotsAdaptorApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+    <envs>
+      <env name="ADAPTOR_HOST" value="localhost" />
+    </envs>
+    <module name="webots-adaptor" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="at.jku.swe.simcomp.webotsadaptor.WebotsAdaptorApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
