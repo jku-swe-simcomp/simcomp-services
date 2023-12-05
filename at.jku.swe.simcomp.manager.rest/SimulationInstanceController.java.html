@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SimulationInstanceController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Adaptor Manager</a> &gt; <a href="index.source.html" class="el_package">at.jku.swe.simcomp.manager.rest</a> &gt; <span class="el_source">SimulationInstanceController.java</span></div><h1>SimulationInstanceController.java</h1><pre class="source lang-java linenums">package at.jku.swe.simcomp.manager.rest;
+
+import at.jku.swe.simcomp.commons.HttpErrorDTO;
+import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeValue;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.simulation.SimulationInstanceConfig;
+import at.jku.swe.simcomp.commons.manager.dto.AvailableServicesDTO;
+import at.jku.swe.simcomp.manager.service.SimulationInstanceService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping(&quot;/simulation&quot;)
+<span class="fc" id="L25">@Slf4j</span>
+@Tag(name = &quot;Simulation Controller&quot;, description = &quot;Endpoints for managing simulation types and corresponding simulation instances.&quot;)
+public class SimulationInstanceController {
+    private final SimulationInstanceService service;
+
+<span class="fc" id="L30">    public SimulationInstanceController(SimulationInstanceService service){</span>
+<span class="fc" id="L31">        this.service = service;</span>
+<span class="fc" id="L32">    }</span>
+
+    @Operation(summary = &quot;Get Simulation Types&quot;,
+            description = &quot;Returns all simulation types that are currently available and the commands/actions that are supported by them.&quot; +
+                    &quot;A simulation type is e.g. 'WEBOTS', which might provide several simulation instances of this type.&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;200&quot;,
+                    description = &quot;Types fetched&quot;,
+                    content = @Content(mediaType = &quot;application/json&quot;,
+                            schema = @Schema(implementation = AvailableServicesDTO.class),
+                            examples = @ExampleObject(value = &quot;{\&quot;availableSimulations\&quot;:[{\&quot;name\&quot;:\&quot;WEBOTS\&quot;, \&quot;supportedActions\&quot;:[\&quot;POSE\&quot;]}]}&quot;)
+                    )),
+            @ApiResponse(responseCode = &quot;500&quot;,
+                    description = &quot;Internal server error&quot;,
+                    content = @Content(mediaType = &quot;application/json&quot;,
+                            schema = @Schema(implementation = HttpErrorDTO.class),
+                            examples =@ExampleObject(value = &quot;{\&quot;type\&quot;:\&quot;ERROR\&quot;,\&quot;status\&quot;:500, \&quot;message\&quot;:\&quot;Internal server error.\&quot;}&quot;)
+                    ))
+    })
+    @GetMapping(value = &quot;/type&quot;, produces = &quot;application/json&quot;)
+    public ResponseEntity&lt;AvailableServicesDTO&gt; getAvailableSimulations(){
+<span class="nc" id="L53">        log.info(&quot;Request to return available simulations received.&quot;);</span>
+<span class="nc" id="L54">        var simulations = service.getAvailableSimulations();</span>
+<span class="nc" id="L55">        log.info(&quot;Available simulations: {}&quot;, simulations);</span>
+<span class="nc" id="L56">        return ResponseEntity.ok(new AvailableServicesDTO(simulations));</span>
+    }
+
+    @Operation(summary = &quot;Get Simulation Instances&quot;,
+            description = &quot;Returns all registered simulation instances for all available simulation types with the corresponding simulation type, the host and port.&quot; +
+                    &quot;If an instance is included in the response, it might still not be available if the instance is associated with an active session.&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;200&quot;,
+                    description = &quot;Simulation instances fetched&quot;,
+                    content = @io.swagger.v3.oas.annotations.media.Content(
+                            array = @ArraySchema(schema = @Schema(implementation = SimulationInstanceConfig.class)),
+                            examples = @ExampleObject(value = &quot;[{\&quot;simulationType\&quot;:\&quot;WEBOTS\&quot;, \&quot;instanceId\&quot;:\&quot;MY_PERSONAL_WEBOTS_INSTANCE\&quot;,\&quot;instanceHost\&quot;:\&quot;localhost\&quot;, \&quot;instancePort\&quot;:10010}]&quot;)
+                    )),
+            @ApiResponse(responseCode = &quot;500&quot;,
+                    description = &quot;Internal server error&quot;,
+                    content = @Content(mediaType = &quot;application/json&quot;,
+                            schema = @Schema(implementation = HttpErrorDTO.class),
+                            examples =@ExampleObject(value = &quot;{\&quot;type\&quot;:\&quot;ERROR\&quot;,\&quot;status\&quot;:500, \&quot;message\&quot;:\&quot;Internal server error.\&quot;}&quot;)
+                    ))
+    })
+    @GetMapping(value = &quot;/instance&quot;, produces = &quot;application/json&quot;)
+    public ResponseEntity&lt;List&lt;SimulationInstanceConfig&gt;&gt; getSimulationInstances(){
+<span class="nc" id="L78">        log.info(&quot;Request to return available simulation instances received.&quot;);</span>
+<span class="nc" id="L79">        return ResponseEntity.ok(service.getSimulationInstances());</span>
+    }
+
+    @Operation(summary = &quot;Get Simulation Instances for a specific Simulation Type&quot;,
+            description = &quot;Returns all registered simulation instances for a given simulation type.&quot; +
+                    &quot;If an instance is included in the response, it might still not be available if the instance is associated with an active session.&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;200&quot;,
+                    description = &quot;Simulation instances fetched&quot;,
+                    content = @io.swagger.v3.oas.annotations.media.Content(
+                            array = @ArraySchema(schema = @Schema(implementation = SimulationInstanceConfig.class)),
+                            examples = @ExampleObject(value = &quot;[{\&quot;simulationType\&quot;:\&quot;WEBOTS\&quot;, \&quot;instanceId\&quot;:\&quot;MY_PERSONAL_WEBOTS_INSTANCE\&quot;,\&quot;instanceHost\&quot;:\&quot;localhost\&quot;, \&quot;instancePort\&quot;:10010}]&quot;)
+                    )),
+            @ApiResponse(responseCode = &quot;500&quot;,
+                    description = &quot;Internal server error&quot;,
+                    content = @Content(mediaType = &quot;application/json&quot;,
+                            schema = @Schema(implementation = HttpErrorDTO.class),
+                            examples =@ExampleObject(value = &quot;{\&quot;type\&quot;:\&quot;ERROR\&quot;,\&quot;status\&quot;:500, \&quot;message\&quot;:\&quot;Internal server error.\&quot;}&quot;)
+                    ))
+    })
+    @GetMapping(&quot;/{type}/instance&quot;)
+    public ResponseEntity&lt;List&lt;SimulationInstanceConfig&gt;&gt; getSimulationInstances(@Parameter(description = &quot;The type of the simulation, e.g. WEBOTS&quot;, required = true)
+                                                                                     @PathVariable String type){
+<span class="nc" id="L102">        log.info(&quot;Request to return available simulation instances of simulation {} received.&quot;, type);</span>
+<span class="nc" id="L103">        return ResponseEntity.ok(service.getSimulationInstances(type));</span>
+    }
+    @Operation(summary = &quot;Register simulation instance&quot;,
+            description = &quot;Registers a simulation instance for the indicated type. For a given type, no two instances can have the same id&quot; +
+                    &quot;and no two instances can have the same combination of host and port.&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;200&quot;,
+                    description = &quot;Registration successful&quot;),
+            @ApiResponse(responseCode = &quot;500&quot;,
+                    description = &quot;Internal server error&quot;,
+                    content = @Content(mediaType = &quot;application/json&quot;,
+                            schema = @Schema(implementation = HttpErrorDTO.class),
+                            examples =@ExampleObject(value = &quot;{\&quot;type\&quot;:\&quot;ERROR\&quot;,\&quot;status\&quot;:500, \&quot;message\&quot;:\&quot;Internal server error.\&quot;}&quot;)
+                    ))
+    })
+    @PostMapping(value = &quot;/instance&quot;, consumes = &quot;application/json&quot;)
+    public ResponseEntity&lt;Void&gt; registerSimulationInstanceForAdaptor(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = &quot;The configuration of the instance.&quot;,
+            content = @Content(mediaType = &quot;application/json&quot;,
+                    schema = @Schema(implementation = SimulationInstanceConfig.class),
+                    examples = @ExampleObject(value = &quot;{\&quot;simulationType\&quot;:\&quot;WEBOTS\&quot;, \&quot;instanceId\&quot;:\&quot;MY_PERSONAL_WEBOTS_INSTANCE\&quot;,\&quot;instanceHost\&quot;:\&quot;localhost\&quot;, \&quot;instancePort\&quot;:10010}&quot;)))
+                                                                         @RequestBody SimulationInstanceConfig config) throws Exception {
+<span class="nc" id="L124">        log.info(&quot;Request to register simulation instance {} for simulation {} received.&quot;, config.getInstanceId(), config.getSimulationType());</span>
+<span class="nc" id="L125">        service.registerSimulationInstanceForAdaptor(config);</span>
+<span class="nc" id="L126">        return ResponseEntity.ok().build();</span>
+    }
+
+
+    @Operation(summary = &quot;Delete simulation instance&quot;,
+            description = &quot;Deletes the simulation instance of the given type.&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;200&quot;,
+                    description = &quot;Deletion successful&quot;),
+            @ApiResponse(responseCode = &quot;500&quot;,
+                    description = &quot;Internal server error&quot;,
+                    content = @Content(mediaType = &quot;application/json&quot;,
+                            schema = @Schema(implementation = HttpErrorDTO.class),
+                            examples =@ExampleObject(value = &quot;{\&quot;type\&quot;:\&quot;ERROR\&quot;,\&quot;status\&quot;:500, \&quot;message\&quot;:\&quot;Internal server error.\&quot;}&quot;)
+                    ))
+    })
+    @DeleteMapping(&quot;/{type}/instance/{instanceId}&quot;)
+    public ResponseEntity&lt;Void&gt; deleteSimulationInstance(@Parameter(description = &quot;The type of the simulation, e.g. WEBOTS&quot;, required = true)
+                                                             @PathVariable String type,
+                                                         @Parameter(description = &quot;The id of the simulation instance to be deleted.&quot;)
+                                                         @PathVariable String instanceId){
+<span class="nc" id="L147">        log.info(&quot;Request to delete simulation instance {} of simulation {} received.&quot;, instanceId, type);</span>
+<span class="nc" id="L148">        service.deleteSimulationInstance(type, instanceId);</span>
+<span class="nc" id="L149">        return ResponseEntity.ok().build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
