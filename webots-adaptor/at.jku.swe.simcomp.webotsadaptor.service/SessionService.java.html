@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SessionService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">webots-adaptor</a> &gt; <a href="index.source.html" class="el_package">at.jku.swe.simcomp.webotsadaptor.service</a> &gt; <span class="el_source">SessionService.java</span></div><h1>SessionService.java</h1><pre class="source lang-java linenums">package at.jku.swe.simcomp.webotsadaptor.service;
+
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.simulation.SimulationInstanceConfig;
+import at.jku.swe.simcomp.webotsadaptor.domain.simulation.SimulationInstanceRemovalListener;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+@Service
+<span class="fc" id="L17">@Slf4j</span>
+public class SessionService implements SimulationInstanceRemovalListener {
+<span class="fc" id="L19">    private static final ConcurrentHashMap&lt;String, SimulationInstanceConfig&gt; currentSessions = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="fc" id="L20">    private static final ConcurrentHashMap&lt;String, Thread&gt; sessionTerminationThreads = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="fc" id="L21">    private static final ExecutorService sessionTerminationExecutor = Executors.newFixedThreadPool(10);</span>
+<span class="fc" id="L22">    private static final Long sessionTerminateAfter = 600_000L;</span>
+
+<span class="fc" id="L24">    public SessionService(WebotsSimulationInstanceService webotsSimulationInstanceService){</span>
+<span class="fc" id="L25">        webotsSimulationInstanceService.addSimulationRemovalListener(this);</span>
+<span class="fc" id="L26">    }</span>
+
+    public synchronized String initializeSession() throws SessionInitializationFailedException {
+<span class="nc" id="L29">        Optional&lt;SimulationInstanceConfig&gt; config = getAvailableInstance();</span>
+<span class="nc" id="L30">        return initializeSession(config);</span>
+    }
+
+    public synchronized String initializeSession(String instanceId) throws SessionInitializationFailedException {
+<span class="nc" id="L34">        Optional&lt;SimulationInstanceConfig&gt; config = getInstance(instanceId);</span>
+<span class="nc" id="L35">        return initializeSession(config);</span>
+    }
+
+    public synchronized String initializeSession(Optional&lt;SimulationInstanceConfig&gt; config) throws SessionInitializationFailedException {
+<span class="nc bnc" id="L39" title="All 2 branches missed.">        if(config.isEmpty()){</span>
+<span class="nc" id="L40">            throw new SessionInitializationFailedException(&quot;No simulation instance available&quot;);</span>
+        }
+
+<span class="nc" id="L43">        String sessionKey =  UUID.randomUUID().toString();</span>
+<span class="nc" id="L44">        currentSessions.put(sessionKey, config.get());</span>
+
+<span class="nc" id="L46">        startSessionTerminationThread(sessionKey);</span>
+<span class="nc" id="L47">        return sessionKey;</span>
+    }
+
+    public synchronized SimulationInstanceConfig renewSession(String sessionKey) throws SessionNotValidException {
+<span class="nc bnc" id="L51" title="All 2 branches missed.">        if(!currentSessions.containsKey(sessionKey))</span>
+<span class="nc" id="L52">            throw new SessionNotValidException(&quot;Session %s not valid&quot;.formatted(sessionKey));</span>
+
+<span class="nc bnc" id="L54" title="All 2 branches missed.">        if(sessionTerminationThreads.containsKey(sessionKey)){</span>
+<span class="nc" id="L55">            sessionTerminationThreads.get(sessionKey).interrupt();</span>
+        }
+
+<span class="nc" id="L58">        startSessionTerminationThread(sessionKey);</span>
+
+<span class="nc" id="L60">        log.info(&quot;Session {} renewed&quot;, sessionKey);</span>
+<span class="nc" id="L61">        return currentSessions.get(sessionKey);</span>
+    }
+    public SimulationInstanceConfig getConfigForSession(String sessionKey) throws SessionNotValidException {
+<span class="nc bnc" id="L64" title="All 2 branches missed.">        if(!currentSessions.containsKey(sessionKey))</span>
+<span class="nc" id="L65">            throw new SessionNotValidException(&quot;Session %s not valid&quot;.formatted(sessionKey));</span>
+
+<span class="nc" id="L67">        return currentSessions.get(sessionKey);</span>
+    }
+
+    public synchronized void closeSession (String sessionKey) throws SessionNotValidException {
+<span class="nc bnc" id="L71" title="All 2 branches missed.">        if(sessionTerminationThreads.containsKey(sessionKey)) {</span>
+<span class="nc" id="L72">            sessionTerminationThreads.get(sessionKey).interrupt();</span>
+        }
+
+<span class="nc bnc" id="L75" title="All 2 branches missed.">        if(currentSessions.containsKey(sessionKey)){</span>
+<span class="nc" id="L76">            currentSessions.remove(sessionKey);</span>
+<span class="nc" id="L77">            log.info(&quot;Session {} removed&quot;, sessionKey);</span>
+        } else {
+<span class="nc" id="L79">            throw new SessionNotValidException(&quot;Session %s not valid&quot;.formatted(sessionKey));</span>
+        }
+<span class="nc" id="L81">    }</span>
+
+    @Override
+    public synchronized void onSimulationRemoved(SimulationInstanceConfig config) {
+<span class="nc" id="L85">        log.info(&quot;Received notification about removal of simulation: {}&quot;, config);</span>
+<span class="nc bnc" id="L86" title="All 2 branches missed.">        for(var entry : currentSessions.entrySet()){</span>
+<span class="nc bnc" id="L87" title="All 2 branches missed.">            if(entry.getValue().equals(config)){</span>
+                try {
+<span class="nc" id="L89">                    closeSession(entry.getKey());</span>
+<span class="nc" id="L90">                } catch (SessionNotValidException e) {</span>
+<span class="nc" id="L91">                    log.warn(&quot;Could not close session upon removal of simulation: {}&quot;, config);</span>
+<span class="nc" id="L92">                }</span>
+<span class="nc" id="L93">                return;</span>
+            }
+<span class="nc" id="L95">        }</span>
+<span class="nc" id="L96">    }</span>
+
+    private void startSessionTerminationThread(String sessionKey) {
+<span class="nc" id="L99">        sessionTerminationExecutor.execute(() -&gt; {</span>
+<span class="nc" id="L100">            log.info(&quot;Session termination {} started&quot;, sessionKey);</span>
+<span class="nc" id="L101">            log.info(&quot;Session termination {} will terminate in {} seconds&quot;, sessionKey, sessionTerminateAfter / 1000);</span>
+<span class="nc" id="L102">            sessionTerminationThreads.put(sessionKey, Thread.currentThread());</span>
+            try {
+<span class="nc" id="L104">                Thread.sleep(sessionTerminateAfter);</span>
+<span class="nc" id="L105">                currentSessions.remove(sessionKey);</span>
+<span class="nc" id="L106">                log.info(&quot;Session {} removed by termination thread&quot;, sessionKey);</span>
+<span class="nc" id="L107">            } catch (InterruptedException e) {</span>
+<span class="nc" id="L108">                log.info(&quot;Session termination thread {} interrupted&quot;, sessionKey);</span>
+<span class="nc" id="L109">            }</span>
+<span class="nc" id="L110">        });</span>
+<span class="nc" id="L111">    }</span>
+
+    private Optional&lt;SimulationInstanceConfig&gt; getAvailableInstance() {
+<span class="nc" id="L114">        return WebotsSimulationInstanceService.instances.stream()</span>
+<span class="nc bnc" id="L115" title="All 2 branches missed.">                .filter(instance -&gt; !currentSessions.containsValue(instance))</span>
+<span class="nc" id="L116">                .findFirst();</span>
+    }
+
+    private Optional&lt;SimulationInstanceConfig&gt; getInstance(String instanceId) {
+<span class="nc" id="L120">        return WebotsSimulationInstanceService.instances.stream()</span>
+<span class="nc bnc" id="L121" title="All 4 branches missed.">                .filter(instance -&gt; !currentSessions.containsValue(instance) &amp;&amp; instance.getInstanceId().equals(instanceId))</span>
+<span class="nc" id="L122">                .findFirst();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

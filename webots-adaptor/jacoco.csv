@@ -1,0 +1,14 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+webots-adaptor,at.jku.swe.simcomp.webotsadaptor.config,ServiceRegistrationConfig,0,20,0,0,0,7,0,2,0,2
+webots-adaptor,at.jku.swe.simcomp.webotsadaptor.service.command_executors,SetJointExecutor,36,3,0,0,7,1,1,1,1,1
+webots-adaptor,at.jku.swe.simcomp.webotsadaptor.service.command_executors,GrabExecutor,31,3,0,0,6,1,1,1,1,1
+webots-adaptor,at.jku.swe.simcomp.webotsadaptor.service.command_executors,AdjustJointAngleCommandExecutor,36,3,0,0,7,1,1,1,1,1
+webots-adaptor,at.jku.swe.simcomp.webotsadaptor.service.command_executors,ResetToHomeExecutor,20,3,0,0,4,1,1,1,1,1
+webots-adaptor,at.jku.swe.simcomp.webotsadaptor.service.command_executors,PoseCommandExecutor,13,3,0,0,3,1,1,1,1,1
+webots-adaptor,at.jku.swe.simcomp.webotsadaptor.service.command_executors,OpenHandExecutor,31,3,0,0,6,1,1,1,1,1
+webots-adaptor,at.jku.swe.simcomp.webotsadaptor,WebotsAdaptorApplication,5,3,0,0,2,1,1,1,1,1
+webots-adaptor,at.jku.swe.simcomp.webotsadaptor.service,WebotsSimulationInstanceService,115,28,12,0,21,9,14,3,8,3
+webots-adaptor,at.jku.swe.simcomp.webotsadaptor.service,WebotsCommandExecutionVisitor,54,24,0,0,6,9,6,1,6,1
+webots-adaptor,at.jku.swe.simcomp.webotsadaptor.service,WebotsExecutionService,171,0,6,0,42,0,7,0,4,0
+webots-adaptor,at.jku.swe.simcomp.webotsadaptor.service,WebotsAdaptorEndpointService,43,6,2,0,8,3,5,1,4,1
+webots-adaptor,at.jku.swe.simcomp.webotsadaptor.service,SessionService,241,24,22,0,55,8,24,2,13,2

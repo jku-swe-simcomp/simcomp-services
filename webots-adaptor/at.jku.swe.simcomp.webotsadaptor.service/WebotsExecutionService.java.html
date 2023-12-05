@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WebotsExecutionService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">webots-adaptor</a> &gt; <a href="index.source.html" class="el_package">at.jku.swe.simcomp.webotsadaptor.service</a> &gt; <span class="el_source">WebotsExecutionService.java</span></div><h1>WebotsExecutionService.java</h1><pre class="source lang-java linenums">package at.jku.swe.simcomp.webotsadaptor.service;
+
+import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.RoboOperationFailedException;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.simulation.SimulationInstanceConfig;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
+
+<span class="nc" id="L22">public class WebotsExecutionService {</span>
+
+    public static ExecutionResultDTO executeCommand(JSONObject command, SimulationInstanceConfig config) throws RoboOperationFailedException, IOException, ParseException {
+<span class="nc" id="L25">        System.out.println(&quot;Connecting to &quot; + config.getInstanceHost() + &quot; on port &quot; + config.getInstancePort());</span>
+        try {
+<span class="nc" id="L27">            JSONObject responseJson = accessWebots(command, config);</span>
+
+<span class="nc" id="L29">            System.out.println(&quot;Simulation Response: &quot; + responseJson.toString());</span>
+
+<span class="nc bnc" id="L31" title="All 2 branches missed.">            if(Objects.equals(responseJson.get(&quot;result&quot;), &quot;success&quot;)) {</span>
+<span class="nc" id="L32">                return ExecutionResultDTO.builder()</span>
+<span class="nc" id="L33">                        .report(&quot;Success&quot;)</span>
+<span class="nc" id="L34">                        .build();</span>
+            } else {
+<span class="nc" id="L36">                System.out.println(&quot;The movement could not be executed&quot;);</span>
+<span class="nc" id="L37">                throw new RoboOperationFailedException(&quot;The movement could not be executed&quot;);</span>
+            }
+<span class="nc" id="L39">        } catch (IOException | ParseException e) {</span>
+<span class="nc" id="L40">            System.out.println(&quot;No connection to the simulation could be built&quot;);</span>
+<span class="nc" id="L41">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L42">            throw e;</span>
+        }
+    }
+
+    public static List&lt;Double&gt; getPositions(SimulationInstanceConfig config) throws RoboOperationFailedException, IOException, ParseException {
+<span class="nc" id="L47">        System.out.println(&quot;Connecting to &quot; + config.getInstanceHost() + &quot; on port &quot;</span>
+<span class="nc" id="L48">                + config.getInstancePort() + &quot; to get the current position&quot;);</span>
+        try {
+<span class="nc" id="L50">            JSONObject json = new JSONObject();</span>
+<span class="nc" id="L51">            json.put(&quot;operation&quot;, &quot;get_position&quot;);</span>
+<span class="nc" id="L52">            JSONObject responseJson = accessWebots(json, config);</span>
+
+<span class="nc bnc" id="L54" title="All 2 branches missed.">            if(Objects.equals(responseJson.get(&quot;result&quot;), &quot;success&quot;)) {</span>
+<span class="nc" id="L55">                JSONArray jsonArray = (JSONArray) responseJson.get(&quot;positions&quot;);</span>
+<span class="nc" id="L56">                Iterator&lt;Double&gt; iterator = jsonArray.iterator();</span>
+<span class="nc" id="L57">                List&lt;Double&gt; positions = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L58" title="All 2 branches missed.">                while(iterator.hasNext()){</span>
+<span class="nc" id="L59">                    positions.add(iterator.next());</span>
+                }
+<span class="nc" id="L61">                return positions;</span>
+            } else {
+<span class="nc" id="L63">                System.out.println(&quot;The movement could not be executed&quot;);</span>
+<span class="nc" id="L64">                throw new RoboOperationFailedException(&quot;The movement could not be executed&quot;);</span>
+            }
+<span class="nc" id="L66">        } catch (IOException | ParseException e) {</span>
+<span class="nc" id="L67">            System.out.println(&quot;No connection to the simulation could be built&quot;);</span>
+<span class="nc" id="L68">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L69">            throw e;</span>
+        }
+    }
+
+    private static JSONObject accessWebots(JSONObject input, SimulationInstanceConfig config) throws IOException, ParseException {
+<span class="nc" id="L74">        Socket client = new Socket(config.getInstanceHost(), config.getInstancePort());</span>
+<span class="nc" id="L75">        DataOutputStream out = new DataOutputStream(client.getOutputStream());</span>
+<span class="nc" id="L76">        System.out.println(&quot;Connected to &quot; + client.getRemoteSocketAddress());</span>
+
+<span class="nc" id="L78">        out.write(input.toString().getBytes(StandardCharsets.UTF_8));</span>
+
+<span class="nc" id="L80">        System.out.println(&quot;Command sent to simulation: &quot; + input);</span>
+<span class="nc" id="L81">        BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));</span>
+<span class="nc" id="L82">        String response = in.readLine();</span>
+<span class="nc" id="L83">        System.out.println(&quot;Response in plain text: &quot; + response);</span>
+<span class="nc" id="L84">        JSONParser parser = new JSONParser();</span>
+<span class="nc" id="L85">        return (JSONObject) parser.parse(response);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
