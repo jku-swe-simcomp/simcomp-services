@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HealthCheckScheduler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">service-registry</a> &gt; <a href="index.source.html" class="el_package">at.jku.swe.simcomp.serviceregistry.service</a> &gt; <span class="el_source">HealthCheckScheduler.java</span></div><h1>HealthCheckScheduler.java</h1><pre class="source lang-java linenums">package at.jku.swe.simcomp.serviceregistry.service;
+
+import at.jku.swe.simcomp.serviceregistry.domain.model.AdaptorStatus;
+import at.jku.swe.simcomp.serviceregistry.domain.repository.AdaptorRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+@Component
+<span class="fc" id="L10">@Slf4j</span>
+public class HealthCheckScheduler {
+    private final AdaptorRepository adaptorRepository;
+    private final AdaptorClient adaptorClient;
+<span class="fc" id="L14">    public HealthCheckScheduler(AdaptorRepository adaptorRepository, AdaptorClient adaptorClient) {</span>
+<span class="fc" id="L15">       this.adaptorRepository = adaptorRepository;</span>
+<span class="fc" id="L16">       this.adaptorClient = adaptorClient;</span>
+<span class="fc" id="L17">    }</span>
+
+    @Scheduled(fixedRate = 60000)
+    public void performHealthCheckAndSetStatus(){
+<span class="fc" id="L21">        log.info(&quot;Performing health check on all adaptors&quot;);</span>
+<span class="nc" id="L22">        adaptorRepository.findAll().forEach(adaptor -&gt; {</span>
+<span class="nc" id="L23">            boolean isHealthy = adaptorClient.isHealthy(adaptor);</span>
+<span class="nc bnc" id="L24" title="All 2 branches missed.">            if(isHealthy){</span>
+<span class="nc" id="L25">                log.info(&quot;Adaptor {} is healthy&quot;, adaptor.getName());</span>
+<span class="nc" id="L26">                adaptor.setStatus(AdaptorStatus.HEALTHY);</span>
+            } else {
+<span class="nc" id="L28">                log.info(&quot;Adaptor {} is unhealthy&quot;, adaptor.getName());</span>
+<span class="nc" id="L29">                adaptor.setStatus(AdaptorStatus.UNHEALTHY);</span>
+            }
+<span class="nc" id="L31">            adaptorRepository.save(adaptor);</span>
+<span class="nc" id="L32">        });</span>
+<span class="nc" id="L33">        log.info(&quot;Health check finished&quot;);</span>
+<span class="nc" id="L34">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
