@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AttributeService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Adaptor Manager</a> &gt; <a href="index.source.html" class="el_package">at.jku.swe.simcomp.manager.service</a> &gt; <span class="el_source">AttributeService.java</span></div><h1>AttributeService.java</h1><pre class="source lang-java linenums">package at.jku.swe.simcomp.manager.service;
+
+import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeKey;
+import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeValue;
+import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
+import at.jku.swe.simcomp.manager.domain.model.AdaptorSession;
+import at.jku.swe.simcomp.manager.domain.model.Session;
+import at.jku.swe.simcomp.manager.domain.repository.SessionRepository;
+import at.jku.swe.simcomp.manager.service.client.AdaptorClient;
+import at.jku.swe.simcomp.manager.service.client.ServiceRegistryClient;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+@Service
+public class AttributeService {
+    private final ServiceRegistryClient serviceRegistryClient;
+    private final AdaptorClient adaptorClient;
+    private final SessionRepository sessionRepository;
+
+    public AttributeService(ServiceRegistryClient serviceRegistryClient,
+                            AdaptorClient adaptorClient,
+<span class="fc" id="L25">                            SessionRepository sessionRepository) {</span>
+<span class="fc" id="L26">        this.serviceRegistryClient = serviceRegistryClient;</span>
+<span class="fc" id="L27">        this.adaptorClient = adaptorClient;</span>
+<span class="fc" id="L28">        this.sessionRepository = sessionRepository;</span>
+<span class="fc" id="L29">    }</span>
+
+    public Map&lt;String, AttributeValue&gt; getAttributeValues(UUID sessionId, AttributeKey attributeKey){
+<span class="fc" id="L32">        Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionId);</span>
+<span class="fc" id="L33">        List&lt;AdaptorSession&gt; sessions = session.getAdaptorSessions();</span>
+<span class="fc" id="L34">        List&lt;ServiceRegistrationConfigDTO&gt; registeredAdaptorConfigs = serviceRegistryClient.getRegisteredAdaptors();</span>
+<span class="fc" id="L35">        var sessionToConfigs = sessions.stream()</span>
+<span class="fc" id="L36">                .collect(Collectors.toMap(Function.identity(), adaptorSession -&gt; findMatchingConfig(adaptorSession, registeredAdaptorConfigs)));</span>
+<span class="fc" id="L37">        Map&lt;String, AttributeValue&gt; attributeValues = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L38" title="All 2 branches covered.">        for(var entry : sessionToConfigs.entrySet()){</span>
+<span class="fc" id="L39">            AdaptorSession adaptorSession = entry.getKey();</span>
+<span class="pc bpc" id="L40" title="1 of 2 branches missed.">            if (entry.getValue().isEmpty()) {</span>
+<span class="nc" id="L41">                attributeValues.put(adaptorSession.getAdaptorName(), null);</span>
+<span class="nc" id="L42">                continue;</span>
+            }
+<span class="fc" id="L44">            ServiceRegistrationConfigDTO config = entry.getValue().get();</span>
+<span class="fc" id="L45">            Optional&lt;AttributeValue&gt; value = adaptorClient.getAttributeValue(adaptorSession.getSessionKey(), attributeKey, config);</span>
+<span class="fc" id="L46">            attributeValues.put(adaptorSession.getAdaptorName(), value.orElse(null));</span>
+<span class="fc" id="L47">        }</span>
+<span class="fc" id="L48">        return attributeValues;</span>
+    }
+
+    private Optional&lt;ServiceRegistrationConfigDTO&gt; findMatchingConfig(AdaptorSession session, List&lt;ServiceRegistrationConfigDTO&gt; registeredAdaptorConfigs) {
+<span class="fc" id="L52">        return registeredAdaptorConfigs.stream()</span>
+<span class="fc" id="L53">                .filter(config -&gt; config.getName().equals(session.getAdaptorName()))</span>
+<span class="fc" id="L54">                .findFirst();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

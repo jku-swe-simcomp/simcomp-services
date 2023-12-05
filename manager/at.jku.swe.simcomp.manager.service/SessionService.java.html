@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SessionService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Adaptor Manager</a> &gt; <a href="index.source.html" class="el_package">at.jku.swe.simcomp.manager.service</a> &gt; <span class="el_source">SessionService.java</span></div><h1>SessionService.java</h1><pre class="source lang-java linenums">package at.jku.swe.simcomp.manager.service;
+
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.BadRequestException;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
+import at.jku.swe.simcomp.commons.manager.dto.session.SessionRequest;
+import at.jku.swe.simcomp.commons.manager.dto.session.SessionRequestVisitor;
+import at.jku.swe.simcomp.commons.manager.dto.session.SessionState;
+import at.jku.swe.simcomp.commons.manager.dto.session.SessionStateDTO;
+import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
+import at.jku.swe.simcomp.manager.domain.model.AdaptorSession;
+import at.jku.swe.simcomp.manager.domain.model.Session;
+import at.jku.swe.simcomp.manager.domain.repository.AdaptorSessionRepository;
+import at.jku.swe.simcomp.manager.domain.repository.SessionRepository;
+import at.jku.swe.simcomp.manager.service.client.AdaptorClient;
+import at.jku.swe.simcomp.manager.service.client.ServiceRegistryClient;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+@Service
+<span class="fc" id="L28">@Slf4j</span>
+public class SessionService implements SessionRequestVisitor {
+    private final SessionRepository sessionRepository;
+    private final AdaptorSessionRepository adaptorSessionRepository;
+    private final ServiceRegistryClient serviceRegistryClient;
+    private final AdaptorClient adaptorClient;
+    public SessionService(SessionRepository sessionRepository,
+                          AdaptorClient adaptorClient,
+                          ServiceRegistryClient serviceRegistryClient,
+<span class="fc" id="L37">                          AdaptorSessionRepository adaptorSessionRepository) {</span>
+<span class="fc" id="L38">        this.sessionRepository = sessionRepository;</span>
+<span class="fc" id="L39">        this.serviceRegistryClient = serviceRegistryClient;</span>
+<span class="fc" id="L40">        this.adaptorClient = adaptorClient;</span>
+<span class="fc" id="L41">        this.adaptorSessionRepository = adaptorSessionRepository;</span>
+<span class="fc" id="L42">    }</span>
+
+    @Override
+    public Session initSession(SessionRequest.SelectedSimulationTypesSessionRequest request) throws SessionInitializationFailedException {
+<span class="fc" id="L46">        var adaptorConfigs = getRegisteredAdaptors().stream()</span>
+<span class="fc" id="L47">                .filter(config -&gt; request.requestedSimulationTypes().contains(config.getName()))</span>
+<span class="fc" id="L48">                .toList();</span>
+<span class="fc" id="L49">        log.debug(&quot;Filtered list of available adaptors: {}&quot;, adaptorConfigs);</span>
+<span class="fc" id="L50">        return requestAdaptorSessionsAndConstructAndPersistAggregatedSession(adaptorConfigs, Integer.MAX_VALUE);</span>
+    }
+
+    @Override
+    public Session initSession(SessionRequest.AnySimulationSessionRequest request) throws SessionInitializationFailedException {
+<span class="fc" id="L55">        return requestAdaptorSessionsAndConstructAndPersistAggregatedSession(getRegisteredAdaptors(), request.n());</span>
+    }
+
+    @Override
+    public Session initSession(SessionRequest.SelectedSimulationInstancesSessionRequest request) throws SessionInitializationFailedException {
+<span class="fc" id="L60">        var adaptorConfigsToRequestedInstanceId = getRegisteredAdaptors().stream()</span>
+<span class="fc" id="L61">                .filter(config -&gt; request.requestedSimulationInstances().containsKey(config.getName()))</span>
+<span class="fc" id="L62">                .collect(Collectors.toMap(Function.identity(), config -&gt; request.requestedSimulationInstances().get(config.getName())));</span>
+
+<span class="fc" id="L64">        List&lt;AdaptorSession&gt; sessions = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        for(var entry : adaptorConfigsToRequestedInstanceId.entrySet()){</span>
+<span class="fc" id="L66">            Optional&lt;String&gt; sessionKey = adaptorClient.getSession(entry.getKey(), entry.getValue());</span>
+<span class="fc" id="L67">            sessionKey.ifPresent(s -&gt; sessions.add(initAdaptorSession(s, entry.getKey().getName(), entry.getValue())));</span>
+<span class="fc" id="L68">        }</span>
+
+<span class="fc bfc" id="L70" title="All 2 branches covered.">        if(sessions.isEmpty()){</span>
+<span class="fc" id="L71">            throw new SessionInitializationFailedException(&quot;Could not obtain a single session.&quot;);</span>
+        }
+<span class="fc" id="L73">        var aggregatedSession = constructAggregatedSession(sessions);</span>
+<span class="fc" id="L74">        return sessionRepository.save(aggregatedSession);</span>
+    }
+
+    public void closeSession(UUID aggregatedSessionKey) throws NotFoundException, BadRequestException {
+<span class="fc" id="L78">        Session session = sessionRepository.findBySessionKeyOrElseThrow(aggregatedSessionKey);</span>
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">        if(session.getState().equals(SessionState.CLOSED)){</span>
+<span class="nc" id="L80">            throw new BadRequestException(&quot;Session %s already closed&quot;.formatted(aggregatedSessionKey));</span>
+        }
+<span class="fc" id="L82">        closeAdaptorSessions(aggregatedSessionKey);</span>
+<span class="fc" id="L83">        sessionRepository.updateSessionStateBySessionKey(aggregatedSessionKey, SessionState.CLOSED);</span>
+<span class="fc" id="L84">        log.debug(&quot;Closed session {}&quot;, aggregatedSessionKey.toString());</span>
+        //TODO: RESET_TO_HOME before closing adaptor-sessions? Or responsibility of the adaptor?
+<span class="fc" id="L86">    }</span>
+
+    public SessionStateDTO getSessionState(UUID sessionKey) throws NotFoundException{
+<span class="fc" id="L89">        Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionKey);</span>
+<span class="fc" id="L90">        return new SessionStateDTO(session.getSessionKey().toString(), session.getState(),</span>
+<span class="fc" id="L91">                session.getAdaptorSessions().stream()</span>
+<span class="pc" id="L92">                        .collect(Collectors.toMap(AdaptorSession::getAdaptorName, AdaptorSession::getState, (state1, state2) -&gt; state1)));</span>
+
+    }
+
+    public void addAdaptorSessionToAggregatedSession(UUID sessionKey, String adaptorName) throws BadRequestException, NotFoundException, SessionInitializationFailedException {
+<span class="fc" id="L97">        Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionKey);</span>
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">        if(session.getState().equals(SessionState.CLOSED)){</span>
+<span class="nc" id="L99">            throw new BadRequestException(&quot;Session %s already closed&quot;.formatted(sessionKey));</span>
+        }
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">        if(session.getAdaptorSessions().stream().map(AdaptorSession::getAdaptorName).anyMatch(name -&gt; name.equals(adaptorName))){</span>
+<span class="nc" id="L102">            throw new BadRequestException(&quot;Simulation %s already part of session %s. You can manually close and reopen the simulation-session to initialize a new simulation-session&quot;.formatted(adaptorName, sessionKey));</span>
+        }
+
+<span class="fc" id="L105">        var adaptorConfigs = getRegisteredAdaptors().stream()</span>
+<span class="fc" id="L106">                .filter(config -&gt; config.getName().equals(adaptorName))</span>
+<span class="fc" id="L107">                .toList();</span>
+
+<span class="fc bfc" id="L109" title="All 2 branches covered.">        if(adaptorConfigs.isEmpty()) {</span>
+<span class="fc" id="L110">            throw new NotFoundException(&quot;Simulation %s not registered&quot;.formatted(adaptorName));</span>
+        }
+
+<span class="fc" id="L113">        var optAdaptorSessionKey = adaptorClient.getSession(adaptorConfigs.get(0));</span>
+
+<span class="fc bfc" id="L115" title="All 2 branches covered.">        if(optAdaptorSessionKey.isEmpty()){</span>
+<span class="fc" id="L116">            throw new SessionInitializationFailedException(&quot;Could not obtain session for simulation %s&quot;.formatted(adaptorName));</span>
+        }
+
+<span class="fc" id="L119">        AdaptorSession adaptorSession = initAdaptorSession(optAdaptorSessionKey.get(), adaptorName, null);</span>
+<span class="fc" id="L120">        session.addAdaptorSession(adaptorSession);</span>
+<span class="fc" id="L121">        sessionRepository.save(session);</span>
+<span class="fc" id="L122">    }</span>
+
+    public void closeAdaptorSessionOfAggregateSession(UUID sessionKey, String adaptorName) throws BadRequestException, NotFoundException {
+<span class="fc" id="L125">        Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionKey);</span>
+<span class="pc bpc" id="L126" title="1 of 2 branches missed.">        if(session.getState().equals(SessionState.CLOSED)){</span>
+<span class="nc" id="L127">            throw new BadRequestException(&quot;Session %s already closed&quot;.formatted(sessionKey));</span>
+        }
+<span class="fc" id="L129">        AdaptorSession adaptorSession = session.getAdaptorSessions().stream()</span>
+<span class="fc" id="L130">                .filter(adaptorSession1 -&gt; adaptorSession1.getAdaptorName().equals(adaptorName))</span>
+<span class="fc" id="L131">                .findFirst()</span>
+<span class="fc" id="L132">                .orElseThrow(() -&gt; new BadRequestException(&quot;Simulation %s not part of session %s&quot;.formatted(adaptorName, sessionKey)));</span>
+
+<span class="pc bpc" id="L134" title="1 of 2 branches missed.">        if(adaptorSession.getState() == SessionState.CLOSED){</span>
+<span class="nc" id="L135">            throw new BadRequestException(&quot;Simulation %s already closed&quot;.formatted(adaptorName));</span>
+        }
+<span class="fc" id="L137">        closeAdaptorSession(adaptorSession, getRegisteredAdaptors());</span>
+<span class="fc" id="L138">    }</span>
+
+    public void reopenAdaptorSessionOfAggregateSession(UUID sessionKey, String adaptorName) throws BadRequestException, SessionInitializationFailedException {
+<span class="fc" id="L141">        Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionKey);</span>
+<span class="pc bpc" id="L142" title="1 of 2 branches missed.">        if(session.getState().equals(SessionState.CLOSED)){</span>
+<span class="nc" id="L143">            throw new BadRequestException(&quot;Session %s already closed&quot;.formatted(sessionKey));</span>
+        }
+<span class="fc" id="L145">        AdaptorSession adaptorSession = session.getAdaptorSessions().stream()</span>
+<span class="fc" id="L146">                .filter(adaptorSession1 -&gt; adaptorSession1.getAdaptorName().equals(adaptorName))</span>
+<span class="fc" id="L147">                .findFirst()</span>
+<span class="fc" id="L148">                .orElseThrow(() -&gt; new BadRequestException(&quot;Simulation %s not part of session %s&quot;.formatted(adaptorName, sessionKey)));</span>
+
+<span class="pc bpc" id="L150" title="1 of 2 branches missed.">        if(adaptorSession.getState().equals(SessionState.OPEN)){</span>
+<span class="nc" id="L151">            throw new BadRequestException(&quot;Simulation %s already open. Close it before trying to reopen a new one&quot;.formatted(adaptorName));</span>
+        }
+
+<span class="fc" id="L154">        var adaptorConfigs = getRegisteredAdaptors().stream()</span>
+<span class="fc" id="L155">                .filter(config -&gt; config.getName().equals(adaptorName))</span>
+<span class="fc" id="L156">                .toList();</span>
+
+<span class="pc bpc" id="L158" title="1 of 2 branches missed.">        if(adaptorConfigs.isEmpty()) {</span>
+<span class="nc" id="L159">            throw new SessionInitializationFailedException(&quot;Simulation %s not registered&quot;.formatted(adaptorName));</span>
+        }
+
+<span class="fc" id="L162">        Optional&lt;String&gt; optAdaptorSessionKey = Optional.empty();</span>
+<span class="pc bpc" id="L163" title="1 of 2 branches missed.">        if(adaptorSession.getInstanceId() != null){</span>
+<span class="nc" id="L164">            optAdaptorSessionKey = adaptorClient.getSession(adaptorConfigs.get(0), adaptorSession.getInstanceId());</span>
+        }else{
+<span class="fc" id="L166">            optAdaptorSessionKey = adaptorClient.getSession(adaptorConfigs.get(0));</span>
+        }
+
+<span class="pc bpc" id="L169" title="1 of 2 branches missed.">        if(optAdaptorSessionKey.isEmpty()){</span>
+<span class="nc" id="L170">            throw new SessionInitializationFailedException(&quot;Could not obtain session for instance %s of simulation %s&quot;.formatted(adaptorSession.getInstanceId(), adaptorName));</span>
+        }
+
+<span class="fc" id="L173">        adaptorSession.setSessionKey(optAdaptorSessionKey.get());</span>
+<span class="fc" id="L174">        adaptorSession.setState(SessionState.OPEN);</span>
+<span class="fc" id="L175">        sessionRepository.save(session);</span>
+        // TODO: reconstruct latest known state of adaptor session
+<span class="fc" id="L177">    }</span>
+    // private region methods
+
+    private Session requestAdaptorSessionsAndConstructAndPersistAggregatedSession(List&lt;ServiceRegistrationConfigDTO&gt; adaptorConfigs, Integer maximumNumberOfSimulations) throws SessionInitializationFailedException {
+<span class="fc" id="L181">        var acquiredSessions = tryObtainAdaptorSessions(adaptorConfigs, maximumNumberOfSimulations);</span>
+<span class="fc" id="L182">        var aggregatedSession = constructAggregatedSession(acquiredSessions);</span>
+<span class="fc" id="L183">        return sessionRepository.save(aggregatedSession);</span>
+    }
+
+    private List&lt;AdaptorSession&gt; tryObtainAdaptorSessions(List&lt;ServiceRegistrationConfigDTO&gt; requestedSimulations, int maximumSimulations){
+<span class="fc" id="L187">        List&lt;AdaptorSession&gt; sessions = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L188" title="All 2 branches covered.">        for(var config : requestedSimulations){</span>
+<span class="pc bpc" id="L189" title="1 of 2 branches missed.">            if(sessions.size() &gt;= maximumSimulations)</span>
+<span class="nc" id="L190">                break;</span>
+
+<span class="fc" id="L192">            tryAddAdaptorSession(config, sessions);</span>
+<span class="fc" id="L193">        }</span>
+<span class="fc" id="L194">        return sessions;</span>
+    }
+
+    private void tryAddAdaptorSession(ServiceRegistrationConfigDTO config, List&lt;AdaptorSession&gt; sessions) {
+<span class="fc" id="L198">        Optional&lt;String&gt; sessionKey = adaptorClient.getSession(config);</span>
+<span class="fc" id="L199">        sessionKey.ifPresent(s -&gt; sessions.add(initAdaptorSession(s, config.getName(), null)));</span>
+<span class="fc" id="L200">    }</span>
+
+    private Session constructAggregatedSession(List&lt;AdaptorSession&gt; adaptorSessions) throws SessionInitializationFailedException {
+<span class="fc bfc" id="L203" title="All 2 branches covered.">        if(adaptorSessions.isEmpty()){</span>
+<span class="fc" id="L204">            throw new SessionInitializationFailedException(&quot;Could not obtain a single session&quot;);</span>
+        }
+<span class="fc" id="L206">        log.debug(&quot;Aggregating adaptor sessions: {}&quot;, adaptorSessions);</span>
+<span class="fc" id="L207">        Session session = initNewSessionWithUUID();</span>
+<span class="fc" id="L208">        adaptorSessions.forEach(session::addAdaptorSession);</span>
+<span class="fc" id="L209">        log.debug(&quot;Aggregated session: {}&quot;, session);</span>
+<span class="fc" id="L210">        return session;</span>
+    }
+
+    private Session initNewSessionWithUUID() {
+<span class="fc" id="L214">        return Session.builder()</span>
+<span class="fc" id="L215">                .sessionKey(UUID.randomUUID())</span>
+<span class="fc" id="L216">                .state(SessionState.OPEN)</span>
+<span class="fc" id="L217">                .build();</span>
+    }
+
+    private AdaptorSession initAdaptorSession(String key, String name, String instanceId){
+<span class="fc" id="L221">        return AdaptorSession.builder()</span>
+<span class="fc" id="L222">                .sessionKey(key)</span>
+<span class="fc" id="L223">                .adaptorName(name)</span>
+<span class="fc" id="L224">                .instanceId(instanceId)</span>
+<span class="fc" id="L225">                .state(SessionState.OPEN)</span>
+<span class="fc" id="L226">                .build();</span>
+    }
+
+    private List&lt;ServiceRegistrationConfigDTO&gt; getRegisteredAdaptors() {
+<span class="fc" id="L230">        return serviceRegistryClient.getRegisteredAdaptors();</span>
+    }
+
+    private void closeAdaptorSessions(UUID aggregatedSessionKey) {
+<span class="fc" id="L234">        var adaptorConfigs = getRegisteredAdaptors();</span>
+<span class="fc bfc" id="L235" title="All 2 branches covered.">        for(var adaptorSession : adaptorSessionRepository.findBySessionSessionKey(aggregatedSessionKey)){</span>
+<span class="fc" id="L236">            closeAdaptorSession(adaptorSession, adaptorConfigs);</span>
+<span class="fc" id="L237">        }</span>
+<span class="fc" id="L238">    }</span>
+
+    private void closeAdaptorSession(AdaptorSession adaptorSession, List&lt;ServiceRegistrationConfigDTO&gt; adaptorConfigs){
+<span class="fc" id="L241">        adaptorConfigs.stream()</span>
+<span class="fc" id="L242">                .filter(config -&gt; config.getName().equals(adaptorSession.getAdaptorName()))</span>
+<span class="fc" id="L243">                .findFirst()</span>
+<span class="fc" id="L244">                .ifPresent(serviceRegistrationConfigDTO -&gt; adaptorClient.closeSession(serviceRegistrationConfigDTO, adaptorSession.getSessionKey()));</span>
+<span class="fc" id="L245">        adaptorSessionRepository.updateSessionStateBySessionKey(adaptorSession.getId(), SessionState.CLOSED);</span>
+<span class="fc" id="L246">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
