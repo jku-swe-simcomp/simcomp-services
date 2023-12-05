@@ -53,4 +53,6 @@ public class RegistrationService {
                .filter(adaptor -> adaptor.getStatus().equals(AdaptorStatus.HEALTHY))
                .map(adaptorMapper::entityToDto).toList();
     }
+
+
 }

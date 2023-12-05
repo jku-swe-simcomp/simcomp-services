@@ -1,4 +1,4 @@
-package at.jku.swe.simcomp.manager.service;
+package at.jku.swe.simcomp.manager.config;
 
 import at.jku.swe.simcomp.commons.adaptor.execution.command.visitor.impl.ExecutionCommandValidationVisitor;
 import org.springframework.context.annotation.Bean;
