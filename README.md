@@ -70,4 +70,4 @@ This creates a console appender for the INFO level and a file appender on the DE
 
 ### Tests
 Coverage reports are published on [github-pages](https://jku-swe-simcomp.github.io/simcomp-services/).
-To add a report for a new Spring Boot project, include the jacoco-plugin (see [here](./manager/pom.xml) for an example), include the generated report in the [Github actions workflow](./.github/workflows/main.yaml) and add a link to the [index.html](./.github/index.html).
+To add a report for a new Spring Boot project, include the jacoco-plugin (see [here](./manager/pom.xml) for an example), include the generated report in the [Github actions workflow](./.github/workflows/main.yml) and add a link to the [index.html](./.github/index.html).
