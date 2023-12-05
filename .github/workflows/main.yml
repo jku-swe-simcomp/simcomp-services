@@ -60,7 +60,7 @@ jobs:
     - name: Deploy Manager Coverage to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         publish_dir: ./simcomp-services/manager/target/site/jacoco
 
     - name: Log in to the Docker Hub
