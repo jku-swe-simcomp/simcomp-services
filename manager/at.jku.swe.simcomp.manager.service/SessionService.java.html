@@ -242,7 +242,7 @@ public class SessionService implements SessionRequestVisitor {
 <span class="fc" id="L242">                .filter(config -&gt; config.getName().equals(adaptorSession.getAdaptorName()))</span>
 <span class="fc" id="L243">                .findFirst()</span>
 <span class="fc" id="L244">                .ifPresent(serviceRegistrationConfigDTO -&gt; adaptorClient.closeSession(serviceRegistrationConfigDTO, adaptorSession.getSessionKey()));</span>
-<span class="fc" id="L245">        adaptorSessionRepository.updateSessionStateBySessionKey(adaptorSession.getId(), SessionState.CLOSED);</span>
+<span class="fc" id="L245">        adaptorSessionRepository.updateSessionStateById(adaptorSession.getId(), SessionState.CLOSED);</span>
 <span class="fc" id="L246">    }</span>
 
 }

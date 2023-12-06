@@ -71,7 +71,7 @@ public class AsyncCommandDistributionService {
 <span class="fc" id="L71">            sendCommandAndUpdateResponse(responseId, serviceRegistrationConfig, command, adaptorSession.getSessionKey());</span>
 <span class="fc" id="L72">        } catch (SessionNotValidException e) {</span>
 <span class="fc" id="L73">            log.info(&quot;Marking simulation session %s from aggregate session %s as closed, as it returned 401 unauthorized.&quot;.formatted(adaptorSession.getAdaptorName(), adaptorSession.getSession().getSessionKey()));</span>
-<span class="fc" id="L74">            adaptorSessionRepository.updateSessionStateBySessionKey(adaptorSessionId, SessionState.CLOSED);</span>
+<span class="fc" id="L74">            adaptorSessionRepository.updateSessionStateById(adaptorSessionId, SessionState.CLOSED);</span>
 <span class="fc" id="L75">        }</span>
 <span class="fc" id="L76">    }</span>
 

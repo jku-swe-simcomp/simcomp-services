@@ -7,20 +7,23 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @Service
-<span class="fc" id="L12">@Slf4j</span>
+<span class="fc" id="L13">@Slf4j</span>
 public class ServiceRegistryClient {
-<span class="fc" id="L14">    private final RestTemplate restTemplate = new RestTemplate();</span>
-<span class="fc" id="L15">    public ServiceRegistryClient() {</span>
-<span class="fc" id="L16">    }</span>
+    private final RestTemplate restTemplate;
+<span class="fc" id="L16">    public ServiceRegistryClient(RestTemplate restTemplate) {</span>
+<span class="fc" id="L17">        this.restTemplate = restTemplate;</span>
+<span class="fc" id="L18">    }</span>
 
     public List&lt;ServiceRegistrationConfigDTO&gt; getRegisteredAdaptors() {
-<span class="fc" id="L19">        log.debug(&quot;Fetching available adaptors...&quot;);</span>
-<span class="nc" id="L20">        ServiceRegistrationConfigDTO[] configs = restTemplate.getForObject(System.getenv(&quot;SERVICE_REGISTRY_ENDPOINT&quot;),</span>
+<span class="fc" id="L21">        log.debug(&quot;Fetching available adaptors...&quot;);</span>
+        // Note: default-object for endpoint does not make sense, but is required for the unit-tests
+<span class="fc" id="L23">        ServiceRegistrationConfigDTO[] configs = restTemplate.getForObject(Objects.requireNonNullElse(System.getenv(&quot;SERVICE_REGISTRY_ENDPOINT&quot;), &quot;&quot;),</span>
                 ServiceRegistrationConfigDTO[].class);
-<span class="nc" id="L22">        log.debug(&quot;Available adaptor configurations: {}&quot;, configs);</span>
-<span class="nc" id="L23">        return Arrays.asList(configs);</span>
+<span class="fc" id="L25">        log.debug(&quot;Available adaptor configurations: {}&quot;, configs);</span>
+<span class="fc" id="L26">        return Arrays.asList(configs);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
