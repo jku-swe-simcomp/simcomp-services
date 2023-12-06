@@ -15,7 +15,7 @@ import java.util.*;
 public class WebotsSimulationInstanceService implements SimulationInstanceService {
     private static final Logger log = LogManager.getLogger();
     private static final Set<SimulationInstanceRemovalListener> SIMULATION_INSTANCE_REMOVAL_LISTENERS = Collections.synchronizedSet(new HashSet<>());
-    public static final Set<SimulationInstanceConfig> instances = Collections.synchronizedSet(new HashSet<>());
+    private static final Set<SimulationInstanceConfig> instances = Collections.synchronizedSet(new HashSet<>());
     private final String adaptorName;
     public WebotsSimulationInstanceService(@Value("${adaptor.endpoint.name}") String adaptorName) {
        this.adaptorName = adaptorName;
@@ -62,5 +62,9 @@ public class WebotsSimulationInstanceService implements SimulationInstanceServic
     public void notifySimulationRemovalListeners(SimulationInstanceConfig config) {
         SIMULATION_INSTANCE_REMOVAL_LISTENERS.forEach(listener -> listener.onSimulationRemoved(config));
         log.info("Notified simulation instance removal listeners about removal of: {}", config);
+    }
+
+    public static Set<SimulationInstanceConfig> getInstances() {
+        return instances;
     }
 }

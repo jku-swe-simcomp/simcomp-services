@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -111,13 +112,13 @@ public class SessionService implements SimulationInstanceRemovalListener {
     }
 
     private Optional<SimulationInstanceConfig> getAvailableInstance() {
-        return WebotsSimulationInstanceService.instances.stream()
+        return WebotsSimulationInstanceService.getInstances().stream()
                 .filter(instance -> !currentSessions.containsValue(instance))
                 .findFirst();
     }
 
     private Optional<SimulationInstanceConfig> getInstance(String instanceId) {
-        return WebotsSimulationInstanceService.instances.stream()
+        return WebotsSimulationInstanceService.getInstances().stream()
                 .filter(instance -> !currentSessions.containsValue(instance) && instance.getInstanceId().equals(instanceId))
                 .findFirst();
     }
