@@ -310,7 +310,7 @@ public class SessionServiceTest {
 
         // Assert
         verify(adaptorClient).closeSession(any(), eq(sessionKey.toString()));
-        verify(adaptorSessionRepository).updateSessionStateBySessionKey(any(Long.class), eq(SessionState.CLOSED));
+        verify(adaptorSessionRepository).updateSessionStateById(any(Long.class), eq(SessionState.CLOSED));
     }
 
     @Test

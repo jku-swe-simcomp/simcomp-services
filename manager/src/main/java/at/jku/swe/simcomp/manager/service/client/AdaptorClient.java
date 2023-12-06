@@ -4,15 +4,16 @@ import at.jku.swe.simcomp.commons.HttpErrorDTO;
 import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeKey;
 import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeValue;
 import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
-import at.jku.swe.simcomp.commons.adaptor.endpoint.AdaptorEndpointConstants;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.simulation.SimulationInstanceConfig;
 import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
 import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 import at.jku.swe.simcomp.manager.rest.exception.CommandExecutionFailedException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -29,15 +30,14 @@ import static at.jku.swe.simcomp.commons.adaptor.endpoint.AdaptorEndpointConstan
 @Slf4j
 public class AdaptorClient {
     private final RestTemplate restTemplate;
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    public AdaptorClient(RestTemplateBuilder restTemplateBuilder,
-                         NoExceptionThrowingResponseErrorHandler noExceptionThrowingResponseErrorHandler) {
-        restTemplate = restTemplateBuilder
-                .errorHandler(noExceptionThrowingResponseErrorHandler)
-                .build();
+    private final ObjectMapper objectMapper;
+    public AdaptorClient(@Qualifier("noExceptionThrowingRestTemplate") RestTemplate restTemplate,
+                         ObjectMapper objectMapper) {
+        this.restTemplate = restTemplate;
+        this.objectMapper = objectMapper;
     }
 
-    public Optional<String> getSession(ServiceRegistrationConfigDTO adaptorConfig) {
+    public Optional<String> getSession(@NonNull ServiceRegistrationConfigDTO adaptorConfig) {
         String url = getDomain(adaptorConfig) + INIT_SESSION_PATH;
         try {
             ResponseEntity<String> response = restTemplate.postForEntity(url, new HttpEntity<>(null), String.class);
@@ -55,7 +55,8 @@ public class AdaptorClient {
         }
     }
 
-    public Optional<String> getSession(ServiceRegistrationConfigDTO adaptorConfig, String instanceId) {
+    public Optional<String> getSession(@NonNull ServiceRegistrationConfigDTO adaptorConfig,
+                                       @NonNull String instanceId) {
         String url = getDomain(adaptorConfig) + getInitSessionPathWithInstanceId(instanceId);
         try {
             ResponseEntity<String> response = restTemplate.postForEntity(url, new HttpEntity<>(null), String.class);
@@ -73,7 +74,8 @@ public class AdaptorClient {
         }
     }
 
-    public void closeSession(ServiceRegistrationConfigDTO adaptorConfig, String sessionKey){
+    public void closeSession(@NonNull ServiceRegistrationConfigDTO adaptorConfig,
+                             @NonNull String sessionKey){
         String url = getDomain(adaptorConfig) + getCloseSessionPathForSessionId(sessionKey);
         try {
             restTemplate.delete(url);
@@ -82,31 +84,45 @@ public class AdaptorClient {
         }
     }
 
-    public ExecutionResultDTO executeCommand(ServiceRegistrationConfigDTO adaptorConfig, ExecutionCommand command, String adaptorSessionKey) throws CommandExecutionFailedException {
+    public ExecutionResultDTO executeCommand(@NonNull ServiceRegistrationConfigDTO adaptorConfig,
+                                             @NonNull ExecutionCommand command,
+                                             @NonNull String adaptorSessionKey) throws CommandExecutionFailedException {
         String url = getDomain(adaptorConfig) + getExecuteActionPathForSessionId(adaptorSessionKey);
-        ResponseEntity<String> response = restTemplate.postForEntity(url, new HttpEntity<>(command, null), String.class);
+        ResponseEntity<String> response;
+        try{
+            response = restTemplate.postForEntity(url, new HttpEntity<>(command, null), String.class);
+        }catch (Exception e){
+            throw new CommandExecutionFailedException("Could not execute command %s for adaptor %s: %s".formatted(command, adaptorConfig.getName(), e.getMessage()), 500);
+        }
 
-        if (response.getStatusCode() == HttpStatus.OK) {
-            log.info("Executed command for adaptor {}: {}", adaptorConfig.getName(), response.getBody());
-            try {
+        try{
+            if (response.getStatusCode() == HttpStatus.OK) {
+                log.info("Executed command for adaptor {}: {}", adaptorConfig.getName(), response.getBody());
                 return objectMapper.readValue(response.getBody(), ExecutionResultDTO.class);
-            } catch (JsonProcessingException e) {
-                throw new CommandExecutionFailedException("Could not deserialize response %s from %s".formatted(response.getBody(), adaptorConfig.getName()), 500);
-            }
-        } else {
-            log.info("Non-200 response when trying to execute command for adaptor {}: {}", adaptorConfig.getName(), response.getBody());
-            try {
+            } else {
+                log.info("Non-200 response when trying to execute command for adaptor {}: {}", adaptorConfig.getName(), response.getBody());
                 HttpErrorDTO error = objectMapper.readValue(response.getBody(), HttpErrorDTO.class);
+                if(error == null){
+                    throw new CommandExecutionFailedException("Could not deserialize response %s from %s".formatted(response.getBody(), adaptorConfig.getName()), 500);
+                }
                 throw new CommandExecutionFailedException(error.getMessage(), (int) error.getStatus());
-            } catch (JsonProcessingException e) {
-                throw new CommandExecutionFailedException("Could not deserialize response %s from %s".formatted(response.getBody(), adaptorConfig.getName()), 500);
             }
+        }catch (JsonProcessingException e){
+            throw new CommandExecutionFailedException("Could not deserialize response %s from %s".formatted(response.getBody(), adaptorConfig.getName()), 500);
         }
     }
 
-    public Optional<AttributeValue> getAttributeValue(String sessionId, AttributeKey attributeKey, ServiceRegistrationConfigDTO config){
+    public Optional<AttributeValue> getAttributeValue(@NonNull String sessionId,
+                                                      @NonNull AttributeKey attributeKey,
+                                                      @NonNull ServiceRegistrationConfigDTO config) throws SessionNotValidException {
         String url = getDomain(config) + getGetAttributePathForAttributeName(sessionId, attributeKey);
-        ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
+        ResponseEntity<String> responseEntity = null;
+        try{
+            responseEntity = restTemplate.getForEntity(url, String.class);
+        }catch (Exception e){
+            log.warn("Could not obtain attribute value for adaptor session {} of {}: {}", sessionId, config.getName(), e.getMessage());
+            return Optional.empty();
+        }
 
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             log.debug("Obtained attribute value for adaptor session {} of {} with key {}: {}", sessionId, config.getName(), attributeKey, responseEntity.getBody());
@@ -114,15 +130,18 @@ public class AdaptorClient {
                 return Optional.ofNullable(objectMapper.readValue(responseEntity.getBody(), AttributeValue.class));
             } catch (JsonProcessingException e) {
                 log.warn("Could not deserialize response {} from {}", responseEntity.getBody(), config.getName());
-                return Optional.empty();
             }
         }else{
             log.warn("Non-2xx response when trying to obtain attribute value for adaptor session {} of {}: {}", sessionId, config.getName(), responseEntity.getBody());
-            return Optional.empty();
+            if(responseEntity.getStatusCode() == HttpStatus.UNAUTHORIZED){
+                throw new SessionNotValidException("Session %s for adaptor %s is not valid".formatted(sessionId, config.getName()));
+            }
         }
+        return Optional.empty();
     }
 
-    public void registerSimulationInstanceForAdaptor(ServiceRegistrationConfigDTO serviceRegistrationConfigDTO, SimulationInstanceConfig config) throws Exception {
+    public void registerSimulationInstanceForAdaptor(@NonNull ServiceRegistrationConfigDTO serviceRegistrationConfigDTO,
+                                                     @NonNull SimulationInstanceConfig config) throws Exception {
         String url = getDomain(serviceRegistrationConfigDTO) + SIMULATION_INSTANCE_PATH;
         HttpEntity<SimulationInstanceConfig> requestEntity = new HttpEntity<>(config, null);
         var response = restTemplate.postForEntity(url, requestEntity, Void.class);
@@ -142,7 +161,8 @@ public class AdaptorClient {
         return responseEntity.getBody();
     }
 
-    public void deleteSimulationInstance(ServiceRegistrationConfigDTO serviceRegistrationConfigDTO, String instanceId){
+    public void deleteSimulationInstance(@NonNull ServiceRegistrationConfigDTO serviceRegistrationConfigDTO,
+                                         @NonNull String instanceId){
         String url = getDomain(serviceRegistrationConfigDTO)+ getDeleteSimulationInstancePathForInstanceId(instanceId);
         restTemplate.delete(url);
     }

@@ -192,6 +192,6 @@ class AsyncCommandDistributionServiceTest {
         // assert
         verify(executionResponseRepository, times(1)).updateExecutionResponse(anyLong(), eq(401), eq(ExecutionResponseState.ERROR), anyString());
         verify(adaptorClient, times(1)).executeCommand(any(), any(), any());
-        verify(adaptorSessionRepository, times(1)).updateSessionStateBySessionKey(1L, SessionState.CLOSED);
+        verify(adaptorSessionRepository, times(1)).updateSessionStateById(1L, SessionState.CLOSED);
     }
 }

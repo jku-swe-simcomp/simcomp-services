@@ -6,6 +6,7 @@ import lombok.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class SimulationInstanceConfig {
     @NonNull
     @Schema(description = "The type of the simulation. e.g. WEBOTS", example = "WEBOTS")

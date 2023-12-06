@@ -3,6 +3,7 @@ package at.jku.swe.simcomp.manager.service.scheduler;
 
 import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeKey;
 import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeValue;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
 import at.jku.swe.simcomp.commons.manager.dto.session.SessionState;
 import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 import at.jku.swe.simcomp.manager.domain.model.AdaptorSession;
@@ -68,15 +69,19 @@ public class JointPositionFetchingScheduler {
     private void fetchJointPosition(AdaptorSession session, ServiceRegistrationConfigDTO config) {
         log.info("Fetching joint positions for session {} with key {} from adaptor {}",
                 session.getId(), session.getSessionKey(), config.getName());
-        adaptorClient.getAttributeValue(session.getSessionKey(), AttributeKey.JOINT_POSITIONS, config)
-                .ifPresent(attributeValue -> {
-                    if(attributeValue instanceof AttributeValue.JointPositions jointPositions){
-                        session.addJointPositions(fromDTO(jointPositions));
-                        adaptorSessionRepository.save(session);
-                    }else {
-                        log.warn("Returned attribute value is not of type JointPositions but of type {}: {}", attributeValue.getClass().getSimpleName(), attributeValue);
-                    }
-                });
+        try {
+            adaptorClient.getAttributeValue(session.getSessionKey(), AttributeKey.JOINT_POSITIONS, config)
+                    .ifPresent(attributeValue -> {
+                        if(attributeValue instanceof AttributeValue.JointPositions jointPositions){
+                            session.addJointPositions(fromDTO(jointPositions));
+                            adaptorSessionRepository.save(session);
+                        }else {
+                            log.warn("Returned attribute value is not of type JointPositions but of type {}: {}", attributeValue.getClass().getSimpleName(), attributeValue);
+                        }
+                    });
+        } catch (SessionNotValidException e) {
+            log.warn("Session {} of {} is not valid anymore. Ignoring it until official request from user.", session.getId(), config.getName());
+        }
     }
 
     private JointPositions fromDTO(AttributeValue.JointPositions jointPositions) {

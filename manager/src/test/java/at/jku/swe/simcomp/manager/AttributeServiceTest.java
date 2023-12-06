@@ -1,10 +1,12 @@
 package at.jku.swe.simcomp.manager;
 import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeKey;
 import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeValue;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
 import at.jku.swe.simcomp.commons.manager.dto.session.SessionState;
 import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 import at.jku.swe.simcomp.manager.domain.model.AdaptorSession;
 import at.jku.swe.simcomp.manager.domain.model.Session;
+import at.jku.swe.simcomp.manager.domain.repository.AdaptorSessionRepository;
 import at.jku.swe.simcomp.manager.domain.repository.SessionRepository;
 import at.jku.swe.simcomp.manager.service.AttributeService;
 import at.jku.swe.simcomp.manager.service.client.AdaptorClient;
@@ -34,11 +36,14 @@ class AttributeServiceTest {
     @Mock
     private SessionRepository sessionRepository;
 
+    @Mock
+    private AdaptorSessionRepository adaptorSessionRepository;
+
     @InjectMocks
     private AttributeService attributeService;
 
     @Test
-    void getAttributeValues_Success() {
+    void getAttributeValues_Success() throws SessionNotValidException {
         // Arrange
         UUID sessionId = UUID.randomUUID();
         AttributeKey attributeKey = AttributeKey.JOINT_POSITIONS;
@@ -67,6 +72,65 @@ class AttributeServiceTest {
         verify(sessionRepository, times(1)).findBySessionKeyOrElseThrow(sessionId);
         verify(serviceRegistryClient, times(1)).getRegisteredAdaptors();
         verify(adaptorClient, times(2)).getAttributeValue(eq(sessionId.toString()), eq(attributeKey), any(ServiceRegistrationConfigDTO.class));
+    }
+
+    @Test
+    void getAttributeValues_when_closedAdaptorSession_then_NoFetching() throws SessionNotValidException {
+        // Arrange
+        UUID sessionId = UUID.randomUUID();
+        AttributeKey attributeKey = AttributeKey.JOINT_POSITIONS;
+        Session session = buildSession(sessionId);
+        List<AdaptorSession> adaptorSessions = buildAdaptorSessions(sessionId, 2);
+        adaptorSessions.forEach(adaptorSession -> adaptorSession.setState(SessionState.CLOSED));
+        List<ServiceRegistrationConfigDTO> registeredAdaptorConfigs = buildAdaptorConfigs(2);
+        for(AdaptorSession adaptorSession : adaptorSessions){
+            session.addAdaptorSession(adaptorSession);
+        }
+
+        when(sessionRepository.findBySessionKeyOrElseThrow(sessionId)).thenReturn(session);
+        when(serviceRegistryClient.getRegisteredAdaptors()).thenReturn(registeredAdaptorConfigs);
+
+        // Act
+        Map<String, AttributeValue> attributeValues = attributeService.getAttributeValues(sessionId, attributeKey);
+
+        // Assert
+        assertEquals(0, attributeValues.size());
+
+        // Verify that methods were called the expected number of times
+        verify(sessionRepository, times(1)).findBySessionKeyOrElseThrow(sessionId);
+        verify(serviceRegistryClient, times(1)).getRegisteredAdaptors();
+        verifyNoInteractions(adaptorClient);
+    }
+
+    @Test
+    void getAttributeValues_when_sessionNotValidException_then_UpdateSessionState() throws SessionNotValidException {
+        // Arrange
+        UUID sessionId = UUID.randomUUID();
+        AttributeKey attributeKey = AttributeKey.JOINT_POSITIONS;
+        Session session = buildSession(sessionId);
+        List<AdaptorSession> adaptorSessions = buildAdaptorSessions(sessionId, 2);
+        List<ServiceRegistrationConfigDTO> registeredAdaptorConfigs = buildAdaptorConfigs(2);
+        for(AdaptorSession adaptorSession : adaptorSessions){
+            session.addAdaptorSession(adaptorSession);
+        }
+
+        when(sessionRepository.findBySessionKeyOrElseThrow(sessionId)).thenReturn(session);
+        when(serviceRegistryClient.getRegisteredAdaptors()).thenReturn(registeredAdaptorConfigs);
+        when(adaptorClient.getAttributeValue(anyString(), eq(attributeKey), any(ServiceRegistrationConfigDTO.class)))
+                .thenThrow(new SessionNotValidException("Session not valid"));
+        // Act
+        Map<String, AttributeValue> attributeValues = attributeService.getAttributeValues(sessionId, attributeKey);
+
+        // Assert
+        assertEquals(2, attributeValues.size());
+        assertEquals(null, attributeValues.get("Adaptor0"));
+        assertEquals(null, attributeValues.get("Adaptor1"));
+
+        // Verify that methods were called the expected number of times
+        verify(sessionRepository, times(1)).findBySessionKeyOrElseThrow(sessionId);
+        verify(serviceRegistryClient, times(1)).getRegisteredAdaptors();
+        verify(adaptorClient, times(2)).getAttributeValue(eq(sessionId.toString()), eq(attributeKey), any(ServiceRegistrationConfigDTO.class));
+        verify(adaptorSessionRepository, times(2)).updateSessionStateById(anyLong(), eq(SessionState.CLOSED));
     }
 
     // Utility methods for creating test data

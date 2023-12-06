@@ -14,7 +14,7 @@ public interface AdaptorSessionRepository extends JpaRepository<AdaptorSession, 
     @Transactional
     @Modifying
     @Query("UPDATE AdaptorSession s SET s.state = :state WHERE s.id = :id")
-    void updateSessionStateBySessionKey(Long id, SessionState state);
+    void updateSessionStateById(Long id, SessionState state);
 
     List<AdaptorSession> findBySessionSessionKey(UUID sessionKey);
 

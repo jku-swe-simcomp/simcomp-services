@@ -2,12 +2,16 @@ package at.jku.swe.simcomp.manager.service;
 
 import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeKey;
 import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeValue;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
+import at.jku.swe.simcomp.commons.manager.dto.session.SessionState;
 import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 import at.jku.swe.simcomp.manager.domain.model.AdaptorSession;
 import at.jku.swe.simcomp.manager.domain.model.Session;
+import at.jku.swe.simcomp.manager.domain.repository.AdaptorSessionRepository;
 import at.jku.swe.simcomp.manager.domain.repository.SessionRepository;
 import at.jku.swe.simcomp.manager.service.client.AdaptorClient;
 import at.jku.swe.simcomp.manager.service.client.ServiceRegistryClient;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -15,40 +19,60 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class AttributeService {
+    private final AdaptorSessionRepository adaptorSessionRepository;
     private final ServiceRegistryClient serviceRegistryClient;
     private final AdaptorClient adaptorClient;
     private final SessionRepository sessionRepository;
 
     public AttributeService(ServiceRegistryClient serviceRegistryClient,
                             AdaptorClient adaptorClient,
-                            SessionRepository sessionRepository) {
+                            SessionRepository sessionRepository,
+                            AdaptorSessionRepository adaptorSessionRepository) {
         this.serviceRegistryClient = serviceRegistryClient;
         this.adaptorClient = adaptorClient;
         this.sessionRepository = sessionRepository;
+        this.adaptorSessionRepository = adaptorSessionRepository;
     }
 
-    public Map<String, AttributeValue> getAttributeValues(UUID sessionId, AttributeKey attributeKey){
+    public Map<String, AttributeValue> getAttributeValues(UUID sessionId,
+                                                          AttributeKey attributeKey){
+        log.info("Getting attribute values for session {} and attribute key {}", sessionId, attributeKey);
         Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionId);
-        List<AdaptorSession> sessions = session.getAdaptorSessions();
+        List<AdaptorSession> sessions = session.getAdaptorSessions().stream()
+                .filter(adaptorSession -> adaptorSession.getState() == SessionState.OPEN)
+                .toList();
         List<ServiceRegistrationConfigDTO> registeredAdaptorConfigs = serviceRegistryClient.getRegisteredAdaptors();
-        var sessionToConfigs = sessions.stream()
-                .collect(Collectors.toMap(Function.identity(), adaptorSession -> findMatchingConfig(adaptorSession, registeredAdaptorConfigs)));
+
+        Map<AdaptorSession, Optional<ServiceRegistrationConfigDTO>> sessionToConfigs = sessions.stream()
+                .collect(Collectors.toMap(Function.identity(),
+                        adaptorSession -> findMatchingConfig(adaptorSession, registeredAdaptorConfigs)));
+
         Map<String, AttributeValue> attributeValues = new HashMap<>();
         for(var entry : sessionToConfigs.entrySet()){
             AdaptorSession adaptorSession = entry.getKey();
             if (entry.getValue().isEmpty()) {
+                log.info("No matching adaptor config found for {} of session {}", adaptorSession.getAdaptorName(), sessionId);
                 attributeValues.put(adaptorSession.getAdaptorName(), null);
                 continue;
             }
             ServiceRegistrationConfigDTO config = entry.getValue().get();
-            Optional<AttributeValue> value = adaptorClient.getAttributeValue(adaptorSession.getSessionKey(), attributeKey, config);
+            Optional<AttributeValue> value = Optional.empty();
+            try {
+                value = adaptorClient.getAttributeValue(adaptorSession.getSessionKey(), attributeKey, config);
+                log.info("Obtained attribute value {} for session {} from {} and attribute key {}", value, adaptorSession.getAdaptorName(), sessionId, attributeKey);
+            } catch (SessionNotValidException e) {
+                log.warn("Session {} of {} is not valid anymore. Closing it.", adaptorSession.getAdaptorName(), session.getSessionKey());
+                adaptorSessionRepository.updateSessionStateById(adaptorSession.getId(), SessionState.CLOSED);
+            }
             attributeValues.put(adaptorSession.getAdaptorName(), value.orElse(null));
         }
         return attributeValues;
     }
 
-    private Optional<ServiceRegistrationConfigDTO> findMatchingConfig(AdaptorSession session, List<ServiceRegistrationConfigDTO> registeredAdaptorConfigs) {
+    private Optional<ServiceRegistrationConfigDTO> findMatchingConfig(AdaptorSession session,
+                                                                      List<ServiceRegistrationConfigDTO> registeredAdaptorConfigs) {
         return registeredAdaptorConfigs.stream()
                 .filter(config -> config.getName().equals(session.getAdaptorName()))
                 .findFirst();
