@@ -19,8 +19,16 @@ Services can integrate commons with the following maven dependency:
 mvn clean install
 ```
 
+## [Manager](./manager)
+Central component with REST endpoints to add simulation instances for supported simulation types (i.e. types for which there are adaptors),
+create sessions containing different simulation instances, executing commands for simulation instances contained in a session,
+and fetch attributes from the simulation instances in the session.
+
+## [User Interface](./simcomp-ui)
+React project offering a more user-friendly interaction with the system/ the Manager.
+
 ## [Service Registry](./service-registry)
-The service registry managing available adaptors and their endpoints.
+The service registry providing information about available adaptors and their supported actions.
 
 ## [Demo Adaptor](./demo-adaptor)
 A demo adaptor showing integration with the service-registry.
@@ -52,6 +60,9 @@ This ensures consistent handling also for errors in arbitrary nested composite-c
 
 ## [Webots-Adaptor](./webots-adaptor) 
 The adaptor for webots simulations.
+
+## [Kinematics Service](./axis-converter)
+Spring boot project with REST endpoints to perform direct and inverse kinematics for the Ned2.
 
 ## General Guidelines
 
