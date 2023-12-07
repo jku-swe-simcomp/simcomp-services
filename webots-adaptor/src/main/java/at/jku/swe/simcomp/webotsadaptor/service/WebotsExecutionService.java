@@ -3,15 +3,13 @@ package at.jku.swe.simcomp.webotsadaptor.service;
 import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.RoboOperationFailedException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.simulation.SimulationInstanceConfig;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -53,10 +51,15 @@ public class WebotsExecutionService {
 
             if(Objects.equals(responseJson.get("result"), "success")) {
                 JSONArray jsonArray = (JSONArray) responseJson.get("positions");
-                Iterator<Double> iterator = jsonArray.iterator();
+                Iterator<String> iterator = jsonArray.iterator();
                 List<Double> positions = new ArrayList<>();
                 while(iterator.hasNext()){
-                    positions.add(iterator.next());
+                    Object val = iterator.next();
+                    if (val instanceof Long) {
+                        positions.add(((Long) val).doubleValue());
+                    } else if (val instanceof Double) {
+                        positions.add((Double) val);
+                    }
                 }
                 return positions;
             } else {
@@ -70,18 +73,27 @@ public class WebotsExecutionService {
         }
     }
 
-    private static JSONObject accessWebots(JSONObject input, SimulationInstanceConfig config) throws IOException, ParseException {
-        Socket client = new Socket(config.getInstanceHost(), config.getInstancePort());
+    protected static JSONObject accessWebots(JSONObject input, SimulationInstanceConfig config) throws IOException, ParseException {
+        Socket client = getSocket(config);
         DataOutputStream out = new DataOutputStream(client.getOutputStream());
         System.out.println("Connected to " + client.getRemoteSocketAddress());
 
         out.write(input.toString().getBytes(StandardCharsets.UTF_8));
 
         System.out.println("Command sent to simulation: " + input);
-        BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-        String response = in.readLine();
+        String response = readResponse(client);
         System.out.println("Response in plain text: " + response);
         JSONParser parser = new JSONParser();
         return (JSONObject) parser.parse(response);
     }
+
+    protected static Socket getSocket(SimulationInstanceConfig config) throws IOException {
+        return new Socket(config.getInstanceHost(), config.getInstancePort());
+    }
+
+    protected static String readResponse(Socket client) throws IOException {
+        BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+        return in.readLine();
+    }
+
 }
