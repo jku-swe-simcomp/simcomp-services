@@ -51,6 +51,10 @@ jobs:
       working-directory: simcomp-services/manager
       run: mvn -B package
 
+    - name: Build axis-converter
+      working-directory: simcomp-services/axis-converter
+      run: mvn -B package
+
     - name: Publish commons jar
       uses: actions/upload-artifact@v3
       with:
@@ -62,10 +66,12 @@ jobs:
         mkdir -p ./simcomp-services/coverage-reports/manager
         mkdir -p ./simcomp-services/coverage-reports/registry
         mkdir -p ./simcomp-services/coverage-reports/webots-adaptor
+        mkdir -p ./simcomp-services/coverage-reports/axis-converter
 
         cp -R ./simcomp-services/manager/target/site/jacoco/* ./simcomp-services/coverage-reports/manager
         cp -R ./simcomp-services/webots-adaptor/target/site/jacoco/* ./simcomp-services/coverage-reports/webots-adaptor
         cp -R ./simcomp-services/service-registry/target/site/jacoco/* ./simcomp-services/coverage-reports/registry
+        cp -R ./simcomp-services/axis-converter/target/site/jacoco/* ./simcomp-services/coverage-reports/axis-converter
         cp ./simcomp-services/.github/index.html ./simcomp-services/coverage-reports/index.html
 
     - name: Deploy Coverage Reports to GitHub Pages
@@ -120,6 +126,14 @@ jobs:
         context: ./simcomp-services/manager
         push: true
         tags: ${{ secrets.DOCKER_NAMESPACE }}/manager:${{ env.DATE }}
+        labels: ${{ steps.meta.outputs.labels }}
+
+    - name: Build and push axis-converter Docker image
+      uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+      with:
+        context: ./simcomp-services/axis-converter
+        push: true
+        tags: ${{ secrets.DOCKER_NAMESPACE }}/axis-converter:${{ env.DATE }}
         labels: ${{ steps.meta.outputs.labels }}
 
     - name: Build and push UI Docker image
