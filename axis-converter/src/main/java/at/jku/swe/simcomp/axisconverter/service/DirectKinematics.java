@@ -1,9 +1,6 @@
 package at.jku.swe.simcomp.axisconverter.service;
 
-import at.jku.swe.simcomp.commons.adaptor.dto.JointAngleAdjustmentDTO;
-import at.jku.swe.simcomp.commons.adaptor.dto.OrientationDTO;
-import at.jku.swe.simcomp.commons.adaptor.dto.PoseDTO;
-import at.jku.swe.simcomp.commons.adaptor.dto.PositionDTO;
+import at.jku.swe.simcomp.commons.adaptor.dto.*;
 
 
 import java.util.ArrayList;
@@ -11,7 +8,7 @@ import java.util.List;
 
 public class DirectKinematics {
 
-    public static PoseDTO directKinematics(List<JointAngleAdjustmentDTO> axes) {
+    public static PoseDTO directKinematics(List<JointPositionDTO> axes) {
 
         double[] axesValues = validateAxes(axes);
 
@@ -81,9 +78,9 @@ public class DirectKinematics {
         return matrices;
     }
 
-    private static double[] validateAxes(List<JointAngleAdjustmentDTO> axes) {
+    private static double[] validateAxes(List<JointPositionDTO> axes) {
         long axesCount = axes.stream()
-                .map(JointAngleAdjustmentDTO::getJoint)
+                .map(JointPositionDTO::getJoint)
                 .distinct()
                 .count();
         if(axesCount != 6) {
@@ -91,7 +88,7 @@ public class DirectKinematics {
         }
 
         double[] axesValues = new double[6];
-        axes.forEach(a -> axesValues[a.getJoint().getIndex()-1] = a.getByRadians());
+        axes.forEach(a -> axesValues[a.getJoint().getIndex()-1] = a.getRadians());
         return axesValues;
     }
 
