@@ -23,35 +23,35 @@ public class WebotsSimulationInstanceService implements SimulationInstanceServic
 
     @Override
     public void addSimulationInstance(SimulationInstanceConfig config) throws BadRequestException {
-<span class="nc bnc" id="L26" title="All 2 branches missed.">        if(!config.getSimulationType().equals(this.adaptorName)){</span>
-<span class="nc" id="L27">            throw new BadRequestException(&quot;Simulation name does not match the name of this adaptor&quot;);</span>
+<span class="fc bfc" id="L26" title="All 2 branches covered.">        if(!config.getSimulationType().equals(this.adaptorName)){</span>
+<span class="fc" id="L27">            throw new BadRequestException(&quot;Simulation name does not match the name of this adaptor&quot;);</span>
         }
-<span class="nc bnc" id="L29" title="All 4 branches missed.">        if(instances.stream().anyMatch(instance -&gt; instance.getInstanceHost().equals(config.getInstanceHost()) &amp;&amp;</span>
-<span class="nc bnc" id="L30" title="All 2 branches missed.">                instance.getInstancePort().equals(config.getInstancePort()))){</span>
-<span class="nc" id="L31">            throw new BadRequestException(&quot;Simulation instance with same host and port already exists&quot;);</span>
+<span class="fc bfc" id="L29" title="All 4 branches covered.">        if(instances.stream().anyMatch(instance -&gt; instance.getInstanceHost().equals(config.getInstanceHost()) &amp;&amp;</span>
+<span class="pc bpc" id="L30" title="1 of 2 branches missed.">                instance.getInstancePort().equals(config.getInstancePort()))){</span>
+<span class="fc" id="L31">            throw new BadRequestException(&quot;Simulation instance with same host and port already exists&quot;);</span>
         }
-<span class="nc bnc" id="L33" title="All 2 branches missed.">        if(instances.stream().anyMatch(instance -&gt; instance.getInstanceId().equals(config.getInstanceId()))){</span>
-<span class="nc" id="L34">            throw new BadRequestException(&quot;Simulation instance with same id already exists&quot;);</span>
+<span class="fc bfc" id="L33" title="All 2 branches covered.">        if(instances.stream().anyMatch(instance -&gt; instance.getInstanceId().equals(config.getInstanceId()))){</span>
+<span class="fc" id="L34">            throw new BadRequestException(&quot;Simulation instance with same id already exists&quot;);</span>
         }
-<span class="nc" id="L36">        instances.add(config);</span>
-<span class="nc" id="L37">        log.info(&quot;Added simulation instance: {}&quot;, config);</span>
-<span class="nc" id="L38">    }</span>
+<span class="fc" id="L36">        instances.add(config);</span>
+<span class="fc" id="L37">        log.info(&quot;Added simulation instance: {}&quot;, config);</span>
+<span class="fc" id="L38">    }</span>
 
     @Override
     public void removeSimulationInstance(String instanceId) {
-<span class="nc" id="L42">        Optional&lt;SimulationInstanceConfig&gt; config = instances.stream().filter(simulation -&gt; simulation.getInstanceId().equals(instanceId)).findFirst();</span>
-<span class="nc bnc" id="L43" title="All 2 branches missed.">        if(config.isPresent()){</span>
-<span class="nc" id="L44">            instances.remove(config.get());</span>
-<span class="nc" id="L45">            notifySimulationRemovalListeners(config.get());</span>
-<span class="nc" id="L46">            log.info(&quot;Removed simulation: {}&quot;, config.get());</span>
+<span class="fc" id="L42">        Optional&lt;SimulationInstanceConfig&gt; config = instances.stream().filter(simulation -&gt; simulation.getInstanceId().equals(instanceId)).findFirst();</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">        if(config.isPresent()){</span>
+<span class="fc" id="L44">            instances.remove(config.get());</span>
+<span class="fc" id="L45">            notifySimulationRemovalListeners(config.get());</span>
+<span class="fc" id="L46">            log.info(&quot;Removed simulation: {}&quot;, config.get());</span>
         }else {
-<span class="nc" id="L48">            log.info(&quot;Simulation instance {} not found&quot;, instanceId);</span>
+<span class="fc" id="L48">            log.info(&quot;Simulation instance {} not found&quot;, instanceId);</span>
         }
-<span class="nc" id="L50">    }</span>
+<span class="fc" id="L50">    }</span>
 
     @Override
     public Set&lt;SimulationInstanceConfig&gt; getSimulationInstances() throws Exception {
-<span class="nc" id="L54">        return instances;</span>
+<span class="fc" id="L54">        return instances;</span>
     }
 
     public void addSimulationRemovalListener(SimulationInstanceRemovalListener listener) {
@@ -60,12 +60,12 @@ public class WebotsSimulationInstanceService implements SimulationInstanceServic
 <span class="fc" id="L60">    }</span>
 
     public void notifySimulationRemovalListeners(SimulationInstanceConfig config) {
-<span class="nc" id="L63">        SIMULATION_INSTANCE_REMOVAL_LISTENERS.forEach(listener -&gt; listener.onSimulationRemoved(config));</span>
-<span class="nc" id="L64">        log.info(&quot;Notified simulation instance removal listeners about removal of: {}&quot;, config);</span>
-<span class="nc" id="L65">    }</span>
+<span class="fc" id="L63">        SIMULATION_INSTANCE_REMOVAL_LISTENERS.forEach(listener -&gt; listener.onSimulationRemoved(config));</span>
+<span class="fc" id="L64">        log.info(&quot;Notified simulation instance removal listeners about removal of: {}&quot;, config);</span>
+<span class="fc" id="L65">    }</span>
 
     public static Set&lt;SimulationInstanceConfig&gt; getInstances() {
-<span class="nc" id="L68">        return instances;</span>
+<span class="fc" id="L68">        return instances;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

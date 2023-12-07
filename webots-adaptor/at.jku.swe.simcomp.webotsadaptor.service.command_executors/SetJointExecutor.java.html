@@ -15,20 +15,20 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 
 @Service
-<span class="nc" id="L18">public class SetJointExecutor</span>
+<span class="fc" id="L18">public class SetJointExecutor</span>
         implements CommandExecutor&lt;ExecutionCommand.SetJointPositionCommand, ExecutionResultDTO&gt; {
 
     @Override
     public ExecutionResultDTO execute(ExecutionCommand.SetJointPositionCommand command, SimulationInstanceConfig config) throws RoboOperationFailedException, IOException, ParseException {
 
-<span class="nc" id="L24">        System.out.println(&quot;Connecting to &quot; + config.getInstanceHost() + &quot; on port &quot; + config.getInstancePort());</span>
+<span class="fc" id="L24">        System.out.println(&quot;Connecting to &quot; + config.getInstanceHost() + &quot; on port &quot; + config.getInstancePort());</span>
 
-<span class="nc" id="L26">        JSONObject json = new JSONObject();</span>
-<span class="nc" id="L27">        @NonNull JointPositionDTO movement = command.jointPosition(); // now a list is used, maybe change to only send one angle adjustment per command</span>
-<span class="nc" id="L28">        json.put(&quot;operation&quot;, &quot;set_axis&quot;);</span>
-<span class="nc" id="L29">        json.put(&quot;axis&quot;, movement.getJoint().getIndex());</span>
-<span class="nc" id="L30">        json.put(&quot;value&quot;, movement.getRadians());</span>
-<span class="nc" id="L31">        return WebotsExecutionService.executeCommand(json, config);</span>
+<span class="fc" id="L26">        JSONObject json = new JSONObject();</span>
+<span class="fc" id="L27">        @NonNull JointPositionDTO movement = command.jointPosition(); // now a list is used, maybe change to only send one angle adjustment per command</span>
+<span class="fc" id="L28">        json.put(&quot;operation&quot;, &quot;set_axis&quot;);</span>
+<span class="fc" id="L29">        json.put(&quot;axis&quot;, movement.getJoint().getIndex());</span>
+<span class="fc" id="L30">        json.put(&quot;value&quot;, movement.getRadians());</span>
+<span class="fc" id="L31">        return WebotsExecutionService.executeCommand(json, config);</span>
     }
 }
 

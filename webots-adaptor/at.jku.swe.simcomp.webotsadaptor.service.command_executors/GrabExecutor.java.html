@@ -13,19 +13,19 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 
 @Service
-<span class="nc" id="L16">public class GrabExecutor</span>
+<span class="fc" id="L16">public class GrabExecutor</span>
         implements CommandExecutor&lt;ExecutionCommand.GrabCommand, ExecutionResultDTO&gt; {
 
     @Override
     public ExecutionResultDTO execute(ExecutionCommand.GrabCommand command, SimulationInstanceConfig config) throws RoboOperationFailedException, IOException, ParseException {
 
-<span class="nc" id="L22">        System.out.println(&quot;Connecting to &quot; + config.getInstanceHost() + &quot; on port &quot; + config.getInstancePort());</span>
+<span class="fc" id="L22">        System.out.println(&quot;Connecting to &quot; + config.getInstanceHost() + &quot; on port &quot; + config.getInstancePort());</span>
 
-<span class="nc" id="L24">        JSONObject json = new JSONObject();</span>
-<span class="nc" id="L25">        json.put(&quot;operation&quot;, &quot;set_axis&quot;);</span>
-<span class="nc" id="L26">        json.put(&quot;axis&quot;, &quot;axis7&quot;);</span>
-<span class="nc" id="L27">        json.put(&quot;value&quot;, -0.1);</span>
-<span class="nc" id="L28">        return WebotsExecutionService.executeCommand(json, config);</span>
+<span class="fc" id="L24">        JSONObject json = new JSONObject();</span>
+<span class="fc" id="L25">        json.put(&quot;operation&quot;, &quot;set_axis&quot;);</span>
+<span class="fc" id="L26">        json.put(&quot;axis&quot;, &quot;axis7&quot;);</span>
+<span class="fc" id="L27">        json.put(&quot;value&quot;, -0.1);</span>
+<span class="fc" id="L28">        return WebotsExecutionService.executeCommand(json, config);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

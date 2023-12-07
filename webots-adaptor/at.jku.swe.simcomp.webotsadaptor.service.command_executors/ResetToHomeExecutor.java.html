@@ -13,16 +13,16 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 
 @Service
-<span class="nc" id="L16">public class ResetToHomeExecutor implements CommandExecutor&lt;ExecutionCommand.ResetToHomeCommand, ExecutionResultDTO&gt; {</span>
+<span class="fc" id="L16">public class ResetToHomeExecutor implements CommandExecutor&lt;ExecutionCommand.ResetToHomeCommand, ExecutionResultDTO&gt; {</span>
 
     @Override
     public ExecutionResultDTO execute(ExecutionCommand.ResetToHomeCommand command, SimulationInstanceConfig config) throws RoboOperationFailedException, IOException, ParseException {
 
-<span class="nc" id="L21">        System.out.println(&quot;Connecting to &quot; + config.getInstanceHost() + &quot; on port &quot; + config.getInstancePort());</span>
+<span class="fc" id="L21">        System.out.println(&quot;Connecting to &quot; + config.getInstanceHost() + &quot; on port &quot; + config.getInstancePort());</span>
 
-<span class="nc" id="L23">        JSONObject json = new JSONObject();</span>
-<span class="nc" id="L24">        json.put(&quot;operation&quot;, &quot;initial_position&quot;);</span>
-<span class="nc" id="L25">        return WebotsExecutionService.executeCommand(json, config);</span>
+<span class="fc" id="L23">        JSONObject json = new JSONObject();</span>
+<span class="fc" id="L24">        json.put(&quot;operation&quot;, &quot;initial_position&quot;);</span>
+<span class="fc" id="L25">        return WebotsExecutionService.executeCommand(json, config);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

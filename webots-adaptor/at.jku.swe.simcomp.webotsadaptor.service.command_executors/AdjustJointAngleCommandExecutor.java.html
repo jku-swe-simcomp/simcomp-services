@@ -15,19 +15,19 @@ import org.json.simple.JSONObject;
 import java.io.IOException;
 
 @Service
-<span class="nc" id="L18">public class AdjustJointAngleCommandExecutor implements CommandExecutor&lt;ExecutionCommand.AdjustJointAngleCommand, ExecutionResultDTO&gt; {</span>
+<span class="fc" id="L18">public class AdjustJointAngleCommandExecutor implements CommandExecutor&lt;ExecutionCommand.AdjustJointAngleCommand, ExecutionResultDTO&gt; {</span>
 
     @Override
     public ExecutionResultDTO execute(ExecutionCommand.AdjustJointAngleCommand command, SimulationInstanceConfig config) throws RoboOperationFailedException, IOException, ParseException {
 
-<span class="nc" id="L23">        System.out.println(&quot;Connecting to &quot; + config.getInstanceHost() + &quot; on port &quot; + config.getInstancePort());</span>
+<span class="fc" id="L23">        System.out.println(&quot;Connecting to &quot; + config.getInstanceHost() + &quot; on port &quot; + config.getInstancePort());</span>
 
-<span class="nc" id="L25">        JSONObject json = new JSONObject();</span>
-<span class="nc" id="L26">        JointAngleAdjustmentDTO movement = command.jointAngleAdjustment(); // now a list is used, maybe change to only send one angle adjustment per command</span>
-<span class="nc" id="L27">        json.put(&quot;operation&quot;, &quot;adjust_axis&quot;);</span>
-<span class="nc" id="L28">        json.put(&quot;axis&quot;, movement.getJoint().getIndex());</span>
-<span class="nc" id="L29">        json.put(&quot;value&quot;, movement.getByRadians());</span>
-<span class="nc" id="L30">        return WebotsExecutionService.executeCommand(json, config);</span>
+<span class="fc" id="L25">        JSONObject json = new JSONObject();</span>
+<span class="fc" id="L26">        JointAngleAdjustmentDTO movement = command.jointAngleAdjustment(); // now a list is used, maybe change to only send one angle adjustment per command</span>
+<span class="fc" id="L27">        json.put(&quot;operation&quot;, &quot;adjust_axis&quot;);</span>
+<span class="fc" id="L28">        json.put(&quot;axis&quot;, movement.getJoint().getIndex());</span>
+<span class="fc" id="L29">        json.put(&quot;value&quot;, movement.getByRadians());</span>
+<span class="fc" id="L30">        return WebotsExecutionService.executeCommand(json, config);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

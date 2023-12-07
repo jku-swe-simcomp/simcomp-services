@@ -14,14 +14,14 @@ import java.io.IOException;
 
 
 @Service
-<span class="nc" id="L17">public class PoseCommandExecutor implements CommandExecutor&lt;ExecutionCommand.PoseCommand, ExecutionResultDTO&gt; {</span>
+<span class="fc" id="L17">public class PoseCommandExecutor implements CommandExecutor&lt;ExecutionCommand.PoseCommand, ExecutionResultDTO&gt; {</span>
 
     @Override
     public ExecutionResultDTO execute(ExecutionCommand.PoseCommand command, SimulationInstanceConfig config) throws RoboOperationFailedException, IOException, ParseException {
 
-<span class="nc" id="L22">        JSONObject json = new JSONObject();</span>
-<span class="nc" id="L23">        json.put(&quot;operation&quot;, &quot;get_position&quot;);</span>
-<span class="nc" id="L24">        return WebotsExecutionService.executeCommand(json, config);</span>
+<span class="fc" id="L22">        JSONObject json = new JSONObject();</span>
+<span class="fc" id="L23">        json.put(&quot;operation&quot;, &quot;get_position&quot;);</span>
+<span class="fc" id="L24">        return WebotsExecutionService.executeCommand(json, config);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
