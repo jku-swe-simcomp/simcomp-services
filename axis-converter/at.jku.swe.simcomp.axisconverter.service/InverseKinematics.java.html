@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InverseKinematics.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">webots-adaptor</a> &gt; <a href="index.source.html" class="el_package">at.jku.swe.simcomp.axisconverter.service</a> &gt; <span class="el_source">InverseKinematics.java</span></div><h1>InverseKinematics.java</h1><pre class="source lang-java linenums">package at.jku.swe.simcomp.axisconverter.service;
+
+import at.jku.swe.simcomp.commons.adaptor.dto.JointAngleAdjustmentDTO;
+import at.jku.swe.simcomp.commons.adaptor.dto.JointPositionDTO;
+import at.jku.swe.simcomp.commons.adaptor.dto.PoseDTO;
+
+import java.util.Arrays;
+
+import java.util.LinkedList;
+import java.util.List;
+
+<span class="nc" id="L12">public class InverseKinematics {</span>
+
+    public static List&lt;JointPositionDTO&gt; inverseKinematics(PoseDTO position) {
+<span class="nc" id="L15">        return new LinkedList&lt;&gt;();</span>
+
+        /*double threshold = Math.PI / 36; // rad
+        double[] trials = new double[(int) (2 * Math.PI / threshold)];
+
+        for (int i = 0; i &lt; trials.length; i++) {
+            trials[i] = -Math.PI + i * threshold;
+        }
+
+        double[] errorVec = new double[0];
+        double[][] bestSolution = new double[6][0];
+        double[] weightSolution = new double[0];
+
+        int count = 0;
+
+        for (double theta6 : trials) {
+            try {
+                double[][] P05_T06 = getJointPositionFive(O, theta6);
+                double[][] joint123 = getPlanarGeometry(P05_T06[0][0], P05_T06[1][0], P05_T06[2][0] - 103 - 80);
+                double[][] T03 = computeT03(joint123);
+                double[][] T06 = computeT06(T03, P05_T06[1][0]);
+
+                double[][] joints6Dof = computeJoints456(T06, joint123);
+                joints6Dof = getRealMovements(joints6Dof, false);
+
+                // Calculate the error of the computed solutions
+            } catch (Exception e) {
+                System.out.println(&quot;Error was found. Possible a lost imaginary solution. :(&quot;);
+                // Handle the exception as needed
+                return;
+            }
+
+            for (double[] joint : joints6Dof) {
+                double error = Math.abs(MathUtils.angleDifference(theta6, joint[5]));
+
+                double[][] dirKin = directKinematics(joint);
+                double dirKinDiff = Vector3D.distance(new Vector3D(O[0], O[1], O[2]),
+                        new Vector3D(dirKin[0][0], dirKin[1][0], dirKin[2][0]));
+
+                if (Math.round(error - threshold, 3) &lt;= 0 &amp;&amp; dirKinDiff &lt; 1) {
+                    errorVec = Arrays.copyOf(errorVec, errorVec.length + 1);
+                    errorVec[errorVec.length - 1] = error;
+
+                    bestSolution = Arrays.copyOf(bestSolution, bestSolution.length + 1);
+                    bestSolution[bestSolution.length - 1] = Arrays.copyOf(joint, joint.length);
+
+                    weightSolution = Arrays.copyOf(weightSolution, weightSolution.length + 1);
+                    weightSolution[weightSolution.length - 1] = dirKinDiff;
+                }
+
+                // Bonus point research
+                errorVec = Arrays.copyOf(errorVec, errorVec.length + 1);
+                errorVec[errorVec.length - 1] = error;
+                // Plotting points or other actions can be added here
+                count++;
+            }
+        }
+
+        // Sorting by closest xyz
+        int[] order = MathUtils.argsort(weightSolution);
+        double[][] bestSolutionSorted = new double[bestSolution.length][bestSolution[0].length];
+
+        for (int i = 0; i &lt; order.length; i++) {
+            bestSolutionSorted[i] = Arrays.copyOf(bestSolution[order[i]], bestSolution[0].length);
+        }
+
+        boolean hasSolutions = bestSolutionSorted.length &gt; 0;
+
+        if (!hasSolutions) {
+            System.out.println(&quot;There are no available solutions!&quot;);
+            return;
+        }
+
+        System.out.println(&quot;Found at least &quot; + bestSolutionSorted.length + &quot; solutions.&quot;);
+        System.out.println(&quot;Best inverse kinematic solution with &quot; + weightSolution[order[0]] + &quot; norm error.&quot;);
+
+        System.out.println(&quot;Best solution :&quot;);
+        System.out.println(Arrays.toString(bestSolutionSorted[0]));
+
+        // Bonus point
+        int n = myKmeans(bestSolutionSorted);
+
+        // Plot error evolution
+        // Add plotting code or other visualization here*/
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
