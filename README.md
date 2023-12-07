@@ -82,3 +82,8 @@ This creates a console appender for the INFO level and a file appender on the DE
 ### Tests
 Coverage reports are published on [github-pages](https://jku-swe-simcomp.github.io/simcomp-services/).
 To add a report for a new Spring Boot project, include the jacoco-plugin (see [here](./manager/pom.xml) for an example), include the generated report in the [Github actions workflow](./.github/workflows/main.yml) and add a link to the [index.html](./.github/index.html).
+
+### Deployment
+This repository is equipped with a Github Actions Continuous Integration pipeline,
+which builds/tests all projects on every push to the main branch, pushes Docker images for all services to the Docker hub.
+Check out the [local-deploy](https://github.com/jku-swe-simcomp/local-deploy) for a docker-compose based deployment of the whole system.
