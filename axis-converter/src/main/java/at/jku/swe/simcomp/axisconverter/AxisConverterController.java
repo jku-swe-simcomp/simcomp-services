@@ -2,7 +2,8 @@ package at.jku.swe.simcomp.axisconverter;
 
 
 import at.jku.swe.simcomp.axisconverter.service.DirectKinematics;
-import at.jku.swe.simcomp.commons.adaptor.dto.JointAngleAdjustmentDTO;
+import at.jku.swe.simcomp.axisconverter.service.InverseKinematics;
+import at.jku.swe.simcomp.commons.adaptor.dto.JointPositionDTO;
 import at.jku.swe.simcomp.commons.adaptor.dto.PoseDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,13 +19,14 @@ import java.util.List;
 @Service
 public class AxisConverterController {
 
+    // TODO: change to other DTO
     @GetMapping("/axisToPos")
-    public List<JointAngleAdjustmentDTO> convertAxesToPosition(PoseDTO position) {
-        return null;
+    public List<JointPositionDTO> convertAxesToPosition(PoseDTO position) {
+        return InverseKinematics.inverseKinematics(position);
     }
 
     @GetMapping("/posToAxis")
-    public PoseDTO convertPositionToAxes(List<JointAngleAdjustmentDTO> axes) {
+    public PoseDTO convertPositionToAxes(List<JointPositionDTO> axes) {
         return DirectKinematics.directKinematics(axes);
     }
 }
