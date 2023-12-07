@@ -21,26 +21,26 @@ public class WebotsAdaptorEndpointService implements AdaptorEndpointService {
 
     @Override
     public String initSession() throws SessionInitializationFailedException {
-<span class="nc" id="L24">        return sessionService.initializeSession();</span>
+<span class="fc" id="L24">        return sessionService.initializeSession();</span>
     }
 
     @Override
     public String initSession(String instanceId) throws SessionInitializationFailedException {
-<span class="nc" id="L29">        return sessionService.initializeSession(instanceId);</span>
+<span class="fc" id="L29">        return sessionService.initializeSession(instanceId);</span>
     }
 
     @Override
     public void closeSession(String sessionId) throws SessionNotValidException {
-<span class="nc" id="L34">        sessionService.closeSession(sessionId);</span>
-<span class="nc" id="L35">    }</span>
+<span class="fc" id="L34">        sessionService.closeSession(sessionId);</span>
+<span class="fc" id="L35">    }</span>
 
     @Override
     public AttributeValue getAttributeValue(AttributeKey attributeKey, String sessionId) throws SessionNotValidException, RoboOperationFailedException, IOException, ParseException {
-<span class="nc" id="L39">        SimulationInstanceConfig config = sessionService.getConfigForSession(sessionId);</span>
+<span class="fc" id="L39">        SimulationInstanceConfig config = sessionService.getConfigForSession(sessionId);</span>
         // Note: can add more cases for different attributes
-<span class="nc bnc" id="L41" title="All 2 branches missed.">        return switch(attributeKey){</span>
-<span class="nc" id="L42">            case JOINT_POSITIONS -&gt;  new AttributeValue.JointPositions(WebotsExecutionService.getPositions(config));</span>
-<span class="nc" id="L43">            default -&gt; throw new UnsupportedOperationException(&quot;Attribute %s not supported by this service&quot;.formatted(attributeKey));</span>
+<span class="fc bfc" id="L41" title="All 2 branches covered.">        return switch(attributeKey){</span>
+<span class="fc" id="L42">            case JOINT_POSITIONS -&gt;  new AttributeValue.JointPositions(WebotsExecutionService.getPositions(config));</span>
+<span class="fc" id="L43">            default -&gt; throw new UnsupportedOperationException(&quot;Attribute %s not supported by this service&quot;.formatted(attributeKey));</span>
         };
     }
 }

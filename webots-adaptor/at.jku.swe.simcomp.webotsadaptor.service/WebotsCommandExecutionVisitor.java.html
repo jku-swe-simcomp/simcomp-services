@@ -26,15 +26,15 @@ public class WebotsCommandExecutionVisitor extends CommandExecutionVisitor {
                                          GrabExecutor grabExecutor,
                                          OpenHandExecutor openHandExecutor,
                                          ResetToHomeExecutor resetToHomeExecutor,
-<span class="fc" id="L29">                                         SetJointExecutor setJointExecutor){</span>
-<span class="fc" id="L30">        this.demoSessionService = demoSessionService;</span>
-<span class="fc" id="L31">        this.adjustJointAngleCommandExecutor = adjustJointAngleCommandExecutor;</span>
-<span class="fc" id="L32">        this.poseCommandExecutor = poseCommandExecutor;</span>
-<span class="fc" id="L33">        this.grabExecutor = grabExecutor;</span>
-<span class="fc" id="L34">        this.openHandExecutor = openHandExecutor;</span>
-<span class="fc" id="L35">        this.setJointExecutor = setJointExecutor;</span>
-<span class="fc" id="L36">        this.resetToHomeExecutor = resetToHomeExecutor;</span>
-<span class="fc" id="L37">    }</span>
+<span class="nc" id="L29">                                         SetJointExecutor setJointExecutor){</span>
+<span class="nc" id="L30">        this.demoSessionService = demoSessionService;</span>
+<span class="nc" id="L31">        this.adjustJointAngleCommandExecutor = adjustJointAngleCommandExecutor;</span>
+<span class="nc" id="L32">        this.poseCommandExecutor = poseCommandExecutor;</span>
+<span class="nc" id="L33">        this.grabExecutor = grabExecutor;</span>
+<span class="nc" id="L34">        this.openHandExecutor = openHandExecutor;</span>
+<span class="nc" id="L35">        this.setJointExecutor = setJointExecutor;</span>
+<span class="nc" id="L36">        this.resetToHomeExecutor = resetToHomeExecutor;</span>
+<span class="nc" id="L37">    }</span>
 
     @Override
     public ExecutionResultDTO visit(ExecutionCommand.AdjustJointAngleCommand command, String sessionKey) throws SessionNotValidException, RoboOperationFailedException, IOException, ParseException {

@@ -15,7 +15,7 @@ import java.util.*;
 public class WebotsSimulationInstanceService implements SimulationInstanceService {
 <span class="fc" id="L16">    private static final Logger log = LogManager.getLogger();</span>
 <span class="fc" id="L17">    private static final Set&lt;SimulationInstanceRemovalListener&gt; SIMULATION_INSTANCE_REMOVAL_LISTENERS = Collections.synchronizedSet(new HashSet&lt;&gt;());</span>
-<span class="fc" id="L18">    public static final Set&lt;SimulationInstanceConfig&gt; instances = Collections.synchronizedSet(new HashSet&lt;&gt;());</span>
+<span class="fc" id="L18">    private static final Set&lt;SimulationInstanceConfig&gt; instances = Collections.synchronizedSet(new HashSet&lt;&gt;());</span>
     private final String adaptorName;
 <span class="fc" id="L20">    public WebotsSimulationInstanceService(@Value(&quot;${adaptor.endpoint.name}&quot;) String adaptorName) {</span>
 <span class="fc" id="L21">       this.adaptorName = adaptorName;</span>
@@ -63,5 +63,9 @@ public class WebotsSimulationInstanceService implements SimulationInstanceServic
 <span class="nc" id="L63">        SIMULATION_INSTANCE_REMOVAL_LISTENERS.forEach(listener -&gt; listener.onSimulationRemoved(config));</span>
 <span class="nc" id="L64">        log.info(&quot;Notified simulation instance removal listeners about removal of: {}&quot;, config);</span>
 <span class="nc" id="L65">    }</span>
+
+    public static Set&lt;SimulationInstanceConfig&gt; getInstances() {
+<span class="nc" id="L68">        return instances;</span>
+    }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
