@@ -7,7 +7,7 @@ service-registry,at.jku.swe.simcomp.serviceregistry.domain.model,SupportedAction
 service-registry,at.jku.swe.simcomp.serviceregistry.domain.model,AdaptorStatus,0,15,0,0,0,3,0,1,0,1
 service-registry,at.jku.swe.simcomp.serviceregistry.domain.model,SupportedActionType.SupportedActionTypeBuilder,36,0,0,0,1,0,6,0,6,0
 service-registry,at.jku.swe.simcomp.serviceregistry.service,RegistrationService,0,77,0,2,0,18,0,7,0,6
-service-registry,at.jku.swe.simcomp.serviceregistry.service,HealthCheckScheduler,40,16,2,0,11,6,2,3,1,3
+service-registry,at.jku.swe.simcomp.serviceregistry.service,HealthCheckScheduler,30,26,2,0,8,9,2,3,1,3
 service-registry,at.jku.swe.simcomp.serviceregistry.service,AdaptorMapper,0,82,0,0,0,23,0,5,0,5
 service-registry,at.jku.swe.simcomp.serviceregistry.service,AdaptorClient,0,29,0,0,0,9,0,3,0,3
 service-registry,at.jku.swe.simcomp.serviceregistry.rest.exceptions,AdaptorAlreadyRegisteredException,0,4,0,0,0,2,0,1,0,1
