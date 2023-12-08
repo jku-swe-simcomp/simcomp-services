@@ -13,6 +13,7 @@ import at.jku.swe.simcomp.commons.adaptor.registration.ServiceRegistryClient;
 import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 import at.jku.swe.simcomp.commons.adaptor.registration.exception.ServiceRegistrationFailedException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.swagger.v3.core.util.Json;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -159,11 +160,24 @@ public class AdaptorEndpointController implements AdaptorEndpoint{
      * Utility method registering this adaptor.
      */
     private void registerThisAdaptorEndpointAtServiceRegistry() {
-        try{
-            this.serviceRegistryClient.register(this.serviceRegistrationConfigDTO);
-        }catch(Exception e){//we want to catch all possible exceptions as this method is called during object initialization
-            System.out.println("Could not register adaptor endpoint at service registry.");
-        }
+            new Thread(() -> {
+                System.out.println("Registering adaptor at service registry...");
+                String delay = System.getenv("REGISTRATION_DELAY_MS");
+                if(delay != null){
+                    System.out.printf("Delay configured. Waiting for %s ms before registration.%n", delay);
+                    try {
+                        Thread.sleep(Long.parseLong(delay));
+                    } catch (InterruptedException e) {
+                        System.out.println("Delay thread interrupted.");
+                    }
+                }
+                try {
+                    this.serviceRegistryClient.register(this.serviceRegistrationConfigDTO);
+                    System.out.println("Registration completed.");
+                } catch (ServiceRegistrationFailedException | JsonProcessingException e) {
+                    System.out.println("Could not register adaptor endpoint at service registry.");
+                }
+            }).start();
     }
 
     /**
