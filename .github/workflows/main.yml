@@ -12,6 +12,7 @@ jobs:
       packages: write
     env:
       SERVICE_REGISTRY_ENDPOINT: not_required_but_cannot_be_null
+      AXIS_CONVERTER_ENDPOINT: not_required_but_cannot_be_null
 
     # check for pull_requests:
     #if: github.event_name != 'pull_request' || github.event.action == 'closed'
