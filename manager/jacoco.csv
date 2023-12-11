@@ -2,6 +2,7 @@ GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_
 Adaptor Manager,at.jku.swe.simcomp.manager.rest,SimulationInstanceController,62,10,0,0,14,4,5,2,5,2
 Adaptor Manager,at.jku.swe.simcomp.manager.rest,ExecutionController,33,10,0,0,7,4,2,2,2,2
 Adaptor Manager,at.jku.swe.simcomp.manager.rest,AttributeController,12,10,0,0,2,4,1,2,1,2
+Adaptor Manager,at.jku.swe.simcomp.manager.rest,RedirectionController,2,3,0,0,1,1,1,1,1,1
 Adaptor Manager,at.jku.swe.simcomp.manager.rest,ErrorHandler,39,3,0,0,15,1,3,1,3,1
 Adaptor Manager,at.jku.swe.simcomp.manager.rest,SessionController,127,10,0,0,30,4,7,2,7,2
 Adaptor Manager,at.jku.swe.simcomp.manager,AdaptorManagerApplication,5,3,0,0,2,1,1,1,1,1
