@@ -2,6 +2,8 @@ package at.jku.swe.simcomp.commons.adaptor.dto;
 
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
