@@ -7,7 +7,7 @@ webots-adaptor,at.jku.swe.simcomp.webotsadaptor.service.command_executors,ResetT
 webots-adaptor,at.jku.swe.simcomp.webotsadaptor.service.command_executors,PoseCommandExecutor,0,16,0,0,0,4,0,2,0,2
 webots-adaptor,at.jku.swe.simcomp.webotsadaptor.service.command_executors,OpenHandExecutor,0,34,0,0,0,7,0,2,0,2
 webots-adaptor,at.jku.swe.simcomp.webotsadaptor,WebotsAdaptorApplication,8,0,0,0,3,0,2,0,2,0
-webots-adaptor,at.jku.swe.simcomp.webotsadaptor,RedirectionController,5,0,0,0,2,0,2,0,2,0
+webots-adaptor,at.jku.swe.simcomp.webotsadaptor,OpenApiConfig,9,0,0,0,3,0,2,0,2,0
 webots-adaptor,at.jku.swe.simcomp.webotsadaptor.service,WebotsSimulationInstanceService,0,145,1,11,0,31,1,17,0,12
 webots-adaptor,at.jku.swe.simcomp.webotsadaptor.service,WebotsCommandExecutionVisitor,0,78,0,0,0,15,0,7,0,7
 webots-adaptor,at.jku.swe.simcomp.webotsadaptor.service,WebotsExecutionService,24,169,1,9,4,45,4,7,3,3

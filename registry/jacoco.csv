@@ -1,5 +1,5 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-service-registry,at.jku.swe.simcomp.serviceregistry.rest,RedirectionController,2,3,0,0,1,1,1,1,1,1
+service-registry,at.jku.swe.simcomp.serviceregistry.rest,OpenApiConfig,0,9,0,0,0,3,0,2,0,2
 service-registry,at.jku.swe.simcomp.serviceregistry.rest,ControllerAdvice,13,3,0,0,5,1,1,1,1,1
 service-registry,at.jku.swe.simcomp.serviceregistry.rest,RegistrationController,30,10,0,0,8,4,3,2,3,2
 service-registry,at.jku.swe.simcomp.serviceregistry.domain.model,Adaptor,140,127,33,13,2,8,26,14,3,14
