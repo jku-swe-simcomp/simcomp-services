@@ -12,7 +12,7 @@ Adaptor Manager,at.jku.swe.simcomp.manager.service.client,ServiceRegistryClient,
 Adaptor Manager,at.jku.swe.simcomp.manager.service.client,AdaptorClient.new ParameterizedTypeReference() {...},0,6,0,0,0,1,0,1,0,1
 Adaptor Manager,at.jku.swe.simcomp.manager.service.client,NoExceptionThrowingResponseErrorHandler,1,3,0,0,1,1,1,1,1,1
 Adaptor Manager,at.jku.swe.simcomp.manager.config,CorsConfig,0,29,0,0,0,8,0,2,0,2
-Adaptor Manager,at.jku.swe.simcomp.manager.config,RestTemplateConfig,0,16,0,0,0,6,0,4,0,4
+Adaptor Manager,at.jku.swe.simcomp.manager.config,RestTemplateConfig,0,28,0,0,0,9,0,4,0,4
 Adaptor Manager,at.jku.swe.simcomp.manager.config,ExecutionCommandValidation,0,7,0,0,0,2,0,2,0,2
 Adaptor Manager,at.jku.swe.simcomp.manager.service.scheduler,JointPositionFetchingScheduler,178,19,10,0,39,7,9,3,4,3
 Adaptor Manager,at.jku.swe.simcomp.manager.service,SessionService,135,589,11,25,11,119,13,39,2,32

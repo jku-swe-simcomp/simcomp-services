@@ -2,6 +2,8 @@
 
 import at.jku.swe.simcomp.manager.service.client.NoExceptionThrowingResponseErrorHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -10,27 +12,28 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
-<span class="fc" id="L13">public class RestTemplateConfig {</span>
+<span class="fc" id="L15">public class RestTemplateConfig {</span>
     @Bean
     @Primary
     public RestTemplate restTemplate() {
-<span class="fc" id="L17">        return new RestTemplate();</span>
+<span class="fc" id="L19">        return new RestTemplate();</span>
     }
 
     @Bean
     @Qualifier(&quot;noExceptionThrowingRestTemplate&quot;)
     public RestTemplate noExceptionThrowingRestTemplate(RestTemplateBuilder restTemplateBuilder,
                                                         NoExceptionThrowingResponseErrorHandler noExceptionThrowingResponseErrorHandler) {
-<span class="fc" id="L24">        return restTemplateBuilder</span>
-<span class="fc" id="L25">                .errorHandler(noExceptionThrowingResponseErrorHandler)</span>
-<span class="fc" id="L26">                .build();</span>
+<span class="fc" id="L26">        return restTemplateBuilder</span>
+<span class="fc" id="L27">                .errorHandler(noExceptionThrowingResponseErrorHandler)</span>
+<span class="fc" id="L28">                .build();</span>
     }
 
     @Bean
     public ObjectMapper objectMapper() {
-<span class="fc" id="L31">        return new ObjectMapper();</span>
+<span class="fc" id="L33">        ObjectMapper mapper = new ObjectMapper();</span>
+<span class="fc" id="L34">        mapper.registerModule(new JavaTimeModule());</span>
+<span class="fc" id="L35">        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);</span>
+<span class="fc" id="L36">        return mapper;</span>
     }
-
-
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
