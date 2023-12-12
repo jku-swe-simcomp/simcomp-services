@@ -1,6 +1,9 @@
 package at.jku.swe.simcomp.manager;
 import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeKey;
 import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeValue;
+import at.jku.swe.simcomp.commons.adaptor.dto.OrientationDTO;
+import at.jku.swe.simcomp.commons.adaptor.dto.PoseDTO;
+import at.jku.swe.simcomp.commons.adaptor.dto.PositionDTO;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
 import at.jku.swe.simcomp.commons.manager.dto.session.SessionState;
 import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
@@ -9,6 +12,7 @@ import at.jku.swe.simcomp.manager.domain.model.Session;
 import at.jku.swe.simcomp.manager.domain.repository.AdaptorSessionRepository;
 import at.jku.swe.simcomp.manager.domain.repository.SessionRepository;
 import at.jku.swe.simcomp.manager.service.AttributeService;
+import at.jku.swe.simcomp.manager.service.KinematicsService;
 import at.jku.swe.simcomp.manager.service.client.AdaptorClient;
 import at.jku.swe.simcomp.manager.service.client.ServiceRegistryClient;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,6 +43,9 @@ class AttributeServiceTest {
 
     @Mock
     private AdaptorSessionRepository adaptorSessionRepository;
+
+    @Mock
+    private KinematicsService kinematicsService;
 
     @InjectMocks
     private AttributeService attributeService;
@@ -74,6 +82,49 @@ class AttributeServiceTest {
         verify(adaptorClient, times(2)).getAttributeValue(eq(sessionId.toString()), eq(attributeKey), any(ServiceRegistrationConfigDTO.class));
     }
 
+    @Test
+    void getAttributeValues_withKinematics_Success() throws SessionNotValidException {
+        // Arrange
+        UUID sessionId = UUID.randomUUID();
+        AttributeKey attributeKey = AttributeKey.POSITION;
+        Session session = buildSession(sessionId);
+        List<AdaptorSession> adaptorSessions = buildAdaptorSessions(sessionId, 2);
+        List<ServiceRegistrationConfigDTO> registeredAdaptorConfigs = buildAdaptorConfigs(2);
+        for(AdaptorSession adaptorSession : adaptorSessions){
+            session.addAdaptorSession(adaptorSession);
+        }
+        AttributeValue.Position position = new AttributeValue.Position(PositionDTO.builder()
+                .x(0.0).y(0.0).z(0.0).build());
+        AttributeValue.Pose pose = new AttributeValue.Pose(PoseDTO.builder()
+                        .position(position.position()).orientation(OrientationDTO.builder()
+                        .x(1.0)
+                        .y(1.0)
+                        .z(1.0)
+                        .build())
+                .build());
+
+        when(sessionRepository.findBySessionKeyOrElseThrow(sessionId)).thenReturn(session);
+        when(serviceRegistryClient.getRegisteredAdaptors()).thenReturn(registeredAdaptorConfigs);
+
+        when(adaptorClient.getAttributeValue(anyString(), eq(AttributeKey.JOINT_POSITIONS), any(ServiceRegistrationConfigDTO.class)))
+                .thenReturn(Optional.of(new AttributeValue.JointPositions(List.of(1.0, 2.0, 3.0, 1.0, 2.0, 3.0))));
+        when(kinematicsService.jointPositionsToPose(any())).thenReturn(pose);
+        // Act
+        Map<String, AttributeValue> attributeValues = attributeService.getAttributeValues(sessionId, attributeKey);
+
+        // Assert
+        assertEquals(2, attributeValues.size());
+        assertTrue(attributeValues.get("Adaptor0") instanceof AttributeValue.Position);
+        assertTrue(attributeValues.get("Adaptor1") instanceof AttributeValue.Position);
+        assertEquals(position, attributeValues.get("Adaptor0"));
+        assertEquals(position, attributeValues.get("Adaptor1"));
+
+        // Verify that methods were called the expected number of times
+        verify(sessionRepository, times(1)).findBySessionKeyOrElseThrow(sessionId);
+        verify(serviceRegistryClient, times(1)).getRegisteredAdaptors();
+        verify(kinematicsService, times(2)).jointPositionsToPose(any());
+        verify(adaptorClient, times(2)).getAttributeValue(eq(sessionId.toString()), eq(AttributeKey.JOINT_POSITIONS), any(ServiceRegistrationConfigDTO.class));
+    }
     @Test
     void getAttributeValues_when_closedAdaptorSession_then_NoFetching() throws SessionNotValidException {
         // Arrange

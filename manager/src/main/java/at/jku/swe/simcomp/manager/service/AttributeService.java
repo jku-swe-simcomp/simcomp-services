@@ -25,18 +25,47 @@ public class AttributeService {
     private final ServiceRegistryClient serviceRegistryClient;
     private final AdaptorClient adaptorClient;
     private final SessionRepository sessionRepository;
+    private final KinematicsService kinematicsService;
 
     public AttributeService(ServiceRegistryClient serviceRegistryClient,
                             AdaptorClient adaptorClient,
                             SessionRepository sessionRepository,
-                            AdaptorSessionRepository adaptorSessionRepository) {
+                            AdaptorSessionRepository adaptorSessionRepository, KinematicsService kinematicsService) {
         this.serviceRegistryClient = serviceRegistryClient;
         this.adaptorClient = adaptorClient;
         this.sessionRepository = sessionRepository;
         this.adaptorSessionRepository = adaptorSessionRepository;
+        this.kinematicsService = kinematicsService;
     }
 
     public Map<String, AttributeValue> getAttributeValues(UUID sessionId,
+                                                          AttributeKey attributeKey){
+        return switch(attributeKey){
+            case POSE, POSITION, ORIENTATION -> getAttributeValuesBasedOnKinematics(sessionId, attributeKey);
+            default -> fetchAttributeValuesFromAdaptors(sessionId, attributeKey);
+        };
+    }
+
+    private Map<String, AttributeValue> getAttributeValuesBasedOnKinematics(UUID sessionId,
+                                                                         AttributeKey attributeKey){
+        Map<String, AttributeValue> jointPositionValues = fetchAttributeValuesFromAdaptors(sessionId, AttributeKey.JOINT_POSITIONS);
+        return jointPositionValues.entrySet().stream()
+                .map(e -> {
+                    if(e.getValue() instanceof AttributeValue.JointPositions p){
+                        AttributeValue.Pose pose = kinematicsService.jointPositionsToPose(p);
+                        AttributeValue resultValue = switch(attributeKey){
+                            case POSITION -> new AttributeValue.Position(pose.pose().getPosition());
+                            case ORIENTATION -> new AttributeValue.Orientation(pose.pose().getOrientation());
+                            default -> pose;
+                        };
+                        return Map.entry(e.getKey(), resultValue);
+                    }
+                    return e;
+                }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+
+    private Map<String, AttributeValue> fetchAttributeValuesFromAdaptors(UUID sessionId,
                                                           AttributeKey attributeKey){
         log.info("Getting attribute values for session {} and attribute key {}", sessionId, attributeKey);
         Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionId);
@@ -70,6 +99,7 @@ public class AttributeService {
         }
         return attributeValues;
     }
+
 
     private Optional<ServiceRegistrationConfigDTO> findMatchingConfig(AdaptorSession session,
                                                                       List<ServiceRegistrationConfigDTO> registeredAdaptorConfigs) {
