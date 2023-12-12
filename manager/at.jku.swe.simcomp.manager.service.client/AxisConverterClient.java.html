@@ -23,14 +23,14 @@ public class AxisConverterClient {
 <span class="fc" id="L23">    }</span>
 
     public PoseDTO jointPositionsToPose(List&lt;JointPositionDTO&gt; jointPositions){
-<span class="nc" id="L26">        HttpEntity&lt;List&lt;JointPositionDTO&gt;&gt; requestEntity = new HttpEntity&lt;&gt;(jointPositions);</span>
-<span class="nc" id="L27">        ResponseEntity&lt;PoseDTO&gt; responseEntity = restTemplate.exchange(</span>
+<span class="fc" id="L26">        HttpEntity&lt;List&lt;JointPositionDTO&gt;&gt; requestEntity = new HttpEntity&lt;&gt;(jointPositions);</span>
+<span class="fc" id="L27">        ResponseEntity&lt;PoseDTO&gt; responseEntity = restTemplate.exchange(</span>
                 axisConverterEndpoint + &quot;/api/converter/axisToPose&quot;,
                 HttpMethod.POST,
                 requestEntity,
                 PoseDTO.class
         );
-<span class="nc" id="L33">        return responseEntity.getBody();</span>
+<span class="fc" id="L33">        return responseEntity.getBody();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
