@@ -1,5 +1,4 @@
 package at.jku.swe.simcomp.commons.manager.dto.execution;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
