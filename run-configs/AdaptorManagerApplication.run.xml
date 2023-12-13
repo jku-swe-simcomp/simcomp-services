@@ -4,6 +4,8 @@
       <env name="DATASOURCE_URL" value="jdbc:postgresql://localhost:5432/manager" />
       <env name="SERVICE_REGISTRY_ENDPOINT" value="http://localhost:8085/api/registration" />
       <env name="AXIS_CONVERTER_ENDPOINT" value="http://localhost:8086" />
+      <env name="IS_DIRECT_KINEMATICS_ENABLED" value="true" />
+      <env name="IS_INVERSE_KINEMATICS_ENABLED" value="false" />
     </envs>
     <module name="manager" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="at.jku.swe.simcomp.manager.AdaptorManagerApplication" />

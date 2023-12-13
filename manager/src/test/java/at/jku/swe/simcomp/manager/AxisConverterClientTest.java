@@ -45,7 +45,7 @@ class AxisConverterClientTest {
         )).thenReturn(responseEntity);
 
         // Act
-        PoseDTO actualPose = axisConverterClient.jointPositionsToPose(jointPositions);
+        PoseDTO actualPose = axisConverterClient.directKinematics(jointPositions);
 
         // Assert
         assertEquals(expectedPose, actualPose);

@@ -221,7 +221,7 @@ public interface ExecutionCommand {
         }
     }
 
-    public static record CompositeCommand(List<ExecutionCommand> commands) implements ExecutionCommand {
+    public static record CompositeCommand(List<? extends ExecutionCommand> commands) implements ExecutionCommand {
         private static final ActionType correspondingActionType = ActionType.COMPOSITE;
 
         @Override

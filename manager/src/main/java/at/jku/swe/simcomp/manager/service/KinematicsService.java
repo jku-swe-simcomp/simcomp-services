@@ -21,12 +21,18 @@ public class KinematicsService {
     }
 
     public ExecutionCommand.CompositeCommand poseToComposite(ExecutionCommand.PoseCommand poseCommand){
-        throw new UnsupportedOperationException();
+        List<JointPositionDTO> jointPositions = axisConverterClient.inverseKinematics(new PoseDTO(poseCommand.position(), poseCommand.orientation()));
+        if(jointPositions.size() != 6){
+            throw new RuntimeException("Wrong number of joint positions for inverse kinematics returned by axis-converter.");
+        }
+        List<ExecutionCommand.SetJointPositionCommand> jointPositionCommands = jointPositions.stream()
+                .map(ExecutionCommand.SetJointPositionCommand::new).toList();
+        return new ExecutionCommand.CompositeCommand(jointPositionCommands);
     }
 
     public AttributeValue.Pose jointPositionsToPose(AttributeValue.JointPositions jointPositions){
         List<JointPositionDTO> jointPositionDTOs = toJointPositionDTOs(jointPositions);
-        PoseDTO poseDTO = axisConverterClient.jointPositionsToPose(jointPositionDTOs);
+        PoseDTO poseDTO = axisConverterClient.directKinematics(jointPositionDTOs);
         return new AttributeValue.Pose(poseDTO);
     }
 

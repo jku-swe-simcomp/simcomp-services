@@ -3,6 +3,7 @@ package at.jku.swe.simcomp.manager.service.client;
 import at.jku.swe.simcomp.commons.adaptor.dto.JointPositionDTO;
 import at.jku.swe.simcomp.commons.adaptor.dto.PoseDTO;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -22,13 +23,24 @@ public class AxisConverterClient {
         this.axisConverterEndpoint = axisConverterEndpoint;
     }
 
-    public PoseDTO jointPositionsToPose(List<JointPositionDTO> jointPositions){
+    public PoseDTO directKinematics(List<JointPositionDTO> jointPositions){
         HttpEntity<List<JointPositionDTO>> requestEntity = new HttpEntity<>(jointPositions);
         ResponseEntity<PoseDTO> responseEntity = restTemplate.exchange(
                 axisConverterEndpoint + "/api/converter/axisToPose",
                 HttpMethod.POST,
                 requestEntity,
                 PoseDTO.class
+        );
+        return responseEntity.getBody();
+    }
+
+    public List<JointPositionDTO> inverseKinematics(PoseDTO poseDTO){
+        HttpEntity<PoseDTO> requestEntity = new HttpEntity<>(poseDTO);
+        ResponseEntity<List<JointPositionDTO>> responseEntity = restTemplate.exchange(
+                axisConverterEndpoint + "/api/converter/poseToAxis",
+                HttpMethod.POST,
+                requestEntity,
+                new ParameterizedTypeReference<>(){}
         );
         return responseEntity.getBody();
     }

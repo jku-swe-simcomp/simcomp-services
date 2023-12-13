@@ -15,9 +15,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -29,22 +31,28 @@ public class ExecutionService {
     private final ObjectMapper objectMapper;
     private final AsyncCommandDistributionService commandDistributionService;
     private final ServiceRegistryClient serviceRegistryClient;
+    private final ExecutionCommandKinematicsVisitor kinematicsVisitor;
+    private final boolean isInverseKinematicsEnabled;
 
     public ExecutionService(SessionRepository sessionRepository,
                             ObjectMapper objectMapper,
                             ExecutionRepository executionRepository,
                             AsyncCommandDistributionService commandDistributionService,
                             ServiceRegistryClient serviceRegistryClient,
-                            AdaptorSessionRepository adaptorSessionRepository) {
+                            AdaptorSessionRepository adaptorSessionRepository,
+                            ExecutionCommandKinematicsVisitor kinematicsVisitor,
+                            @Value("${application.kinematics.inverse.enabled}") Boolean isInverseKinematicsEnabled) {
         this.sessionRepository = sessionRepository;
         this.objectMapper = objectMapper;
         this.executionRepository = executionRepository;
         this.commandDistributionService = commandDistributionService;
         this.serviceRegistryClient = serviceRegistryClient;
         this.adaptorSessionRepository = adaptorSessionRepository;
+        this.kinematicsVisitor = kinematicsVisitor;
+        this.isInverseKinematicsEnabled = Objects.requireNonNullElse(isInverseKinematicsEnabled, false);
     }
 
-    public UUID executeCommand(@NonNull UUID sessionId, @NonNull ExecutionCommand command) throws BadRequestException {
+    public UUID executeCommand(@NonNull final UUID sessionId, @NonNull ExecutionCommand command) throws BadRequestException {
         Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionId);
         if(session.getState().equals(SessionState.CLOSED)){
             throw new BadRequestException("Session %s already closed.".formatted(sessionId));
@@ -52,6 +60,14 @@ public class ExecutionService {
         log.info("Executing command {} for session {}", command, sessionId);
         Execution execution = initExecution(command, sessionId);
         log.info("Created execution {} for session {}", execution.getExecutionId(), sessionId);
+        if(isInverseKinematicsEnabled){
+            try {
+                command = command.accept(kinematicsVisitor, null);
+                log.info("Transformed command using kinematics: {}.", command);
+            } catch (Exception e) {
+                log.warn("Kinematics operation failed, using original command.");
+            }
+        }
         distributeCommands(sessionId, execution.getExecutionId(), command);
         return execution.getExecutionId();
     }

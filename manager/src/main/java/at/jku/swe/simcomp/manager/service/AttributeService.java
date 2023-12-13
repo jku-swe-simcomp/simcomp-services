@@ -12,6 +12,7 @@ import at.jku.swe.simcomp.manager.domain.repository.SessionRepository;
 import at.jku.swe.simcomp.manager.service.client.AdaptorClient;
 import at.jku.swe.simcomp.manager.service.client.ServiceRegistryClient;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -26,24 +27,28 @@ public class AttributeService {
     private final AdaptorClient adaptorClient;
     private final SessionRepository sessionRepository;
     private final KinematicsService kinematicsService;
+    private final Boolean isDirectKinematicsEnabled;
 
     public AttributeService(ServiceRegistryClient serviceRegistryClient,
                             AdaptorClient adaptorClient,
                             SessionRepository sessionRepository,
-                            AdaptorSessionRepository adaptorSessionRepository, KinematicsService kinematicsService) {
+                            AdaptorSessionRepository adaptorSessionRepository,
+                            KinematicsService kinematicsService,
+                            @Value("${application.kinematics.direct.enabled}") Boolean isDirectKinematicsEnabled) {
         this.serviceRegistryClient = serviceRegistryClient;
         this.adaptorClient = adaptorClient;
         this.sessionRepository = sessionRepository;
         this.adaptorSessionRepository = adaptorSessionRepository;
         this.kinematicsService = kinematicsService;
+        this.isDirectKinematicsEnabled = Objects.requireNonNullElse(isDirectKinematicsEnabled, true);
     }
 
     public Map<String, AttributeValue> getAttributeValues(UUID sessionId,
                                                           AttributeKey attributeKey){
-        return switch(attributeKey){
+        return isDirectKinematicsEnabled ? switch(attributeKey){
             case POSE, POSITION, ORIENTATION -> getAttributeValuesBasedOnKinematics(sessionId, attributeKey);
             default -> fetchAttributeValuesFromAdaptors(sessionId, attributeKey);
-        };
+        } : fetchAttributeValuesFromAdaptors(sessionId, attributeKey);
     }
 
     private Map<String, AttributeValue> getAttributeValuesBasedOnKinematics(UUID sessionId,
