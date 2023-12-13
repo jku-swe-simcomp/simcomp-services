@@ -2,5 +2,5 @@ GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_
 webots-adaptor,at.jku.swe.simcomp.axisconverter,AxisConverterController,13,0,0,0,4,0,4,0,4,0
 webots-adaptor,at.jku.swe.simcomp.axisconverter,AxisConverterApplication,8,0,0,0,3,0,2,0,2,0
 webots-adaptor,at.jku.swe.simcomp.axisconverter,OpenApiConfig,9,0,0,0,3,0,2,0,2,0
-webots-adaptor,at.jku.swe.simcomp.axisconverter.service,DirectKinematics,1155,0,24,0,81,0,22,0,10,0
-webots-adaptor,at.jku.swe.simcomp.axisconverter.service,InverseKinematics,7,0,0,0,2,0,2,0,2,0
+webots-adaptor,at.jku.swe.simcomp.axisconverter.service,DirectKinematics,35,1120,3,21,4,77,4,18,1,9
+webots-adaptor,at.jku.swe.simcomp.axisconverter.service,InverseKinematics,3,4,0,0,1,1,1,1,1,1

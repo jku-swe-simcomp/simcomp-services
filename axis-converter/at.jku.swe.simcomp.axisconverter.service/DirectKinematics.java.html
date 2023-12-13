@@ -10,148 +10,148 @@ import java.util.List;
 
     public static PoseDTO directKinematics(List&lt;JointPositionDTO&gt; axes) {
 
-<span class="nc" id="L13">        double[] axesValues = validateAxes(axes);</span>
+<span class="fc" id="L13">        double[] axesValues = validateAxes(axes);</span>
 
-<span class="nc" id="L15">        applyBounds(axesValues);</span>
+<span class="fc" id="L15">        applyBounds(axesValues);</span>
 
-<span class="nc" id="L17">        List&lt;double[][]&gt; matrices = getMultiplicationMatrices(axesValues);</span>
+<span class="fc" id="L17">        List&lt;double[][]&gt; matrices = getMultiplicationMatrices(axesValues);</span>
 
-<span class="nc" id="L19">        double[][] totalTMatrix = matrices.get(0);</span>
+<span class="fc" id="L19">        double[][] totalTMatrix = matrices.get(0);</span>
 
-<span class="nc bnc" id="L21" title="All 2 branches missed.">        for(int i = 1; i &lt; matrices.size(); i++) {</span>
-<span class="nc" id="L22">            totalTMatrix = matrixMultiplication(totalTMatrix, matrices.get(i));</span>
+<span class="fc bfc" id="L21" title="All 2 branches covered.">        for(int i = 1; i &lt; matrices.size(); i++) {</span>
+<span class="fc" id="L22">            totalTMatrix = matrixMultiplication(totalTMatrix, matrices.get(i));</span>
         }
 
-<span class="nc" id="L25">        double[] coords = matrixVectorMultiplication(totalTMatrix, new double[]{0, 0, 0, 1});</span>
-<span class="nc" id="L26">        double[] orientation = getOrientation(totalTMatrix);</span>
+<span class="fc" id="L25">        double[] coords = matrixVectorMultiplication(totalTMatrix, new double[]{0, 0, 0, 1});</span>
+<span class="fc" id="L26">        double[] orientation = getOrientation(totalTMatrix);</span>
 
-<span class="nc" id="L28">        PositionDTO positionDTO = new PositionDTO(coords[0], coords[1], coords[2]);</span>
-<span class="nc" id="L29">        OrientationDTO orientationDTO = new OrientationDTO(orientation[0], orientation[1], orientation[2]);</span>
-<span class="nc" id="L30">        return new PoseDTO(positionDTO, orientationDTO);</span>
+<span class="fc" id="L28">        PositionDTO positionDTO = new PositionDTO(coords[0], coords[1], coords[2]);</span>
+<span class="fc" id="L29">        OrientationDTO orientationDTO = new OrientationDTO(orientation[0], orientation[1], orientation[2]);</span>
+<span class="fc" id="L30">        return new PoseDTO(positionDTO, orientationDTO);</span>
     }
 
     private static List&lt;double[][]&gt; getMultiplicationMatrices(double[] axes) {
-<span class="nc" id="L34">        List&lt;double[][]&gt; matrices = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L34">        List&lt;double[][]&gt; matrices = new ArrayList&lt;&gt;();</span>
 
-<span class="nc" id="L36">        matrices.add(new double[][]{</span>
-<span class="nc" id="L37">                {Math.cos(axes[0]), -Math.sin(axes[0]), 0, 0},</span>
-<span class="nc" id="L38">                {Math.sin(axes[0]), Math.cos(axes[0]), 0, 0},</span>
+<span class="fc" id="L36">        matrices.add(new double[][]{</span>
+<span class="fc" id="L37">                {Math.cos(axes[0]), -Math.sin(axes[0]), 0, 0},</span>
+<span class="fc" id="L38">                {Math.sin(axes[0]), Math.cos(axes[0]), 0, 0},</span>
                 {0, 0, 1, 103},
                 {0, 0, 0, 1}
         });
 
-<span class="nc" id="L43">        matrices.add(new double[][]{</span>
-<span class="nc" id="L44">                {Math.cos(axes[1]), 0, Math.sin(axes[1]), 0},</span>
+<span class="fc" id="L43">        matrices.add(new double[][]{</span>
+<span class="fc" id="L44">                {Math.cos(axes[1]), 0, Math.sin(axes[1]), 0},</span>
                 {0, 1, 0, 0},
-<span class="nc" id="L46">                {-Math.sin(axes[1]), 0, Math.cos(axes[1]), 80},</span>
+<span class="fc" id="L46">                {-Math.sin(axes[1]), 0, Math.cos(axes[1]), 80},</span>
                 {0, 0, 0, 1}
         });
 
-<span class="nc" id="L50">        matrices.add(new double[][]{</span>
-<span class="nc" id="L51">                {Math.cos(axes[2]), 0, Math.sin(axes[2]), 0},</span>
+<span class="fc" id="L50">        matrices.add(new double[][]{</span>
+<span class="fc" id="L51">                {Math.cos(axes[2]), 0, Math.sin(axes[2]), 0},</span>
                 {0, 1, 0, 0},
-<span class="nc" id="L53">                {-Math.sin(axes[2]), 0, Math.cos(axes[2]), 210},</span>
+<span class="fc" id="L53">                {-Math.sin(axes[2]), 0, Math.cos(axes[2]), 210},</span>
                 {0, 0, 0, 1}
         });
 
-<span class="nc" id="L57">        matrices.add(new double[][]{</span>
+<span class="fc" id="L57">        matrices.add(new double[][]{</span>
                 {1, 0, 0, 41.5},
-<span class="nc" id="L59">                {0, Math.cos(axes[3]), -Math.sin(axes[3]), 0},</span>
-<span class="nc" id="L60">                {0, Math.sin(axes[3]), Math.cos(axes[3]), 30},</span>
+<span class="fc" id="L59">                {0, Math.cos(axes[3]), -Math.sin(axes[3]), 0},</span>
+<span class="fc" id="L60">                {0, Math.sin(axes[3]), Math.cos(axes[3]), 30},</span>
                 {0, 0, 0, 1}
         });
 
-<span class="nc" id="L64">        matrices.add(new double[][]{</span>
-<span class="nc" id="L65">                {Math.cos(axes[4]), 0, Math.sin(axes[4]), 180},</span>
+<span class="fc" id="L64">        matrices.add(new double[][]{</span>
+<span class="fc" id="L65">                {Math.cos(axes[4]), 0, Math.sin(axes[4]), 180},</span>
                 {0, 1, 0, 0},
-<span class="nc" id="L67">                {-Math.sin(axes[4]), 0, Math.cos(axes[4]), 0},</span>
+<span class="fc" id="L67">                {-Math.sin(axes[4]), 0, Math.cos(axes[4]), 0},</span>
                 {0, 0, 0, 1}
         });
 
-<span class="nc" id="L71">        matrices.add(new double[][]{</span>
+<span class="fc" id="L71">        matrices.add(new double[][]{</span>
                 {1, 0, 0, 23.7},
-<span class="nc" id="L73">                {0, Math.cos(axes[5]), -Math.sin(axes[5]), 0},</span>
-<span class="nc" id="L74">                {0, Math.sin(axes[5]), Math.cos(axes[5]), -5.5},</span>
+<span class="fc" id="L73">                {0, Math.cos(axes[5]), -Math.sin(axes[5]), 0},</span>
+<span class="fc" id="L74">                {0, Math.sin(axes[5]), Math.cos(axes[5]), -5.5},</span>
                 {0, 0, 0, 1}
         });
 
-<span class="nc" id="L78">        return matrices;</span>
+<span class="fc" id="L78">        return matrices;</span>
     }
 
     private static double[] validateAxes(List&lt;JointPositionDTO&gt; axes) {
-<span class="nc" id="L82">        long axesCount = axes.stream()</span>
-<span class="nc" id="L83">                .map(JointPositionDTO::getJoint)</span>
-<span class="nc" id="L84">                .distinct()</span>
-<span class="nc" id="L85">                .count();</span>
-<span class="nc bnc" id="L86" title="All 2 branches missed.">        if(axesCount != 6) {</span>
-<span class="nc" id="L87">            throw new IllegalArgumentException(&quot;Not all Axis values are set. Please set the axes 1-6.&quot;);</span>
+<span class="fc" id="L82">        long axesCount = axes.stream()</span>
+<span class="fc" id="L83">                .map(JointPositionDTO::getJoint)</span>
+<span class="fc" id="L84">                .distinct()</span>
+<span class="fc" id="L85">                .count();</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">        if(axesCount != 6) {</span>
+<span class="fc" id="L87">            throw new IllegalArgumentException(&quot;Not all Axis values are set. Please set the axes 1-6.&quot;);</span>
         }
 
-<span class="nc" id="L90">        double[] axesValues = new double[6];</span>
-<span class="nc" id="L91">        axes.forEach(a -&gt; axesValues[a.getJoint().getIndex()-1] = a.getRadians());</span>
-<span class="nc" id="L92">        return axesValues;</span>
+<span class="fc" id="L90">        double[] axesValues = new double[6];</span>
+<span class="fc" id="L91">        axes.forEach(a -&gt; axesValues[a.getJoint().getIndex()-1] = a.getRadians());</span>
+<span class="fc" id="L92">        return axesValues;</span>
     }
 
     private static double[][] matrixMultiplication(double[][] matrixA, double[][] matrixB) {
-<span class="nc" id="L96">        int rowsA = matrixA.length;</span>
-<span class="nc" id="L97">        int colsA = matrixA[0].length;</span>
-<span class="nc" id="L98">        int colsB = matrixB[0].length;</span>
+<span class="fc" id="L96">        int rowsA = matrixA.length;</span>
+<span class="fc" id="L97">        int colsA = matrixA[0].length;</span>
+<span class="fc" id="L98">        int colsB = matrixB[0].length;</span>
 
-<span class="nc" id="L100">        double[][] result = new double[rowsA][colsB];</span>
+<span class="fc" id="L100">        double[][] result = new double[rowsA][colsB];</span>
 
-<span class="nc bnc" id="L102" title="All 2 branches missed.">        for (int i = 0; i &lt; rowsA; i++) {</span>
-<span class="nc bnc" id="L103" title="All 2 branches missed.">            for (int j = 0; j &lt; colsB; j++) {</span>
-<span class="nc bnc" id="L104" title="All 2 branches missed.">                for (int k = 0; k &lt; colsA; k++) {</span>
-<span class="nc" id="L105">                    result[i][j] += matrixA[i][k] * matrixB[k][j];</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">        for (int i = 0; i &lt; rowsA; i++) {</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">            for (int j = 0; j &lt; colsB; j++) {</span>
+<span class="fc bfc" id="L104" title="All 2 branches covered.">                for (int k = 0; k &lt; colsA; k++) {</span>
+<span class="fc" id="L105">                    result[i][j] += matrixA[i][k] * matrixB[k][j];</span>
                 }
             }
         }
 
-<span class="nc" id="L110">        return result;</span>
+<span class="fc" id="L110">        return result;</span>
     }
 
     private static double[] matrixVectorMultiplication(double[][] matrix, double[] vector) {
-<span class="nc" id="L114">        int rows = matrix.length;</span>
-<span class="nc" id="L115">        int cols = matrix[0].length;</span>
+<span class="fc" id="L114">        int rows = matrix.length;</span>
+<span class="fc" id="L115">        int cols = matrix[0].length;</span>
 
-<span class="nc bnc" id="L117" title="All 2 branches missed.">        if (cols != vector.length) {</span>
+<span class="pc bpc" id="L117" title="1 of 2 branches missed.">        if (cols != vector.length) {</span>
 <span class="nc" id="L118">            throw new IllegalArgumentException(&quot;Matrix and vector dimensions do not match for multiplication.&quot;);</span>
         }
 
-<span class="nc" id="L121">        double[] result = new double[rows];</span>
+<span class="fc" id="L121">        double[] result = new double[rows];</span>
 
-<span class="nc bnc" id="L123" title="All 2 branches missed.">        for (int i = 0; i &lt; rows; i++) {</span>
-<span class="nc bnc" id="L124" title="All 2 branches missed.">            for (int j = 0; j &lt; cols; j++) {</span>
-<span class="nc" id="L125">                result[i] += matrix[i][j] * vector[j];</span>
+<span class="fc bfc" id="L123" title="All 2 branches covered.">        for (int i = 0; i &lt; rows; i++) {</span>
+<span class="fc bfc" id="L124" title="All 2 branches covered.">            for (int j = 0; j &lt; cols; j++) {</span>
+<span class="fc" id="L125">                result[i] += matrix[i][j] * vector[j];</span>
             }
         }
 
-<span class="nc" id="L129">        return result;</span>
+<span class="fc" id="L129">        return result;</span>
     }
 
     private static double[] getOrientation(double[][] matrix) {
-<span class="nc" id="L133">        double alpha = 0;</span>
-<span class="nc" id="L134">        double beta = Math.atan2(Math.sqrt(matrix[0][2] * matrix[0][2] + matrix[1][2] * matrix[1][2]), matrix[2][2]);</span>
+<span class="fc" id="L133">        double alpha = 0;</span>
+<span class="fc" id="L134">        double beta = Math.atan2(Math.sqrt(matrix[0][2] * matrix[0][2] + matrix[1][2] * matrix[1][2]), matrix[2][2]);</span>
         double gamma;
-<span class="nc" id="L136">        double betaRounde = Math.round(beta*1000)/1000.0;</span>
+<span class="fc" id="L136">        double betaRounde = Math.round(beta*1000)/1000.0;</span>
 
-<span class="nc bnc" id="L138" title="All 2 branches missed.">        if (betaRounde == Math.round(1000*Math.PI / 2)/1000.0) {</span>
+<span class="pc bpc" id="L138" title="1 of 2 branches missed.">        if (betaRounde == Math.round(1000*Math.PI / 2)/1000.0) {</span>
 <span class="nc" id="L139">            gamma = Math.atan2(matrix[1][0], matrix[0][0]);</span>
-<span class="nc bnc" id="L140" title="All 2 branches missed.">        } else if (betaRounde == Math.round(1000*-Math.PI / 2)/1000.0) {</span>
+<span class="pc bpc" id="L140" title="1 of 2 branches missed.">        } else if (betaRounde == Math.round(1000*-Math.PI / 2)/1000.0) {</span>
 <span class="nc" id="L141">            gamma = -Math.atan2(matrix[1][0], matrix[0][0]);</span>
-<span class="nc bnc" id="L142" title="All 2 branches missed.">        } else if (betaRounde == 0) {</span>
-<span class="nc" id="L143">            gamma = 0;</span>
-<span class="nc" id="L144">            alpha = Math.cos(beta) * Math.atan2(matrix[1][0], matrix[0][0]);</span>
+<span class="fc bfc" id="L142" title="All 2 branches covered.">        } else if (betaRounde == 0) {</span>
+<span class="fc" id="L143">            gamma = 0;</span>
+<span class="fc" id="L144">            alpha = Math.cos(beta) * Math.atan2(matrix[1][0], matrix[0][0]);</span>
         } else {
-<span class="nc" id="L146">            alpha = Math.atan2(matrix[1][2] / Math.sin(beta), matrix[1][0] / Math.sin(beta));</span>
-<span class="nc" id="L147">            gamma = Math.atan2(-matrix[2][1] / Math.sin(beta), matrix[2][0] / Math.sin(beta));</span>
+<span class="fc" id="L146">            alpha = Math.atan2(matrix[1][2] / Math.sin(beta), matrix[1][0] / Math.sin(beta));</span>
+<span class="fc" id="L147">            gamma = Math.atan2(-matrix[2][1] / Math.sin(beta), matrix[2][0] / Math.sin(beta));</span>
         }
 
-<span class="nc" id="L150">        return new double[]{alpha, beta, gamma};</span>
+<span class="fc" id="L150">        return new double[]{alpha, beta, gamma};</span>
     }
 
     private static void applyBounds(double[] axes) {
-<span class="nc" id="L154">        double[][] rangeRotation = {</span>
+<span class="fc" id="L154">        double[][] rangeRotation = {</span>
                 {-175, 175},
                 {-36.7, 90},
                 {-80, 90},
@@ -160,18 +160,18 @@ import java.util.List;
                 {-147.5, 147.5}
         };
 
-<span class="nc bnc" id="L163" title="All 2 branches missed.">        for (int i = 0; i &lt; axes.length; i++) {</span>
-<span class="nc" id="L164">            axes[i] = boundAngle(axes[i], rangeRotation[i][0], rangeRotation[i][1]);</span>
+<span class="fc bfc" id="L163" title="All 2 branches covered.">        for (int i = 0; i &lt; axes.length; i++) {</span>
+<span class="fc" id="L164">            axes[i] = boundAngle(axes[i], rangeRotation[i][0], rangeRotation[i][1]);</span>
         }
-<span class="nc" id="L166">    }</span>
+<span class="fc" id="L166">    }</span>
 
     private static double boundAngle(double x, double lowerBound, double upperBound) {
-<span class="nc" id="L169">        x =  Math.round(x * 10000) / 10000.0;</span>
-<span class="nc" id="L170">        lowerBound = Math.round(lowerBound * 10000) / 10000.0;</span>
-<span class="nc" id="L171">        upperBound = Math.round(upperBound * 10000) / 10000.0;</span>
+<span class="fc" id="L169">        x =  Math.round(x * 10000) / 10000.0;</span>
+<span class="fc" id="L170">        lowerBound = Math.round(lowerBound * 10000) / 10000.0;</span>
+<span class="fc" id="L171">        upperBound = Math.round(upperBound * 10000) / 10000.0;</span>
 
-<span class="nc" id="L173">        x = Math.max(x, lowerBound);</span>
-<span class="nc" id="L174">        return Math.min(x, upperBound);</span>
+<span class="fc" id="L173">        x = Math.max(x, lowerBound);</span>
+<span class="fc" id="L174">        return Math.min(x, upperBound);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
