@@ -21,21 +21,27 @@ public class KinematicsService {
 <span class="fc" id="L21">    }</span>
 
     public ExecutionCommand.CompositeCommand poseToComposite(ExecutionCommand.PoseCommand poseCommand){
-<span class="nc" id="L24">        throw new UnsupportedOperationException();</span>
+<span class="nc" id="L24">        List&lt;JointPositionDTO&gt; jointPositions = axisConverterClient.inverseKinematics(new PoseDTO(poseCommand.position(), poseCommand.orientation()));</span>
+<span class="nc bnc" id="L25" title="All 2 branches missed.">        if(jointPositions.size() != 6){</span>
+<span class="nc" id="L26">            throw new RuntimeException(&quot;Wrong number of joint positions for inverse kinematics returned by axis-converter.&quot;);</span>
+        }
+<span class="nc" id="L28">        List&lt;ExecutionCommand.SetJointPositionCommand&gt; jointPositionCommands = jointPositions.stream()</span>
+<span class="nc" id="L29">                .map(ExecutionCommand.SetJointPositionCommand::new).toList();</span>
+<span class="nc" id="L30">        return new ExecutionCommand.CompositeCommand(jointPositionCommands);</span>
     }
 
     public AttributeValue.Pose jointPositionsToPose(AttributeValue.JointPositions jointPositions){
-<span class="nc" id="L28">        List&lt;JointPositionDTO&gt; jointPositionDTOs = toJointPositionDTOs(jointPositions);</span>
-<span class="nc" id="L29">        PoseDTO poseDTO = axisConverterClient.jointPositionsToPose(jointPositionDTOs);</span>
-<span class="nc" id="L30">        return new AttributeValue.Pose(poseDTO);</span>
+<span class="nc" id="L34">        List&lt;JointPositionDTO&gt; jointPositionDTOs = toJointPositionDTOs(jointPositions);</span>
+<span class="nc" id="L35">        PoseDTO poseDTO = axisConverterClient.directKinematics(jointPositionDTOs);</span>
+<span class="nc" id="L36">        return new AttributeValue.Pose(poseDTO);</span>
     }
 
     private List&lt;JointPositionDTO&gt; toJointPositionDTOs(AttributeValue.JointPositions jointPositions) {
-<span class="nc" id="L34">        List&lt;JointPositionDTO&gt; jointPositionDTOS = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L35" title="All 2 branches missed.">        for(int i = 0; i &lt; 6; i++){</span>
-<span class="nc" id="L36">           jointPositionDTOS.add(new JointPositionDTO(RoboJoint.valueOf(&quot;AXIS_&quot; + (i+1)), jointPositions.jointPositions().get(i)));</span>
+<span class="nc" id="L40">        List&lt;JointPositionDTO&gt; jointPositionDTOS = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L41" title="All 2 branches missed.">        for(int i = 0; i &lt; 6; i++){</span>
+<span class="nc" id="L42">           jointPositionDTOS.add(new JointPositionDTO(RoboJoint.valueOf(&quot;AXIS_&quot; + (i+1)), jointPositions.jointPositions().get(i)));</span>
         }
-<span class="nc" id="L38">        return jointPositionDTOS;</span>
+<span class="nc" id="L44">        return jointPositionDTOS;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
