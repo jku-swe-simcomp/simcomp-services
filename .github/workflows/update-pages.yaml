@@ -20,7 +20,7 @@ jobs:
           
       - name: Update Index HTML
         run: |
-          sed -i "s|<b>Last E2E test was completed at: </b>|<b>Last E2E test was completed at: $COMPLETION_TIME</b>|" ./simcomp-services/gh-pages/index.html
+          sed -i "s|<b>Last E2E test was completed at: .*</b>|<b>Last E2E test was completed at: $COMPLETION_TIME</b>|" ./index.html
 
       - name: Commit and Push Changes
         run: |
