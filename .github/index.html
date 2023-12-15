@@ -13,6 +13,15 @@
     <li><a href="./webots-adaptor/">Webots Adaptor Coverage</a></li>
     <li><a href="./axis-converter/">Axis Converter Coverage</a></li>
 </ul>
+<h1>End-to-End Tests</h1>
 <b>Last E2E test was completed at: </b>
+<p>The E2E tests are configured as a dedicated github actions workflow in the <a href="https://github.com/jku-swe-simcomp/local-deploy">local-deploy</a>, which is triggerd by every change in the repository.</p>
+<p>The current test-scenario completes the following steps:</p>
+    <ul>
+        <li>Deploying the whole system based on the docker-compose configuration.</li>
+        <li>Fetching adaptors from the manager to verify registration of adaptors.</li>
+        <li>Registering simulation instances for webots and demo adaptor.</li>
+        <li>Fetching simulation instances to verify registration of instances.</li>
+    </ul>
 </body>
 </html>
