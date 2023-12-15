@@ -1,0 +1,31 @@
+name: update E2E test completion time in gh-pages
+on:
+  repository_dispatch:
+    types: [e2e-completed]
+
+jobs:
+  update-env:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PAT }}
+          ref: gh-pages
+          
+      - name: Load Environment Variables
+        run: |
+          export COMPLETION_TIME=$(date +"%Y-%m-%d %H:%M:%S")
+          echo "COMPLETION_TIME=$COMPLETION_TIME" >> $GITHUB_ENV
+          
+      - name: Update Index HTML
+        run: |
+          sed -i "s|<b>Last E2E test was completed at: </b>|<b>Last E2E test was completed at: $COMPLETION_TIME</b>|" ./simcomp-services/gh-pages/index.html
+
+      - name: Commit and Push Changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add index.html
+          git commit -m "Updated completion time of E2E test in local-deploy"
+          git push
