@@ -32,7 +32,7 @@ Adaptor Manager,at.jku.swe.simcomp.manager.domain.model,JointPositions.JointPosi
 Adaptor Manager,at.jku.swe.simcomp.manager.domain.model,Execution.ExecutionBuilder,37,36,1,1,0,1,6,4,5,4
 Adaptor Manager,at.jku.swe.simcomp.manager.domain.model,Session.SessionBuilder,47,45,2,2,0,1,8,4,6,4
 Adaptor Manager,at.jku.swe.simcomp.manager.domain.model,ExecutionResponse,59,57,0,0,9,9,12,10,12,10
-Adaptor Manager,at.jku.swe.simcomp.manager.domain.model,AdaptorSession,45,101,0,0,8,14,9,17,9,17
 Adaptor Manager,at.jku.swe.simcomp.manager.domain.model,AdaptorSession.AdaptorSessionBuilder,38,62,1,1,0,1,5,8,4,8
+Adaptor Manager,at.jku.swe.simcomp.manager.domain.model,AdaptorSession,45,101,0,0,8,14,9,17,9,17
 Adaptor Manager,at.jku.swe.simcomp.manager.domain.repository,ExecutionRepository,20,0,0,0,1,0,2,0,2,0
 Adaptor Manager,at.jku.swe.simcomp.manager.domain.repository,SessionRepository,20,0,0,0,1,0,2,0,2,0
