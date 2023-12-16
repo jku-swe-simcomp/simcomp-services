@@ -52,6 +52,10 @@ public class ExecutionService {
         this.isInverseKinematicsEnabled = Objects.requireNonNullElse(isInverseKinematicsEnabled, false);
     }
 
+    public List<ExecutionDTO> getAllExecutionsForSession(UUID sessionKey) {
+        return executionRepository.findBySessionSessionKey(sessionKey).stream().map(this::fromModel).toList();
+    }
+
     public UUID executeCommand(@NonNull final UUID sessionId, @NonNull ExecutionCommand command) throws BadRequestException {
         Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionId);
         if(session.getState().equals(SessionState.CLOSED)){

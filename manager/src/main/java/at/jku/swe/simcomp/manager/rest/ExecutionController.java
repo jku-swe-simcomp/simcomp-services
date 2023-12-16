@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -84,6 +85,38 @@ public class ExecutionController {
         UUID executionId = executionService.executeCommand(sessionId, command);
         log.info("Returning execution id {}", executionId);
         return ResponseEntity.status(202).body(executionId.toString());
+    }
+
+    @Operation(summary = "Get all Executions for Session",
+            description = "Returns all executions and the responses from the simulations for a given session, identified by the session-id.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Ok.",
+                    content = @io.swagger.v3.oas.annotations.media.Content(
+                            array = @ArraySchema(schema = @Schema(implementation = ExecutionDTO.class)),
+                            examples = @ExampleObject(value = " " +
+                                    "[{ \"id\": \"123e4567-e89b-12d3-a456-426614174001\", \"sessionId\": \"f47ac10b-58cc-4372-a567-0e02b2c3d479\", \"command\": {\"type\":\"GRAB\"}, \"createdAt\": \"2023-01-01T12:34:56\", " +
+                                    "\"responses\": [" +
+                                    "{ \"simulationName\": \"WEBOTS\", \"responseCode\": 200, \"state\":\"SUCCESS\", \"report\":\"Grab command was executed.\" }, " +
+                                    "{ \"simulationName\": \"GAZEBO\", \"responseCode\": 202, \"state\":\"RUNNING\", \"report\":\"\" }, " +
+                                    "{ \"simulationName\": \"PHYSICAL\", \"responseCode\": 401, \"state\":\"ERROR\", \"report\":\"Session is not valid anymore.\" } " +
+                                    "]}]")
+                    )
+            ),
+            @ApiResponse(responseCode = "500",
+                    description = "Internal server error",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = HttpErrorDTO.class),
+                            examples =@ExampleObject(value = "{\"type\":\"ERROR\",\"status\":500, \"message\":\"Internal server error.\"}")
+                    ))
+    })
+    @GetMapping(value = "/{sessionId}/execution")
+    public ResponseEntity<List<ExecutionDTO>> getAllExecutions(@Parameter(description = "The id of the session.", required = true, schema = @Schema(implementation = UUID.class, example = "123e4567-e89b-12d3-a456-426614174001"))
+                                          @PathVariable("sessionId") UUID sessionId){
+        log.info("Request to get executions for session {}.", sessionId);
+        List<ExecutionDTO> executions = executionService.getAllExecutionsForSession(sessionId);
+        log.info("Returning executions {}.", executions);
+        return ResponseEntity.status(200).body(executions);
     }
 
     @Operation(summary = "Get information about execution and responses.",
