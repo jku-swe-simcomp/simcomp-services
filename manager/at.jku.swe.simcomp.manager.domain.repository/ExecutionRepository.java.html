@@ -4,6 +4,7 @@ import at.jku.swe.simcomp.manager.domain.model.Execution;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.webjars.NotFoundException;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -11,7 +12,9 @@ public interface ExecutionRepository extends JpaRepository&lt;Execution, Long&gt
     Optional&lt;Execution&gt; findByExecutionId(UUID executionId);
 
     default Execution findByExecutionUUIDOrElseThrow(UUID executionId) throws NotFoundException {
-<span class="nc" id="L14">        return findByExecutionId(executionId).orElseThrow(() -&gt;new NotFoundException(&quot;Execution with UUID %s not found.&quot;.formatted(executionId)));</span>
+<span class="nc" id="L15">        return findByExecutionId(executionId).orElseThrow(() -&gt;new NotFoundException(&quot;Execution with UUID %s not found.&quot;.formatted(executionId)));</span>
     }
+
+    List&lt;Execution&gt; findBySessionSessionKey(UUID sessionKey);
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
