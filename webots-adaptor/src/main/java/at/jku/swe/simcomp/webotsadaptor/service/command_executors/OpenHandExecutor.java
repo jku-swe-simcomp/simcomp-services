@@ -6,22 +6,24 @@ import at.jku.swe.simcomp.commons.adaptor.endpoint.simulation.SimulationInstance
 import at.jku.swe.simcomp.commons.adaptor.execution.command.CommandExecutor;
 import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
 import at.jku.swe.simcomp.webotsadaptor.service.WebotsExecutionService;
+import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
+@Slf4j
 @Service
 public class OpenHandExecutor
         implements CommandExecutor<ExecutionCommand.OpenHandCommand, ExecutionResultDTO> {
 
 
     @Override
-    public ExecutionResultDTO execute(ExecutionCommand.OpenHandCommand command, SimulationInstanceConfig config) throws RoboOperationFailedException, IOException, ParseException {
+    public ExecutionResultDTO execute(ExecutionCommand.OpenHandCommand command, SimulationInstanceConfig config)
+            throws RoboOperationFailedException, IOException, ParseException {
 
-        System.out.println("Connecting to " + config.getInstanceHost() + " on port " + config.getInstancePort());
-
+        log.info("Executing open hand command");
         JSONObject json = new JSONObject();
         json.put("operation", "set_axis");
         json.put("axis", "axis7");
