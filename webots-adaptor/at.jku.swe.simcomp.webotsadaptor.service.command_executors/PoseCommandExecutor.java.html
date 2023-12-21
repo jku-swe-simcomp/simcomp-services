@@ -6,6 +6,7 @@ import at.jku.swe.simcomp.commons.adaptor.endpoint.simulation.SimulationInstance
 import at.jku.swe.simcomp.commons.adaptor.execution.command.CommandExecutor;
 import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
 import at.jku.swe.simcomp.webotsadaptor.service.WebotsExecutionService;
+import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Service;
@@ -13,15 +14,18 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 
 
+<span class="fc" id="L17">@Slf4j</span>
 @Service
-<span class="fc" id="L17">public class PoseCommandExecutor implements CommandExecutor&lt;ExecutionCommand.PoseCommand, ExecutionResultDTO&gt; {</span>
+<span class="fc" id="L19">public class PoseCommandExecutor implements CommandExecutor&lt;ExecutionCommand.PoseCommand, ExecutionResultDTO&gt; {</span>
 
     @Override
-    public ExecutionResultDTO execute(ExecutionCommand.PoseCommand command, SimulationInstanceConfig config) throws RoboOperationFailedException, IOException, ParseException {
+    public ExecutionResultDTO execute(ExecutionCommand.PoseCommand command, SimulationInstanceConfig config)
+            throws RoboOperationFailedException, IOException, ParseException {
 
-<span class="fc" id="L22">        JSONObject json = new JSONObject();</span>
-<span class="fc" id="L23">        json.put(&quot;operation&quot;, &quot;get_position&quot;);</span>
-<span class="fc" id="L24">        return WebotsExecutionService.executeCommand(json, config);</span>
+<span class="fc" id="L25">        log.info(&quot;Executing get position command&quot;);</span>
+<span class="fc" id="L26">        JSONObject json = new JSONObject();</span>
+<span class="fc" id="L27">        json.put(&quot;operation&quot;, &quot;get_position&quot;);</span>
+<span class="fc" id="L28">        return WebotsExecutionService.executeCommand(json, config);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -4,6 +4,7 @@ import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.RoboOperationFailedException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.simulation.SimulationInstanceConfig;
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -17,83 +18,84 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
-<span class="nc" id="L20">public class WebotsExecutionService {</span>
+<span class="fc" id="L21">@Slf4j</span>
+<span class="nc" id="L22">public class WebotsExecutionService {</span>
 
     public static ExecutionResultDTO executeCommand(JSONObject command, SimulationInstanceConfig config) throws RoboOperationFailedException, IOException, ParseException {
-<span class="fc" id="L23">        System.out.println(&quot;Connecting to &quot; + config.getInstanceHost() + &quot; on port &quot; + config.getInstancePort());</span>
+<span class="fc" id="L25">        log.info(&quot;Connecting to {} on port {}&quot;, config.getInstanceHost(), config.getInstancePort());</span>
         try {
-<span class="fc" id="L25">            JSONObject responseJson = accessWebots(command, config);</span>
+<span class="fc" id="L27">            JSONObject responseJson = accessWebots(command, config);</span>
 
-<span class="fc" id="L27">            System.out.println(&quot;Simulation Response: &quot; + responseJson.toString());</span>
+<span class="fc" id="L29">            log.info(&quot;Simulation Response: {}&quot;, responseJson.toString());</span>
 
-<span class="fc bfc" id="L29" title="All 2 branches covered.">            if(Objects.equals(responseJson.get(&quot;result&quot;), &quot;success&quot;)) {</span>
-<span class="fc" id="L30">                return ExecutionResultDTO.builder()</span>
-<span class="fc" id="L31">                        .report(&quot;Success&quot;)</span>
-<span class="fc" id="L32">                        .build();</span>
+<span class="fc bfc" id="L31" title="All 2 branches covered.">            if(Objects.equals(responseJson.get(&quot;result&quot;), &quot;success&quot;)) {</span>
+<span class="fc" id="L32">                return ExecutionResultDTO.builder()</span>
+<span class="fc" id="L33">                        .report(&quot;Success&quot;)</span>
+<span class="fc" id="L34">                        .build();</span>
             } else {
-<span class="fc" id="L34">                System.out.println(&quot;The movement could not be executed&quot;);</span>
-<span class="fc" id="L35">                throw new RoboOperationFailedException(&quot;The movement could not be executed&quot;);</span>
+<span class="fc" id="L36">                log.error(&quot;The movement could not be executed&quot;);</span>
+<span class="fc" id="L37">                throw new RoboOperationFailedException(&quot;The movement could not be executed&quot;);</span>
             }
-<span class="fc" id="L37">        } catch (IOException | ParseException e) {</span>
-<span class="fc" id="L38">            System.out.println(&quot;No connection to the simulation could be built&quot;);</span>
-<span class="fc" id="L39">            System.out.println(e.getMessage());</span>
-<span class="fc" id="L40">            throw e;</span>
+<span class="fc" id="L39">        } catch (IOException | ParseException e) {</span>
+<span class="fc" id="L40">            log.error(&quot;No connection to the simulation could be built&quot;);</span>
+<span class="fc" id="L41">            log.error(e.getMessage());</span>
+<span class="fc" id="L42">            throw e;</span>
         }
     }
 
     public static List&lt;Double&gt; getPositions(SimulationInstanceConfig config) throws RoboOperationFailedException, IOException, ParseException {
-<span class="fc" id="L45">        System.out.println(&quot;Connecting to &quot; + config.getInstanceHost() + &quot; on port &quot;</span>
-<span class="fc" id="L46">                + config.getInstancePort() + &quot; to get the current position&quot;);</span>
+<span class="fc" id="L47">        log.info(&quot;Connecting to {} on port {}, to get the current position&quot;, config.getInstanceHost(), config.getInstancePort());</span>
         try {
-<span class="fc" id="L48">            JSONObject json = new JSONObject();</span>
-<span class="fc" id="L49">            json.put(&quot;operation&quot;, &quot;get_position&quot;);</span>
-<span class="fc" id="L50">            JSONObject responseJson = accessWebots(json, config);</span>
+<span class="fc" id="L49">            JSONObject json = new JSONObject();</span>
+<span class="fc" id="L50">            json.put(&quot;operation&quot;, &quot;get_position&quot;);</span>
+<span class="fc" id="L51">            JSONObject responseJson = accessWebots(json, config);</span>
 
-<span class="fc bfc" id="L52" title="All 2 branches covered.">            if(Objects.equals(responseJson.get(&quot;result&quot;), &quot;success&quot;)) {</span>
-<span class="fc" id="L53">                JSONArray jsonArray = (JSONArray) responseJson.get(&quot;positions&quot;);</span>
-<span class="fc" id="L54">                Iterator&lt;String&gt; iterator = jsonArray.iterator();</span>
-<span class="fc" id="L55">                List&lt;Double&gt; positions = new ArrayList&lt;&gt;();</span>
-<span class="fc bfc" id="L56" title="All 2 branches covered.">                while(iterator.hasNext()){</span>
-<span class="fc" id="L57">                    Object val = iterator.next();</span>
-<span class="fc bfc" id="L58" title="All 2 branches covered.">                    if (val instanceof Long) {</span>
-<span class="fc" id="L59">                        positions.add(((Long) val).doubleValue());</span>
-<span class="pc bpc" id="L60" title="1 of 2 branches missed.">                    } else if (val instanceof Double) {</span>
-<span class="fc" id="L61">                        positions.add((Double) val);</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">            if(Objects.equals(responseJson.get(&quot;result&quot;), &quot;success&quot;)) {</span>
+<span class="fc" id="L54">                log.info(&quot;Converting JSON to Double list&quot;);</span>
+<span class="fc" id="L55">                JSONArray jsonArray = (JSONArray) responseJson.get(&quot;positions&quot;);</span>
+<span class="fc" id="L56">                Iterator&lt;String&gt; iterator = jsonArray.iterator();</span>
+<span class="fc" id="L57">                List&lt;Double&gt; positions = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">                while(iterator.hasNext()){</span>
+<span class="fc" id="L59">                    Object val = iterator.next();</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">                    if (val instanceof Long) {</span>
+<span class="fc" id="L61">                        positions.add(((Long) val).doubleValue());</span>
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">                    } else if (val instanceof Double) {</span>
+<span class="fc" id="L63">                        positions.add((Double) val);</span>
                     }
-<span class="fc" id="L63">                }</span>
-<span class="fc" id="L64">                return positions;</span>
+<span class="fc" id="L65">                }</span>
+<span class="fc" id="L66">                return positions;</span>
             } else {
-<span class="fc" id="L66">                System.out.println(&quot;The movement could not be executed&quot;);</span>
-<span class="fc" id="L67">                throw new RoboOperationFailedException(&quot;The movement could not be executed&quot;);</span>
+<span class="fc" id="L68">                log.error(&quot;The movement could not be executed&quot;);</span>
+<span class="fc" id="L69">                throw new RoboOperationFailedException(&quot;The movement could not be executed&quot;);</span>
             }
-<span class="fc" id="L69">        } catch (IOException | ParseException e) {</span>
-<span class="fc" id="L70">            System.out.println(&quot;No connection to the simulation could be built&quot;);</span>
-<span class="fc" id="L71">            System.out.println(e.getMessage());</span>
-<span class="fc" id="L72">            throw e;</span>
+<span class="fc" id="L71">        } catch (IOException | ParseException e) {</span>
+<span class="fc" id="L72">            log.error(&quot;No connection to the simulation could be built&quot;);</span>
+<span class="fc" id="L73">            log.error(e.getMessage());</span>
+<span class="fc" id="L74">            throw e;</span>
         }
     }
 
     protected static JSONObject accessWebots(JSONObject input, SimulationInstanceConfig config) throws IOException, ParseException {
-<span class="fc" id="L77">        Socket client = getSocket(config);</span>
-<span class="fc" id="L78">        DataOutputStream out = new DataOutputStream(client.getOutputStream());</span>
-<span class="fc" id="L79">        System.out.println(&quot;Connected to &quot; + client.getRemoteSocketAddress());</span>
+<span class="fc" id="L79">        Socket client = getSocket(config);</span>
+<span class="fc" id="L80">        DataOutputStream out = new DataOutputStream(client.getOutputStream());</span>
+<span class="fc" id="L81">        log.info(&quot;Connected to {}&quot;, client.getRemoteSocketAddress());</span>
 
-<span class="fc" id="L81">        out.write(input.toString().getBytes(StandardCharsets.UTF_8));</span>
+<span class="fc" id="L83">        out.write(input.toString().getBytes(StandardCharsets.UTF_8));</span>
 
-<span class="fc" id="L83">        System.out.println(&quot;Command sent to simulation: &quot; + input);</span>
-<span class="fc" id="L84">        String response = readResponse(client);</span>
-<span class="fc" id="L85">        System.out.println(&quot;Response in plain text: &quot; + response);</span>
-<span class="fc" id="L86">        JSONParser parser = new JSONParser();</span>
-<span class="fc" id="L87">        return (JSONObject) parser.parse(response);</span>
+<span class="fc" id="L85">        log.info(&quot;Command sent to simulation: {}&quot;, input);</span>
+<span class="fc" id="L86">        String response = readResponse(client);</span>
+<span class="fc" id="L87">        log.info(&quot;Response in plain text: {}&quot;, response);</span>
+<span class="fc" id="L88">        JSONParser parser = new JSONParser();</span>
+<span class="fc" id="L89">        return (JSONObject) parser.parse(response);</span>
     }
 
     protected static Socket getSocket(SimulationInstanceConfig config) throws IOException {
-<span class="nc" id="L91">        return new Socket(config.getInstanceHost(), config.getInstancePort());</span>
+<span class="nc" id="L93">        return new Socket(config.getInstanceHost(), config.getInstancePort());</span>
     }
 
     protected static String readResponse(Socket client) throws IOException {
-<span class="nc" id="L95">        BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));</span>
-<span class="nc" id="L96">        return in.readLine();</span>
+<span class="nc" id="L97">        BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));</span>
+<span class="nc" id="L98">        return in.readLine();</span>
     }
 
 }
