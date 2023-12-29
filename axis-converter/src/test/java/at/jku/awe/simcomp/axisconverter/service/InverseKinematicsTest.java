@@ -10,13 +10,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 public class InverseKinematicsTest {
 
     @Test
     void inverseKinematicsTest() {
-        List<JointPositionDTO> jointPositionDTOS = InverseKinematics.inverseKinematics(null);
-        assertEquals(new LinkedList<>(), jointPositionDTOS);
+        assertThrows(NullPointerException.class, () -> InverseKinematics.inverseKinematics(null));
     }
 }
