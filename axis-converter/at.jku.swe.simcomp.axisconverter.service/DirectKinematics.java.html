@@ -135,8 +135,8 @@ import java.util.List;
         double gamma;
 <span class="fc" id="L136">        double betaRounde = Math.round(beta*1000)/1000.0;</span>
 
-<span class="pc bpc" id="L138" title="1 of 2 branches missed.">        if (betaRounde == Math.round(1000*Math.PI / 2)/1000.0) {</span>
-<span class="nc" id="L139">            gamma = Math.atan2(matrix[1][0], matrix[0][0]);</span>
+<span class="fc bfc" id="L138" title="All 2 branches covered.">        if (betaRounde == Math.round(1000*Math.PI / 2)/1000.0) {</span>
+<span class="fc" id="L139">            gamma = Math.atan2(matrix[1][0], matrix[0][0]);</span>
 <span class="pc bpc" id="L140" title="1 of 2 branches missed.">        } else if (betaRounde == Math.round(1000*-Math.PI / 2)/1000.0) {</span>
 <span class="nc" id="L141">            gamma = -Math.atan2(matrix[1][0], matrix[0][0]);</span>
 <span class="fc bfc" id="L142" title="All 2 branches covered.">        } else if (betaRounde == 0) {</span>
