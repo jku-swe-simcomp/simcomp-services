@@ -12,7 +12,7 @@ public class JointPositionCommandExecutor implements CommandExecutor<ExecutionCo
     @Override
     public ExecutionResultDTO execute(ExecutionCommand.SetJointPositionCommand command, SimulationInstanceConfig config) {
         return ExecutionResultDTO.builder()
-                .report("Pose command executed")
+                .report("Did set joint position of axis %s to %s.".formatted(command.jointPosition().getJoint(), command.jointPosition().getRadians()))
                 .build();
     }
 }
