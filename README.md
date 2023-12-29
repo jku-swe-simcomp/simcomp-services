@@ -61,6 +61,9 @@ This ensures consistent handling also for errors in arbitrary nested composite-c
 ## [Webots-Adaptor](./webots-adaptor) 
 The adaptor for webots simulations.
 
+## [Azure-Adaptor](./azure-adaptor) 
+The adaptor for azure simulations.
+
 ## [Kinematics Service](./axis-converter)
 Spring boot project with REST endpoints to perform direct and inverse kinematics for the Ned2.
 
