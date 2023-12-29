@@ -152,12 +152,12 @@ public class DirectKinematics {
 
     private static void applyBounds(double[] axes) {
         double[][] rangeRotation = {
-                {-175, 175},
-                {-36.7, 90},
-                {-80, 90},
-                {-175, 175},
-                {-110, 100},
-                {-147.5, 147.5}
+                {-160, 160},
+                {-45.8, 45.8},
+                {-86, 74.4},
+                {-114.5, 114.5},
+                {-86, 86},
+                {-143, 143}
         };
 
         for (int i = 0; i < axes.length; i++) {
