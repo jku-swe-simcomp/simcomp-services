@@ -1,11 +1,13 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="AzureAdaptorApplication" type="Application" factoryName="Application" nameIsGenerated="true">
+    <option name="ALTERNATIVE_JRE_PATH" value="18" />
+    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <envs>
       <env name="ADAPTOR_HOST" value="Localhost" />
       <env name="SERVICE_REGISTRY_ENDPOINT" value="http://localhost:8085/api/registration" />
     </envs>
     <option name="MAIN_CLASS_NAME" value="at.jku.swe.simcomp.azureadapter.AzureAdaptorApplication" />
-    <module name="azure-digitaltwins-core" />
+    <module name="azure-adapter" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="at.jku.swe.simcomp.azureadapter.*" />

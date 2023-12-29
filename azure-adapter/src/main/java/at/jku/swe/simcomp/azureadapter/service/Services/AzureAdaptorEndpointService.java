@@ -33,6 +33,9 @@ public class AzureAdaptorEndpointService implements AdaptorEndpointService {
     public AttributeValue getAttributeValue(AttributeKey attributeKey, String sessionId) throws SessionNotValidException {
         demoSessionService.renewSession(sessionId);
         // Note: can add more cases for different attributes
+        /*
+         * TODO: Changes like needed
+         */
         return switch(attributeKey){
             case JOINT_POSITIONS -> new AttributeValue.JointPositions(AzureCommandExecutionVisitor.currentJointPositions);
             default -> throw new UnsupportedOperationException("Attribute %s not supported by this service".formatted(attributeKey));

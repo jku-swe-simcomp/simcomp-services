@@ -1,100 +1,84 @@
 package at.jku.swe.simcomp.axisconverter.service;
 
-import at.jku.swe.simcomp.commons.adaptor.dto.JointAngleAdjustmentDTO;
 import at.jku.swe.simcomp.commons.adaptor.dto.JointPositionDTO;
 import at.jku.swe.simcomp.commons.adaptor.dto.PoseDTO;
+import at.jku.swe.simcomp.commons.adaptor.dto.RoboJoint;
 
-import java.util.Arrays;
-
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public class InverseKinematics {
 
-    public static List<JointPositionDTO> inverseKinematics(PoseDTO position) {
-        return new LinkedList<>();
+    final static double AXIS_1_MIN = -2.8;
+    final static double AXIS_1_MAX = 2.8;
+    final static double AXIS_2_MIN = -0.8;
+    final static double AXIS_2_MAX = 0.8;
+    final static double AXIS_3_MIN = -1.5;
+    final static double AXIS_3_MAX = 1.3;
+    final static double AXIS_4_MIN = -2;
+    final static double AXIS_4_MAX = 2;
+    final static double AXIS_5_MIN = -1.5;
+    final static double AXIS_5_MAX = 1.5;
+    public static List<JointPositionDTO> inverseKinematics(PoseDTO position, int granularity){
 
-        /*double threshold = Math.PI / 36; // rad
-        double[] trials = new double[(int) (2 * Math.PI / threshold)];
-
-        for (int i = 0; i < trials.length; i++) {
-            trials[i] = -Math.PI + i * threshold;
+        if(granularity > 35 || granularity < 2) {
+            throw new IllegalArgumentException("The granularity must be within the bounds 2 and 35");
         }
 
-        double[] errorVec = new double[0];
-        double[][] bestSolution = new double[6][0];
-        double[] weightSolution = new double[0];
+        if(position == null) {
+            throw new IllegalArgumentException("The position may not be null");
+        }
 
-        int count = 0;
-
-        for (double theta6 : trials) {
-            try {
-                double[][] P05_T06 = getJointPositionFive(O, theta6);
-                double[][] joint123 = getPlanarGeometry(P05_T06[0][0], P05_T06[1][0], P05_T06[2][0] - 103 - 80);
-                double[][] T03 = computeT03(joint123);
-                double[][] T06 = computeT06(T03, P05_T06[1][0]);
-
-                double[][] joints6Dof = computeJoints456(T06, joint123);
-                joints6Dof = getRealMovements(joints6Dof, false);
-
-                // Calculate the error of the computed solutions
-            } catch (Exception e) {
-                System.out.println("Error was found. Possible a lost imaginary solution. :(");
-                // Handle the exception as needed
-                return;
-            }
-
-            for (double[] joint : joints6Dof) {
-                double error = Math.abs(MathUtils.angleDifference(theta6, joint[5]));
-
-                double[][] dirKin = directKinematics(joint);
-                double dirKinDiff = Vector3D.distance(new Vector3D(O[0], O[1], O[2]),
-                        new Vector3D(dirKin[0][0], dirKin[1][0], dirKin[2][0]));
-
-                if (Math.round(error - threshold, 3) <= 0 && dirKinDiff < 1) {
-                    errorVec = Arrays.copyOf(errorVec, errorVec.length + 1);
-                    errorVec[errorVec.length - 1] = error;
-
-                    bestSolution = Arrays.copyOf(bestSolution, bestSolution.length + 1);
-                    bestSolution[bestSolution.length - 1] = Arrays.copyOf(joint, joint.length);
-
-                    weightSolution = Arrays.copyOf(weightSolution, weightSolution.length + 1);
-                    weightSolution[weightSolution.length - 1] = dirKinDiff;
+        double minimumError = Double.MAX_VALUE;
+        double[] bestSolution = new double[]{0,0,0,0,0,0};
+        for(int axis1 = 0; axis1 < granularity; axis1 ++){
+            for(int axis2 = 0; axis2 < granularity; axis2 ++){
+                for(int axis3 = 0; axis3 < granularity; axis3 ++){
+                    for(int axis4 = 0; axis4 < granularity; axis4 ++){
+                        for(int axis5 = 0; axis5 < granularity; axis5 ++){
+                            double[] axisPos = getAxisPos(axis1,
+                                    axis2, axis3,
+                                    axis4, axis5,
+                                    granularity);
+                            double error = calculateError(axisPos, position);
+                            if(error < minimumError) {
+                                minimumError = error;
+                                bestSolution = axisPos;
+                            }
+                        }
+                    }
                 }
-
-                // Bonus point research
-                errorVec = Arrays.copyOf(errorVec, errorVec.length + 1);
-                errorVec[errorVec.length - 1] = error;
-                // Plotting points or other actions can be added here
-                count++;
             }
         }
+        return jointPositionList(bestSolution);
+    }
 
-        // Sorting by closest xyz
-        int[] order = MathUtils.argsort(weightSolution);
-        double[][] bestSolutionSorted = new double[bestSolution.length][bestSolution[0].length];
+    private static double calculateError(double[] axisPosition, PoseDTO position){
+        PoseDTO axisPose = DirectKinematics.directKinematics(jointPositionList(axisPosition));
+        // TODO maybe also consider direction
+        double difX = axisPose.getPosition().getX() - position.getPosition().getX();
+        double difY = axisPose.getPosition().getY() - position.getPosition().getY();
+        double difZ = axisPose.getPosition().getZ() - position.getPosition().getZ();
+        return Math.pow(difX, 2)+Math.pow(difY, 2)+Math.pow(difZ, 2);
+    }
 
-        for (int i = 0; i < order.length; i++) {
-            bestSolutionSorted[i] = Arrays.copyOf(bestSolution[order[i]], bestSolution[0].length);
-        }
+    private static List<JointPositionDTO> jointPositionList(double[] bestSolution) {
+        List<JointPositionDTO> joints = new ArrayList<>(6);
+        joints.add(new JointPositionDTO(RoboJoint.AXIS_1, bestSolution[0]));
+        joints.add(new JointPositionDTO(RoboJoint.AXIS_2, bestSolution[1]));
+        joints.add(new JointPositionDTO(RoboJoint.AXIS_3, bestSolution[2]));
+        joints.add(new JointPositionDTO(RoboJoint.AXIS_4, bestSolution[3]));
+        joints.add(new JointPositionDTO(RoboJoint.AXIS_5, bestSolution[4]));
+        joints.add(new JointPositionDTO(RoboJoint.AXIS_6, bestSolution[5]));
+        return joints;
+    }
 
-        boolean hasSolutions = bestSolutionSorted.length > 0;
-
-        if (!hasSolutions) {
-            System.out.println("There are no available solutions!");
-            return;
-        }
-
-        System.out.println("Found at least " + bestSolutionSorted.length + " solutions.");
-        System.out.println("Best inverse kinematic solution with " + weightSolution[order[0]] + " norm error.");
-
-        System.out.println("Best solution :");
-        System.out.println(Arrays.toString(bestSolutionSorted[0]));
-
-        // Bonus point
-        int n = myKmeans(bestSolutionSorted);
-
-        // Plot error evolution
-        // Add plotting code or other visualization here*/
+    private static double[] getAxisPos(int axis1, int axis2, int axis3, int axis4, int axis5, int granularity) {
+        double axisPos1 = AXIS_1_MIN + axis1*(AXIS_1_MAX-AXIS_1_MIN)/(granularity-1);
+        double axisPos2 = AXIS_2_MIN + axis2*(AXIS_2_MAX-AXIS_2_MIN)/(granularity-1);
+        double axisPos3 = AXIS_3_MIN + axis3*(AXIS_3_MAX-AXIS_3_MIN)/(granularity-1);
+        double axisPos4 = AXIS_4_MIN + axis4*(AXIS_4_MAX-AXIS_4_MIN)/(granularity-1);
+        double axisPos5 = AXIS_5_MIN + axis5*(AXIS_5_MAX-AXIS_5_MIN)/(granularity-1);
+        return new double[]{axisPos1, axisPos2, axisPos3, axisPos4, axisPos5, 0};
     }
 }
