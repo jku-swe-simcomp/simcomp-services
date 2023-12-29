@@ -17,19 +17,15 @@ import java.util.Optional;
 <span class="nc" id="L17">public class AxisConverterController {</span>
 
     @PostMapping(&quot;/poseToAxis&quot;)
-    public List&lt;JointPositionDTO&gt; convertAxesToPosition(@RequestBody PoseDTO position) {
-<span class="nc" id="L21">        System.out.println(position);</span>
-<span class="nc" id="L22">        return InverseKinematics.inverseKinematics(position);</span>
-    }
-
-    @PostMapping(&quot;/poseToAxis/{granularity}&quot;)
-    public List&lt;JointPositionDTO&gt; convertAxesToPosition(@RequestBody PoseDTO position, @PathVariable int granularity) {
-<span class="nc" id="L27">        return InverseKinematics.inverseKinematics(position, granularity);</span>
+    public List&lt;JointPositionDTO&gt; convertAxesToPosition(@RequestBody PoseDTO position,
+                                                        @RequestParam(required = false, defaultValue = &quot;15&quot;) Integer granularity) {
+<span class="nc" id="L22">        System.out.println(granularity);</span>
+<span class="nc" id="L23">        return InverseKinematics.inverseKinematics(position, granularity);</span>
     }
 
     @PostMapping(&quot;/axisToPose&quot;)
     public PoseDTO convertPositionToAxes(@RequestBody List&lt;JointPositionDTO&gt; axes) {
-<span class="nc" id="L32">        return DirectKinematics.directKinematics(axes);</span>
+<span class="nc" id="L28">        return DirectKinematics.directKinematics(axes);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

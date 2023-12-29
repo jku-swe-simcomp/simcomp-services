@@ -1,6 +1,6 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
 webots-adaptor,at.jku.swe.simcomp.axisconverter,AxisConverterApplication,8,0,0,0,3,0,2,0,2,0
-webots-adaptor,at.jku.swe.simcomp.axisconverter,AxisConverterController,20,0,0,0,6,0,5,0,5,0
+webots-adaptor,at.jku.swe.simcomp.axisconverter,AxisConverterController,18,0,0,0,5,0,4,0,4,0
 webots-adaptor,at.jku.swe.simcomp.axisconverter,OpenApiConfig,9,0,0,0,3,0,2,0,2,0
 webots-adaptor,at.jku.swe.simcomp.axisconverter.service,DirectKinematics,22,1133,2,22,3,78,3,19,1,9
-webots-adaptor,at.jku.swe.simcomp.axisconverter.service,InverseKinematics,3,297,0,12,1,33,1,11,1,5
+webots-adaptor,at.jku.swe.simcomp.axisconverter.service,InverseKinematics,3,311,0,18,1,36,1,13,1,4

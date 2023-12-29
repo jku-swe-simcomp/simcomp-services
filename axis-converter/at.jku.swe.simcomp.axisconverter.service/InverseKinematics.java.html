@@ -21,61 +21,65 @@ import java.util.List;
     final static double AXIS_5_MAX = 1.5;
     public static List&lt;JointPositionDTO&gt; inverseKinematics(PoseDTO position, int granularity){
 
-<span class="fc" id="L24">        double minimumError = Double.MAX_VALUE;</span>
-<span class="fc" id="L25">        double[] bestSolution = new double[]{0,0,0,0,0,0};</span>
-<span class="fc bfc" id="L26" title="All 2 branches covered.">        for(int axis1 = 0; axis1 &lt; granularity; axis1 ++){</span>
-<span class="fc bfc" id="L27" title="All 2 branches covered.">            for(int axis2 = 0; axis2 &lt; granularity; axis2 ++){</span>
-<span class="fc bfc" id="L28" title="All 2 branches covered.">                for(int axis3 = 0; axis3 &lt; granularity; axis3 ++){</span>
-<span class="fc bfc" id="L29" title="All 2 branches covered.">                    for(int axis4 = 0; axis4 &lt; granularity; axis4 ++){</span>
-<span class="fc bfc" id="L30" title="All 2 branches covered.">                        for(int axis5 = 0; axis5 &lt; granularity; axis5 ++){</span>
-<span class="fc" id="L31">                            double[] axisPos = getAxisPos(axis1,</span>
+<span class="fc bfc" id="L24" title="All 4 branches covered.">        if(granularity &gt; 35 || granularity &lt; 2) {</span>
+<span class="fc" id="L25">            throw new IllegalArgumentException(&quot;The granularity must be within the bounds 2 and 35&quot;);</span>
+        }
+
+<span class="fc bfc" id="L28" title="All 2 branches covered.">        if(position == null) {</span>
+<span class="fc" id="L29">            throw new IllegalArgumentException(&quot;The position may not be null&quot;);</span>
+        }
+
+<span class="fc" id="L32">        double minimumError = Double.MAX_VALUE;</span>
+<span class="fc" id="L33">        double[] bestSolution = new double[]{0,0,0,0,0,0};</span>
+<span class="fc bfc" id="L34" title="All 2 branches covered.">        for(int axis1 = 0; axis1 &lt; granularity; axis1 ++){</span>
+<span class="fc bfc" id="L35" title="All 2 branches covered.">            for(int axis2 = 0; axis2 &lt; granularity; axis2 ++){</span>
+<span class="fc bfc" id="L36" title="All 2 branches covered.">                for(int axis3 = 0; axis3 &lt; granularity; axis3 ++){</span>
+<span class="fc bfc" id="L37" title="All 2 branches covered.">                    for(int axis4 = 0; axis4 &lt; granularity; axis4 ++){</span>
+<span class="fc bfc" id="L38" title="All 2 branches covered.">                        for(int axis5 = 0; axis5 &lt; granularity; axis5 ++){</span>
+<span class="fc" id="L39">                            double[] axisPos = getAxisPos(axis1,</span>
                                     axis2, axis3,
                                     axis4, axis5,
                                     granularity);
-<span class="fc" id="L35">                            double error = calculateError(axisPos, position);</span>
-<span class="fc bfc" id="L36" title="All 2 branches covered.">                            if(error &lt; minimumError) {</span>
-<span class="fc" id="L37">                                minimumError = error;</span>
-<span class="fc" id="L38">                                bestSolution = axisPos;</span>
+<span class="fc" id="L43">                            double error = calculateError(axisPos, position);</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">                            if(error &lt; minimumError) {</span>
+<span class="fc" id="L45">                                minimumError = error;</span>
+<span class="fc" id="L46">                                bestSolution = axisPos;</span>
                             }
                         }
                     }
                 }
             }
         }
-<span class="fc" id="L45">        return jointPositionList(bestSolution);</span>
-    }
-
-    public static List&lt;JointPositionDTO&gt; inverseKinematics(PoseDTO position) {
-<span class="fc" id="L49">        return inverseKinematics(position, 15);</span>
+<span class="fc" id="L53">        return jointPositionList(bestSolution);</span>
     }
 
     private static double calculateError(double[] axisPosition, PoseDTO position){
-<span class="fc" id="L53">        PoseDTO axisPose = DirectKinematics.directKinematics(jointPositionList(axisPosition));</span>
+<span class="fc" id="L57">        PoseDTO axisPose = DirectKinematics.directKinematics(jointPositionList(axisPosition));</span>
         // TODO maybe also consider direction
-<span class="fc" id="L55">        double difX = axisPose.getPosition().getX() - position.getPosition().getX();</span>
-<span class="fc" id="L56">        double difY = axisPose.getPosition().getY() - position.getPosition().getY();</span>
-<span class="fc" id="L57">        double difZ = axisPose.getPosition().getZ() - position.getPosition().getZ();</span>
-<span class="fc" id="L58">        return Math.pow(difX, 2)+Math.pow(difY, 2)+Math.pow(difZ, 2);</span>
+<span class="fc" id="L59">        double difX = axisPose.getPosition().getX() - position.getPosition().getX();</span>
+<span class="fc" id="L60">        double difY = axisPose.getPosition().getY() - position.getPosition().getY();</span>
+<span class="fc" id="L61">        double difZ = axisPose.getPosition().getZ() - position.getPosition().getZ();</span>
+<span class="fc" id="L62">        return Math.pow(difX, 2)+Math.pow(difY, 2)+Math.pow(difZ, 2);</span>
     }
 
     private static List&lt;JointPositionDTO&gt; jointPositionList(double[] bestSolution) {
-<span class="fc" id="L62">        List&lt;JointPositionDTO&gt; joints = new ArrayList&lt;&gt;(6);</span>
-<span class="fc" id="L63">        joints.add(new JointPositionDTO(RoboJoint.AXIS_1, bestSolution[0]));</span>
-<span class="fc" id="L64">        joints.add(new JointPositionDTO(RoboJoint.AXIS_2, bestSolution[1]));</span>
-<span class="fc" id="L65">        joints.add(new JointPositionDTO(RoboJoint.AXIS_3, bestSolution[2]));</span>
-<span class="fc" id="L66">        joints.add(new JointPositionDTO(RoboJoint.AXIS_4, bestSolution[3]));</span>
-<span class="fc" id="L67">        joints.add(new JointPositionDTO(RoboJoint.AXIS_5, bestSolution[4]));</span>
-<span class="fc" id="L68">        joints.add(new JointPositionDTO(RoboJoint.AXIS_6, bestSolution[5]));</span>
-<span class="fc" id="L69">        return joints;</span>
+<span class="fc" id="L66">        List&lt;JointPositionDTO&gt; joints = new ArrayList&lt;&gt;(6);</span>
+<span class="fc" id="L67">        joints.add(new JointPositionDTO(RoboJoint.AXIS_1, bestSolution[0]));</span>
+<span class="fc" id="L68">        joints.add(new JointPositionDTO(RoboJoint.AXIS_2, bestSolution[1]));</span>
+<span class="fc" id="L69">        joints.add(new JointPositionDTO(RoboJoint.AXIS_3, bestSolution[2]));</span>
+<span class="fc" id="L70">        joints.add(new JointPositionDTO(RoboJoint.AXIS_4, bestSolution[3]));</span>
+<span class="fc" id="L71">        joints.add(new JointPositionDTO(RoboJoint.AXIS_5, bestSolution[4]));</span>
+<span class="fc" id="L72">        joints.add(new JointPositionDTO(RoboJoint.AXIS_6, bestSolution[5]));</span>
+<span class="fc" id="L73">        return joints;</span>
     }
 
     private static double[] getAxisPos(int axis1, int axis2, int axis3, int axis4, int axis5, int granularity) {
-<span class="fc" id="L73">        double axisPos1 = AXIS_1_MIN + axis1*(AXIS_1_MAX-AXIS_1_MIN)/(granularity-1);</span>
-<span class="fc" id="L74">        double axisPos2 = AXIS_2_MIN + axis2*(AXIS_2_MAX-AXIS_2_MIN)/(granularity-1);</span>
-<span class="fc" id="L75">        double axisPos3 = AXIS_3_MIN + axis3*(AXIS_3_MAX-AXIS_3_MIN)/(granularity-1);</span>
-<span class="fc" id="L76">        double axisPos4 = AXIS_4_MIN + axis4*(AXIS_4_MAX-AXIS_4_MIN)/(granularity-1);</span>
-<span class="fc" id="L77">        double axisPos5 = AXIS_5_MIN + axis5*(AXIS_5_MAX-AXIS_5_MIN)/(granularity-1);</span>
-<span class="fc" id="L78">        return new double[]{axisPos1, axisPos2, axisPos3, axisPos4, axisPos5, 0};</span>
+<span class="fc" id="L77">        double axisPos1 = AXIS_1_MIN + axis1*(AXIS_1_MAX-AXIS_1_MIN)/(granularity-1);</span>
+<span class="fc" id="L78">        double axisPos2 = AXIS_2_MIN + axis2*(AXIS_2_MAX-AXIS_2_MIN)/(granularity-1);</span>
+<span class="fc" id="L79">        double axisPos3 = AXIS_3_MIN + axis3*(AXIS_3_MAX-AXIS_3_MIN)/(granularity-1);</span>
+<span class="fc" id="L80">        double axisPos4 = AXIS_4_MIN + axis4*(AXIS_4_MAX-AXIS_4_MIN)/(granularity-1);</span>
+<span class="fc" id="L81">        double axisPos5 = AXIS_5_MIN + axis5*(AXIS_5_MAX-AXIS_5_MIN)/(granularity-1);</span>
+<span class="fc" id="L82">        return new double[]{axisPos1, axisPos2, axisPos3, axisPos4, axisPos5, 0};</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
