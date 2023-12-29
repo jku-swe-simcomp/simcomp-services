@@ -6,25 +6,30 @@ import at.jku.swe.simcomp.axisconverter.service.InverseKinematics;
 import at.jku.swe.simcomp.commons.adaptor.dto.JointPositionDTO;
 import at.jku.swe.simcomp.commons.adaptor.dto.PoseDTO;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(&quot;/api/converter&quot;)
 <span class="nc" id="L16">@Slf4j</span>
 <span class="nc" id="L17">public class AxisConverterController {</span>
 
-    // TODO: change to other DTO
     @PostMapping(&quot;/poseToAxis&quot;)
     public List&lt;JointPositionDTO&gt; convertAxesToPosition(@RequestBody PoseDTO position) {
+<span class="nc" id="L21">        System.out.println(position);</span>
 <span class="nc" id="L22">        return InverseKinematics.inverseKinematics(position);</span>
+    }
+
+    @PostMapping(&quot;/poseToAxis/{granularity}&quot;)
+    public List&lt;JointPositionDTO&gt; convertAxesToPosition(@RequestBody PoseDTO position, @PathVariable int granularity) {
+<span class="nc" id="L27">        return InverseKinematics.inverseKinematics(position, granularity);</span>
     }
 
     @PostMapping(&quot;/axisToPose&quot;)
     public PoseDTO convertPositionToAxes(@RequestBody List&lt;JointPositionDTO&gt; axes) {
-<span class="nc" id="L27">        return DirectKinematics.directKinematics(axes);</span>
+<span class="nc" id="L32">        return DirectKinematics.directKinematics(axes);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
