@@ -37,7 +37,7 @@ public class ExecutionResponse {
     @Enumerated(EnumType.STRING)
 <span class="fc" id="L38">    private ExecutionResponseState state;</span>
 
-    @Column
+    @Column(length = 2550)
 <span class="fc" id="L41">    private String report;</span>
 
     @Column(name = &quot;created_at&quot;, nullable = false, updatable = false)
