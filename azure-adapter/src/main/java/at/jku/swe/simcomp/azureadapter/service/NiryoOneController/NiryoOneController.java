@@ -1,9 +1,10 @@
 package at.jku.swe.simcomp.azureadapter.service.NiryoOneController;
 
-import at.jku.swe.simcomp.azureadapter.service.HelperClasses.DigitalTwinsClientBuilder;
 import at.jku.swe.simcomp.azureadapter.service.HelperClasses.DigitalTwinsServiceVersion;
 import at.jku.swe.simcomp.azureadapter.service.NiryoOneModel.NiryoOneModel;
 import com.azure.core.models.JsonPatchDocument;
+import com.azure.digitaltwins.core.DigitalTwinsClient;
+import com.azure.digitaltwins.core.DigitalTwinsClientBuilder;
 import com.azure.identity.ClientSecretCredentialBuilder;
 import com.azure.identity.DefaultAzureCredentialBuilder;
 import com.microsoft.azure.sdk.iot.service.digitaltwin.DigitalTwinClient;
@@ -14,11 +15,11 @@ import java.util.Collections;
 
 public class NiryoOneController {
 
-    private DigitalTwinClient client;
+    private DigitalTwinsClient client;
     private String digitalTwinId;
 
 
-    public NiryoOneController(DigitalTwinClient client, String digitalTwinId) {
+    public NiryoOneController(DigitalTwinsClient client, String digitalTwinId) {
         this.client = client;
         this.digitalTwinId = digitalTwinId;
     }
@@ -46,8 +47,8 @@ public class NiryoOneController {
         DigitalTwinsClientBuilder clientBuilder = new DigitalTwinsClientBuilder()
                 .credential(credentialBuilder.build())
                 .endpoint(digitalTwinsEndpoint)
-                .serviceVersion(DigitalTwinsServiceVersion.getLatest());
-        DigitalTwinClient syncClient = clientBuilder.buildClient();
+                .serviceVersion((com.azure.digitaltwins.core.DigitalTwinsServiceVersion) DigitalTwinsServiceVersion.getLatest());
+        DigitalTwinsClient syncClient = clientBuilder.buildClient();
         try {
             BasicDigitalTwin digitalTwin = syncClient.getDigitalTwin("HostName=RobotHubStudent.azure-devices.net;DeviceId=TestRobot;SharedAccessKey=DLmglEWvJzNTjBdIHk9WW8xfHkhoeYvDPAIoTDYQHns="/*TODO: Evaluate the correctness*/, BasicDigitalTwin.class);
             System.out.println("Digital Twin retrieved: " + digitalTwin);
@@ -67,7 +68,7 @@ public class NiryoOneController {
 
             JsonPatchDocument patchDocument = new JsonPatchDocument();
             patchDocument.appendReplace(propertyPath, angle);
-            client.updateDigitalTwin(digitalTwinId, new ArrayList<>(Collections.singleton(patchDocument)));
+            client.updateDigitalTwin(digitalTwinId, patchDocument);
 
             System.out.println("Joint angle for " + jointName + " updated successfully.");
         } catch (Exception e) {
@@ -146,7 +147,7 @@ public class NiryoOneController {
             patchDocument.appendReplace("/joint4_angle", joint4);
             patchDocument.appendReplace("/joint5_angle", joint5);
             patchDocument.appendReplace("/joint6_angle", joint6);;
-            client.updateDigitalTwin(digitalTwinId, new ArrayList<>(Collections.singleton(patchDocument)));
+            client.updateDigitalTwin(digitalTwinId, patchDocument);
 
             System.out.println("Joint angles updated successfully.");
         } catch (Exception e) {

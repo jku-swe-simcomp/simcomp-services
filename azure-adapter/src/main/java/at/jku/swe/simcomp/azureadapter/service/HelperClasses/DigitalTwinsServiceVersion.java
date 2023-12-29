@@ -32,9 +32,10 @@ public enum DigitalTwinsServiceVersion implements ServiceVersion {
 
     /**
      * Gets the latest service API version of Azure Digital Twins that is supported by this client.
+     *
      * @return The latest service API version of Azure Digital Twins that is supported by this client.
      */
-    public static DigitalTwinsServiceVersion getLatest() {
+    public static ServiceVersion getLatest() {
         return V2022_05_31;
     }
 }
