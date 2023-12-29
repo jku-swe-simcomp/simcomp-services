@@ -1,0 +1,44 @@
+{
+ "@context": "dtmi:dtdl:context;2",
+ "@id": "dtmi:com:example:NiryoOne;1",
+ "@type": "Interface",
+ "displayName": "Niryo One Robot",
+ "contents": [
+  {
+   "@type": "Property",
+   "name": "joint1_angle",
+   "displayName": "Joint 1 Angle",
+   "schema": "double"
+  },
+  {
+   "@type": "Property",
+   "name": "joint2_angle",
+   "displayName": "Joint 2 Angle",
+   "schema": "double"
+  },
+  {
+   "@type": "Property",
+   "name": "joint3_angle",
+   "displayName": "Joint 3 Angle",
+   "schema": "double"
+  },
+  {
+   "@type": "Property",
+   "name": "joint4_angle",
+   "displayName": "Joint 4 Angle",
+   "schema": "double"
+  },
+  {
+   "@type": "Property",
+   "name": "joint5_angle",
+   "displayName": "Joint 5 Angle",
+   "schema": "double"
+  },
+  {
+   "@type": "Property",
+   "name": "joint6_angle",
+   "displayName": "Joint 6 Angle",
+   "schema": "double"
+  }
+ ]
+}
