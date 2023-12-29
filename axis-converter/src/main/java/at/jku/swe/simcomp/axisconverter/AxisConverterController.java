@@ -17,13 +17,9 @@ import java.util.Optional;
 public class AxisConverterController {
 
     @PostMapping("/poseToAxis")
-    public List<JointPositionDTO> convertAxesToPosition(@RequestBody PoseDTO position) {
-        System.out.println(position);
-        return InverseKinematics.inverseKinematics(position);
-    }
-
-    @PostMapping("/poseToAxis/{granularity}")
-    public List<JointPositionDTO> convertAxesToPosition(@RequestBody PoseDTO position, @PathVariable int granularity) {
+    public List<JointPositionDTO> convertAxesToPosition(@RequestBody PoseDTO position,
+                                                        @RequestParam(required = false, defaultValue = "15") Integer granularity) {
+        System.out.println(granularity);
         return InverseKinematics.inverseKinematics(position, granularity);
     }
 

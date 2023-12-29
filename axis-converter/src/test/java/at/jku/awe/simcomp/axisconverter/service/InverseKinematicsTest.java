@@ -19,14 +19,17 @@ public class InverseKinematicsTest {
 
     @Test
     void inverseKinematicsTest() {
-        assertThrows(NullPointerException.class, () -> InverseKinematics.inverseKinematics(null));
+        assertThrows(IllegalArgumentException.class, () -> InverseKinematics.inverseKinematics(null, 10));
 
         PoseDTO position = new PoseDTO(
                 new PositionDTO(100.0, 100.0, 100.0),
                 new OrientationDTO(100.0, 100.0, 100.0)
         );
 
-        List<JointPositionDTO> jointPositions = InverseKinematics.inverseKinematics(position);
+        assertThrows(IllegalArgumentException.class, () -> InverseKinematics.inverseKinematics(position, 1));
+        assertThrows(IllegalArgumentException.class, () -> InverseKinematics.inverseKinematics(position, 36));
+
+        List<JointPositionDTO> jointPositions = InverseKinematics.inverseKinematics(position, 15);
         assertEquals(jointPositions.get(0).getRadians(), 0.8, 0.01);
         assertEquals(jointPositions.get(1).getRadians(), 0.68571, 0.01);
         assertEquals(jointPositions.get(2).getRadians(), 0.9, 0.01);

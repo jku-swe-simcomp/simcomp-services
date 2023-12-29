@@ -21,6 +21,14 @@ public class InverseKinematics {
     final static double AXIS_5_MAX = 1.5;
     public static List<JointPositionDTO> inverseKinematics(PoseDTO position, int granularity){
 
+        if(granularity > 35 || granularity < 2) {
+            throw new IllegalArgumentException("The granularity must be within the bounds 2 and 35");
+        }
+
+        if(position == null) {
+            throw new IllegalArgumentException("The position may not be null");
+        }
+
         double minimumError = Double.MAX_VALUE;
         double[] bestSolution = new double[]{0,0,0,0,0,0};
         for(int axis1 = 0; axis1 < granularity; axis1 ++){
@@ -43,10 +51,6 @@ public class InverseKinematics {
             }
         }
         return jointPositionList(bestSolution);
-    }
-
-    public static List<JointPositionDTO> inverseKinematics(PoseDTO position) {
-        return inverseKinematics(position, 15);
     }
 
     private static double calculateError(double[] axisPosition, PoseDTO position){
