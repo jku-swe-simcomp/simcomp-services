@@ -1,6 +1,5 @@
 package at.jku.swe.simcomp.azureadapter.service.NiryoOneModel;
 
-import at.jku.swe.simcomp.azureadapter.service.HelperClasses.DeserializerService;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class NiryoOneModel {
@@ -23,16 +22,14 @@ public class NiryoOneModel {
     @JsonProperty("joint6_angle")
     private double joint6Angle;
 
-    private DeserializerService deserializerService;
 
-    public NiryoOneModel(double joint1Angle, double joint2Angle, double joint3Angle, double joint4Angle, double joint5Angle, double joint6Angle, DeserializerService deserializerService) {
+    public NiryoOneModel(double joint1Angle, double joint2Angle, double joint3Angle, double joint4Angle, double joint5Angle, double joint6Angle) {
         this.joint1Angle = joint1Angle;
         this.joint2Angle = joint2Angle;
         this.joint3Angle = joint3Angle;
         this.joint4Angle = joint4Angle;
         this.joint5Angle = joint5Angle;
         this.joint6Angle = joint6Angle;
-        this.deserializerService = deserializerService;
     }
 
     public double getJoint1Angle() {

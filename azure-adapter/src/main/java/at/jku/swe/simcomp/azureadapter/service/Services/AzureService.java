@@ -1,4 +1,4 @@
-package at.jku.swe.simcomp.azureadapter.service.AzureController;
+package at.jku.swe.simcomp.azureadapter.service.Services;
 
 import com.azure.core.credential.AccessToken;
 import com.azure.core.credential.TokenCredential;
@@ -9,7 +9,7 @@ import com.azure.identity.ClientSecretCredential;
 import com.azure.identity.ClientSecretCredentialBuilder;
 import reactor.core.publisher.Mono;
 
-public class AzureController {
+public class AzureService {
 
     public static void createDigitalTwin(String endpoint, String clientId, String clientSecret, String tenantId, String twinId, String twinPayload) {
         DigitalTwinsClient client = createDigitalTwinsClient(endpoint, clientId, clientSecret, tenantId);

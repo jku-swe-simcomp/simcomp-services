@@ -8,7 +8,6 @@ import org.springframework.context.annotation.ComponentScan;
  * Azure application showing integration of an adaptor with the service-registry.
  */
 @SpringBootApplication
-@ComponentScan("at.jku.swe.simcomp.azureadapter.service.NiryoOneController")
 @ComponentScan(basePackages = {"at.jku.swe.simcomp"})
 public class AzureAdaptorApplication {
 

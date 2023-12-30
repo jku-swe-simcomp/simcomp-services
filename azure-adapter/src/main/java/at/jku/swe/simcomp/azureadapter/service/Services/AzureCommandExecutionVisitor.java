@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@ComponentScan("at.jku.swe.simcomp.azureadapter.service.NiryoOneController")
 public class AzureCommandExecutionVisitor extends CommandExecutionVisitor {
     /*
      * TODO: Initialize all the needed services
