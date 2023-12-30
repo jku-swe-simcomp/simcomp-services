@@ -13,21 +13,21 @@ import java.io.IOException;
 
 @Service
 public class WebotsCommandExecutionVisitor extends CommandExecutionVisitor {
-    private final SessionService demoSessionService;
+    private final SessionService sessionService;
     private final PoseCommandExecutor poseCommandExecutor;
     private final AdjustJointAngleCommandExecutor adjustJointAngleCommandExecutor;
     private final GrabExecutor grabExecutor;
     private final OpenHandExecutor openHandExecutor;
     private final ResetToHomeExecutor resetToHomeExecutor;
     private final SetJointExecutor setJointExecutor;
-    public WebotsCommandExecutionVisitor(SessionService demoSessionService,
+    public WebotsCommandExecutionVisitor(SessionService sessionService,
                                          PoseCommandExecutor poseCommandExecutor,
                                          AdjustJointAngleCommandExecutor adjustJointAngleCommandExecutor,
                                          GrabExecutor grabExecutor,
                                          OpenHandExecutor openHandExecutor,
                                          ResetToHomeExecutor resetToHomeExecutor,
                                          SetJointExecutor setJointExecutor){
-        this.demoSessionService = demoSessionService;
+        this.sessionService = sessionService;
         this.adjustJointAngleCommandExecutor = adjustJointAngleCommandExecutor;
         this.poseCommandExecutor = poseCommandExecutor;
         this.grabExecutor = grabExecutor;
@@ -38,28 +38,28 @@ public class WebotsCommandExecutionVisitor extends CommandExecutionVisitor {
 
     @Override
     public ExecutionResultDTO visit(ExecutionCommand.AdjustJointAngleCommand command, String sessionKey) throws SessionNotValidException, RoboOperationFailedException, IOException, ParseException {
-        return adjustJointAngleCommandExecutor.execute(command, demoSessionService.renewSession(sessionKey));
+        return adjustJointAngleCommandExecutor.execute(command, sessionService.renewSession(sessionKey));
     }
 
     @Override
     public ExecutionResultDTO visit(ExecutionCommand.PoseCommand command, String sessionKey) throws SessionNotValidException, RoboOperationFailedException, IOException, ParseException {
-        return poseCommandExecutor.execute(command, demoSessionService.renewSession(sessionKey));
+        return poseCommandExecutor.execute(command, sessionService.renewSession(sessionKey));
     }
 
     @Override
     public ExecutionResultDTO visit(ExecutionCommand.GrabCommand command, String sessionKey) throws SessionNotValidException, RoboOperationFailedException, IOException, ParseException {
-        return grabExecutor.execute(command, demoSessionService.renewSession(sessionKey));
+        return grabExecutor.execute(command, sessionService.renewSession(sessionKey));
     }
     @Override
     public ExecutionResultDTO visit(ExecutionCommand.OpenHandCommand command, String sessionKey) throws SessionNotValidException, RoboOperationFailedException, IOException, ParseException {
-        return openHandExecutor.execute(command, demoSessionService.renewSession(sessionKey));
+        return openHandExecutor.execute(command, sessionService.renewSession(sessionKey));
     }
     @Override
     public ExecutionResultDTO visit(ExecutionCommand.ResetToHomeCommand command, String sessionKey) throws SessionNotValidException, RoboOperationFailedException, IOException, ParseException {
-        return resetToHomeExecutor.execute(command, demoSessionService.renewSession(sessionKey));
+        return resetToHomeExecutor.execute(command, sessionService.renewSession(sessionKey));
     }
     @Override
     public ExecutionResultDTO visit(ExecutionCommand.SetJointPositionCommand command, String sessionKey) throws SessionNotValidException, RoboOperationFailedException, IOException, ParseException {
-        return setJointExecutor.execute(command, demoSessionService.renewSession(sessionKey));
+        return setJointExecutor.execute(command, sessionService.renewSession(sessionKey));
     }
 }
