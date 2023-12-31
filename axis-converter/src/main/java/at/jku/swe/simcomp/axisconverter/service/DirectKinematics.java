@@ -6,8 +6,18 @@ import at.jku.swe.simcomp.commons.adaptor.dto.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class to apply direct kinematics for niryo ned 2
+ */
 public class DirectKinematics {
 
+    /**
+     * Method to get the position of the robot arm based on the
+     * sixes axes values.
+     * @param axes values of the six axes
+     * @return the position of the head of the robot arm in X, Y,
+     * and Z dimension and its orientation
+     */
     public static PoseDTO directKinematics(List<JointPositionDTO> axes) {
 
         double[] axesValues = validateAxes(axes);

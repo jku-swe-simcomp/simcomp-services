@@ -87,17 +87,17 @@ jobs:
         github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         publish_dir: ./simcomp-services/coverage-reports
 
-    - name: Create Java Docs for Webots Adaptor
-      run: |
-        cd ./simcomp-services/webots-adaptor
-        mvn clean install javadoc:javadoc
-      working-directory: ${{ github.workspace }}
+#    - name: Create Java Docs for Webots Adaptor
+#      run: |
+#        cd ./simcomp-services/webots-adaptor
+#        mvn clean install javadoc:javadoc
+#      working-directory: ${{ github.workspace }}
 
-    - name: Deploy Javadoc for Webots Adaptor
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-        publish_dir: ./simcomp-services/webots-adaptor/target/site/apidocs
+#    - name: Deploy Javadoc for Webots Adaptor
+#      uses: peaceiris/actions-gh-pages@v3
+#      with:
+#        github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+#        publish_dir: ./simcomp-services/webots-adaptor/target/site/apidocs
 
     - name: Log in to the Docker Hub
       uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9

@@ -7,6 +7,9 @@ import at.jku.swe.simcomp.commons.adaptor.dto.RoboJoint;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class to apply reverse kinematics for the niryo ned 2
+ */
 public class InverseKinematics {
 
     final static double AXIS_1_MIN = -2.8;
@@ -19,6 +22,16 @@ public class InverseKinematics {
     final static double AXIS_4_MAX = 2;
     final static double AXIS_5_MIN = -1.5;
     final static double AXIS_5_MAX = 1.5;
+
+    /**
+     * Method to calculate the axes values for the position of the robot arm.
+     * The granularity can be set, the higher the value to longer the caluclation
+     * takes. The granularity value must be within 2 and 35. The higher, the more
+     * fine-grained the test values are.
+     * @param position the wished position of the robot
+     * @param granularity defined how exact the calculation is
+     * @return the axis values that lead to the position closest ot the wished position
+     */
     public static List<JointPositionDTO> inverseKinematics(PoseDTO position, int granularity){
 
         if(granularity > 35 || granularity < 2) {
