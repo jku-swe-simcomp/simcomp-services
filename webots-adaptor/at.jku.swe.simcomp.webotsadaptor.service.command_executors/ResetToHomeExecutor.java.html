@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ResetToHomeExecutor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">webots-adaptor</a> &gt; <a href="index.source.html" class="el_package">at.jku.swe.simcomp.webotsadaptor.service.command_executors</a> &gt; <span class="el_source">ResetToHomeExecutor.java</span></div><h1>ResetToHomeExecutor.java</h1><pre class="source lang-java linenums">package at.jku.swe.simcomp.webotsadaptor.service.command_executors;
+
+import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.RoboOperationFailedException;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.simulation.SimulationInstanceConfig;
+import at.jku.swe.simcomp.commons.adaptor.execution.command.CommandExecutor;
+import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
+import at.jku.swe.simcomp.webotsadaptor.service.WebotsExecutionService;
+import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+
+/**
+ * Class to execute reset to home command
+ * @see CommandExecutor
+ */
+<span class="fc" id="L20">@Slf4j</span>
+@Service
+<span class="fc" id="L22">public class ResetToHomeExecutor implements CommandExecutor&lt;ExecutionCommand.ResetToHomeCommand, ExecutionResultDTO&gt; {</span>
+
+    /**
+     * Method that executes a reset to home position command at a simulation
+     * @param command the command to execute
+     * @param config the configuration of the simulation
+     * @return the result of the execution
+     * @throws RoboOperationFailedException if the simulation could not execute the command
+     * @throws IOException if no connection to the simulation could be built
+     * @throws ParseException if the created json is invalid
+     */
+    @Override
+    public ExecutionResultDTO execute(ExecutionCommand.ResetToHomeCommand command, SimulationInstanceConfig config)
+            throws RoboOperationFailedException, IOException, ParseException {
+
+<span class="fc" id="L37">        log.info(&quot;Executing set to home position command&quot;);</span>
+<span class="fc" id="L38">        JSONObject json = new JSONObject();</span>
+<span class="fc" id="L39">        json.put(&quot;operation&quot;, &quot;initial_position&quot;);</span>
+<span class="fc" id="L40">        return WebotsExecutionService.executeCommand(json, config);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AttributeService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Adaptor Manager</a> &gt; <a href="index.source.html" class="el_package">at.jku.swe.simcomp.manager.service</a> &gt; <span class="el_source">AttributeService.java</span></div><h1>AttributeService.java</h1><pre class="source lang-java linenums">package at.jku.swe.simcomp.manager.service;
+
+import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeKey;
+import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeValue;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
+import at.jku.swe.simcomp.commons.manager.dto.session.SessionState;
+import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
+import at.jku.swe.simcomp.manager.domain.model.AdaptorSession;
+import at.jku.swe.simcomp.manager.domain.model.Session;
+import at.jku.swe.simcomp.manager.domain.repository.AdaptorSessionRepository;
+import at.jku.swe.simcomp.manager.domain.repository.SessionRepository;
+import at.jku.swe.simcomp.manager.service.client.AdaptorClient;
+import at.jku.swe.simcomp.manager.service.client.ServiceRegistryClient;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+@Service
+<span class="fc" id="L23">@Slf4j</span>
+public class AttributeService {
+    private final AdaptorSessionRepository adaptorSessionRepository;
+    private final ServiceRegistryClient serviceRegistryClient;
+    private final AdaptorClient adaptorClient;
+    private final SessionRepository sessionRepository;
+    private final KinematicsService kinematicsService;
+    private final Boolean isDirectKinematicsEnabled;
+
+    public AttributeService(ServiceRegistryClient serviceRegistryClient,
+                            AdaptorClient adaptorClient,
+                            SessionRepository sessionRepository,
+                            AdaptorSessionRepository adaptorSessionRepository,
+                            KinematicsService kinematicsService,
+<span class="fc" id="L37">                            @Value(&quot;${application.kinematics.direct.enabled}&quot;) Boolean isDirectKinematicsEnabled) {</span>
+<span class="fc" id="L38">        this.serviceRegistryClient = serviceRegistryClient;</span>
+<span class="fc" id="L39">        this.adaptorClient = adaptorClient;</span>
+<span class="fc" id="L40">        this.sessionRepository = sessionRepository;</span>
+<span class="fc" id="L41">        this.adaptorSessionRepository = adaptorSessionRepository;</span>
+<span class="fc" id="L42">        this.kinematicsService = kinematicsService;</span>
+<span class="fc" id="L43">        this.isDirectKinematicsEnabled = Objects.requireNonNullElse(isDirectKinematicsEnabled, true);</span>
+<span class="fc" id="L44">    }</span>
+
+    public Map&lt;String, AttributeValue&gt; getAttributeValues(UUID sessionId,
+                                                          AttributeKey attributeKey){
+<span class="pc bpc" id="L48" title="1 of 4 branches missed.">        return isDirectKinematicsEnabled ? switch(attributeKey){</span>
+<span class="fc" id="L49">            case POSE, POSITION, ORIENTATION -&gt; getAttributeValuesBasedOnKinematics(sessionId, attributeKey);</span>
+<span class="fc" id="L50">            default -&gt; fetchAttributeValuesFromAdaptors(sessionId, attributeKey);</span>
+<span class="nc" id="L51">        } : fetchAttributeValuesFromAdaptors(sessionId, attributeKey);</span>
+    }
+
+    private Map&lt;String, AttributeValue&gt; getAttributeValuesBasedOnKinematics(UUID sessionId,
+                                                                         AttributeKey attributeKey){
+<span class="fc" id="L56">        Map&lt;String, AttributeValue&gt; jointPositionValues = fetchAttributeValuesFromAdaptors(sessionId, AttributeKey.JOINT_POSITIONS);</span>
+<span class="fc" id="L57">        return jointPositionValues.entrySet().stream()</span>
+<span class="fc" id="L58">                .map(e -&gt; {</span>
+<span class="pc bpc" id="L59" title="1 of 2 branches missed.">                    if(e.getValue() instanceof AttributeValue.JointPositions p){</span>
+<span class="fc" id="L60">                        AttributeValue.Pose pose = kinematicsService.jointPositionsToPose(p);</span>
+<span class="pc bpc" id="L61" title="2 of 3 branches missed.">                        AttributeValue resultValue = switch(attributeKey){</span>
+<span class="fc" id="L62">                            case POSITION -&gt; new AttributeValue.Position(pose.pose().getPosition());</span>
+<span class="nc" id="L63">                            case ORIENTATION -&gt; new AttributeValue.Orientation(pose.pose().getOrientation());</span>
+<span class="pc" id="L64">                            default -&gt; pose;</span>
+                        };
+<span class="fc" id="L66">                        return Map.entry(e.getKey(), resultValue);</span>
+                    }
+<span class="nc" id="L68">                    return e;</span>
+<span class="fc" id="L69">                }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));</span>
+    }
+
+
+    private Map&lt;String, AttributeValue&gt; fetchAttributeValuesFromAdaptors(UUID sessionId,
+                                                          AttributeKey attributeKey){
+<span class="fc" id="L75">        log.info(&quot;Getting attribute values for session {} and attribute key {}&quot;, sessionId, attributeKey);</span>
+<span class="fc" id="L76">        Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionId);</span>
+<span class="fc" id="L77">        List&lt;AdaptorSession&gt; sessions = session.getAdaptorSessions().stream()</span>
+<span class="fc bfc" id="L78" title="All 2 branches covered.">                .filter(adaptorSession -&gt; adaptorSession.getState() == SessionState.OPEN)</span>
+<span class="fc" id="L79">                .toList();</span>
+<span class="fc" id="L80">        List&lt;ServiceRegistrationConfigDTO&gt; registeredAdaptorConfigs = serviceRegistryClient.getRegisteredAdaptors();</span>
+
+<span class="fc" id="L82">        Map&lt;AdaptorSession, Optional&lt;ServiceRegistrationConfigDTO&gt;&gt; sessionToConfigs = sessions.stream()</span>
+<span class="fc" id="L83">                .collect(Collectors.toMap(Function.identity(),</span>
+<span class="fc" id="L84">                        adaptorSession -&gt; findMatchingConfig(adaptorSession, registeredAdaptorConfigs)));</span>
+
+<span class="fc" id="L86">        Map&lt;String, AttributeValue&gt; attributeValues = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">        for(var entry : sessionToConfigs.entrySet()){</span>
+<span class="fc" id="L88">            AdaptorSession adaptorSession = entry.getKey();</span>
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">            if (entry.getValue().isEmpty()) {</span>
+<span class="nc" id="L90">                log.info(&quot;No matching adaptor config found for {} of session {}&quot;, adaptorSession.getAdaptorName(), sessionId);</span>
+<span class="nc" id="L91">                attributeValues.put(adaptorSession.getAdaptorName(), null);</span>
+<span class="nc" id="L92">                continue;</span>
+            }
+<span class="fc" id="L94">            ServiceRegistrationConfigDTO config = entry.getValue().get();</span>
+<span class="fc" id="L95">            Optional&lt;AttributeValue&gt; value = Optional.empty();</span>
+            try {
+<span class="fc" id="L97">                value = adaptorClient.getAttributeValue(adaptorSession.getSessionKey(), attributeKey, config);</span>
+<span class="fc" id="L98">                log.info(&quot;Obtained attribute value {} for session {} from {} and attribute key {}&quot;, value, adaptorSession.getAdaptorName(), sessionId, attributeKey);</span>
+<span class="fc" id="L99">            } catch (SessionNotValidException e) {</span>
+<span class="fc" id="L100">                log.warn(&quot;Session {} of {} is not valid anymore. Closing it.&quot;, adaptorSession.getAdaptorName(), session.getSessionKey());</span>
+<span class="fc" id="L101">                adaptorSessionRepository.updateSessionStateById(adaptorSession.getId(), SessionState.CLOSED);</span>
+<span class="fc" id="L102">            }</span>
+<span class="fc" id="L103">            attributeValues.put(adaptorSession.getAdaptorName(), value.orElse(null));</span>
+<span class="fc" id="L104">        }</span>
+<span class="fc" id="L105">        return attributeValues;</span>
+    }
+
+
+    private Optional&lt;ServiceRegistrationConfigDTO&gt; findMatchingConfig(AdaptorSession session,
+                                                                      List&lt;ServiceRegistrationConfigDTO&gt; registeredAdaptorConfigs) {
+<span class="fc" id="L111">        return registeredAdaptorConfigs.stream()</span>
+<span class="fc" id="L112">                .filter(config -&gt; config.getName().equals(session.getAdaptorName()))</span>
+<span class="fc" id="L113">                .findFirst();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

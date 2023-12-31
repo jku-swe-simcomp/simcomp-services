@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"at.jku.swe.simcomp.webotsadaptor"},{"l":"at.jku.swe.simcomp.webotsadaptor.config"},{"l":"at.jku.swe.simcomp.webotsadaptor.domain.simulation"},{"l":"at.jku.swe.simcomp.webotsadaptor.service"},{"l":"at.jku.swe.simcomp.webotsadaptor.service.command_executors"}];updateSearchResults();

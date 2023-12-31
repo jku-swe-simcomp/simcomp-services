@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>KinematicsService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Adaptor Manager</a> &gt; <a href="index.source.html" class="el_package">at.jku.swe.simcomp.manager.service</a> &gt; <span class="el_source">KinematicsService.java</span></div><h1>KinematicsService.java</h1><pre class="source lang-java linenums">package at.jku.swe.simcomp.manager.service;
+
+import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeValue;
+import at.jku.swe.simcomp.commons.adaptor.dto.JointPositionDTO;
+import at.jku.swe.simcomp.commons.adaptor.dto.PoseDTO;
+import at.jku.swe.simcomp.commons.adaptor.dto.RoboJoint;
+import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
+import at.jku.swe.simcomp.manager.service.client.AxisConverterClient;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+public class KinematicsService {
+
+    private final AxisConverterClient axisConverterClient;
+
+<span class="fc" id="L19">    public KinematicsService(AxisConverterClient axisConverterClient) {</span>
+<span class="fc" id="L20">        this.axisConverterClient = axisConverterClient;</span>
+<span class="fc" id="L21">    }</span>
+
+    public ExecutionCommand.CompositeCommand poseToComposite(ExecutionCommand.PoseCommand poseCommand){
+<span class="nc" id="L24">        List&lt;JointPositionDTO&gt; jointPositions = axisConverterClient.inverseKinematics(new PoseDTO(poseCommand.position(), poseCommand.orientation()));</span>
+<span class="nc bnc" id="L25" title="All 2 branches missed.">        if(jointPositions.size() != 6){</span>
+<span class="nc" id="L26">            throw new RuntimeException(&quot;Wrong number of joint positions for inverse kinematics returned by axis-converter.&quot;);</span>
+        }
+<span class="nc" id="L28">        List&lt;ExecutionCommand.SetJointPositionCommand&gt; jointPositionCommands = jointPositions.stream()</span>
+<span class="nc" id="L29">                .map(ExecutionCommand.SetJointPositionCommand::new).toList();</span>
+<span class="nc" id="L30">        return new ExecutionCommand.CompositeCommand(jointPositionCommands);</span>
+    }
+
+    public AttributeValue.Pose jointPositionsToPose(AttributeValue.JointPositions jointPositions){
+<span class="nc" id="L34">        List&lt;JointPositionDTO&gt; jointPositionDTOs = toJointPositionDTOs(jointPositions);</span>
+<span class="nc" id="L35">        PoseDTO poseDTO = axisConverterClient.directKinematics(jointPositionDTOs);</span>
+<span class="nc" id="L36">        return new AttributeValue.Pose(poseDTO);</span>
+    }
+
+    private List&lt;JointPositionDTO&gt; toJointPositionDTOs(AttributeValue.JointPositions jointPositions) {
+<span class="nc" id="L40">        List&lt;JointPositionDTO&gt; jointPositionDTOS = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L41" title="All 2 branches missed.">        for(int i = 0; i &lt; 6; i++){</span>
+<span class="nc" id="L42">           jointPositionDTOS.add(new JointPositionDTO(RoboJoint.valueOf(&quot;AXIS_&quot; + (i+1)), jointPositions.jointPositions().get(i)));</span>
+        }
+<span class="nc" id="L44">        return jointPositionDTOS;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

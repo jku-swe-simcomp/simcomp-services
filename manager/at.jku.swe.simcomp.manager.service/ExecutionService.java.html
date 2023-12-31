@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExecutionService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Adaptor Manager</a> &gt; <a href="index.source.html" class="el_package">at.jku.swe.simcomp.manager.service</a> &gt; <span class="el_source">ExecutionService.java</span></div><h1>ExecutionService.java</h1><pre class="source lang-java linenums">package at.jku.swe.simcomp.manager.service;
+
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.BadRequestException;
+import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
+import at.jku.swe.simcomp.commons.manager.dto.execution.ExecutionDTO;
+import at.jku.swe.simcomp.commons.manager.dto.execution.ExecutionResponseDTO;
+import at.jku.swe.simcomp.commons.manager.dto.session.SessionState;
+import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
+import at.jku.swe.simcomp.manager.domain.model.*;
+import at.jku.swe.simcomp.manager.domain.repository.AdaptorSessionRepository;
+import at.jku.swe.simcomp.manager.domain.repository.ExecutionRepository;
+import at.jku.swe.simcomp.manager.domain.repository.SessionRepository;
+import at.jku.swe.simcomp.manager.service.client.ServiceRegistryClient;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
+@Service
+<span class="fc" id="L26">@Slf4j</span>
+public class ExecutionService {
+    private final AdaptorSessionRepository adaptorSessionRepository;
+    private final SessionRepository sessionRepository;
+    private final ExecutionRepository executionRepository;
+    private final ObjectMapper objectMapper;
+    private final AsyncCommandDistributionService commandDistributionService;
+    private final ServiceRegistryClient serviceRegistryClient;
+    private final ExecutionCommandKinematicsVisitor kinematicsVisitor;
+    private final boolean isInverseKinematicsEnabled;
+
+    public ExecutionService(SessionRepository sessionRepository,
+                            ObjectMapper objectMapper,
+                            ExecutionRepository executionRepository,
+                            AsyncCommandDistributionService commandDistributionService,
+                            ServiceRegistryClient serviceRegistryClient,
+                            AdaptorSessionRepository adaptorSessionRepository,
+                            ExecutionCommandKinematicsVisitor kinematicsVisitor,
+<span class="fc" id="L44">                            @Value(&quot;${application.kinematics.inverse.enabled}&quot;) Boolean isInverseKinematicsEnabled) {</span>
+<span class="fc" id="L45">        this.sessionRepository = sessionRepository;</span>
+<span class="fc" id="L46">        this.objectMapper = objectMapper;</span>
+<span class="fc" id="L47">        this.executionRepository = executionRepository;</span>
+<span class="fc" id="L48">        this.commandDistributionService = commandDistributionService;</span>
+<span class="fc" id="L49">        this.serviceRegistryClient = serviceRegistryClient;</span>
+<span class="fc" id="L50">        this.adaptorSessionRepository = adaptorSessionRepository;</span>
+<span class="fc" id="L51">        this.kinematicsVisitor = kinematicsVisitor;</span>
+<span class="fc" id="L52">        this.isInverseKinematicsEnabled = Objects.requireNonNullElse(isInverseKinematicsEnabled, false);</span>
+<span class="fc" id="L53">    }</span>
+
+    public List&lt;ExecutionDTO&gt; getAllExecutionsForSession(UUID sessionKey) {
+<span class="nc" id="L56">        return executionRepository.findBySessionSessionKey(sessionKey).stream().map(this::fromModel).toList();</span>
+    }
+
+<span class="pc bpc" id="L59" title="2 of 4 branches missed.">    public UUID executeCommand(@NonNull final UUID sessionId, @NonNull ExecutionCommand command) throws BadRequestException {</span>
+<span class="fc" id="L60">        Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionId);</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">        if(session.getState().equals(SessionState.CLOSED)){</span>
+<span class="fc" id="L62">            throw new BadRequestException(&quot;Session %s already closed.&quot;.formatted(sessionId));</span>
+        }
+<span class="fc" id="L64">        log.info(&quot;Executing command {} for session {}&quot;, command, sessionId);</span>
+<span class="fc" id="L65">        Execution execution = initExecution(command, sessionId);</span>
+<span class="fc" id="L66">        log.info(&quot;Created execution {} for session {}&quot;, execution.getExecutionId(), sessionId);</span>
+<span class="pc bpc" id="L67" title="1 of 2 branches missed.">        if(isInverseKinematicsEnabled){</span>
+            try {
+<span class="nc" id="L69">                command = command.accept(kinematicsVisitor, null);</span>
+<span class="nc" id="L70">                log.info(&quot;Transformed command using kinematics: {}.&quot;, command);</span>
+<span class="nc" id="L71">            } catch (Exception e) {</span>
+<span class="nc" id="L72">                log.warn(&quot;Kinematics operation failed, using original command.&quot;);</span>
+<span class="nc" id="L73">            }</span>
+        }
+<span class="fc" id="L75">        distributeCommands(sessionId, execution.getExecutionId(), command);</span>
+<span class="fc" id="L76">        return execution.getExecutionId();</span>
+    }
+
+    public ExecutionDTO getExecution(UUID executionId) {
+<span class="fc" id="L80">        Execution execution = executionRepository.findByExecutionUUIDOrElseThrow(executionId);</span>
+<span class="fc" id="L81">        return fromModel(execution);</span>
+    }
+
+
+    // private region methods
+    private ExecutionDTO fromModel(Execution execution) {
+<span class="fc" id="L87">        return new ExecutionDTO(execution.getExecutionId().toString(),</span>
+<span class="fc" id="L88">                execution.getSession().getSessionKey().toString(),</span>
+<span class="fc" id="L89">                execution.getCommand(),</span>
+<span class="fc" id="L90">                execution.getCreatedAt(),</span>
+<span class="fc" id="L91">                execution.getResponses().stream()</span>
+<span class="fc" id="L92">                        .map(r -&gt; new ExecutionResponseDTO(r.getAdaptorSession().getAdaptorName(), r.getResponseCode(), r.getState(), r.getReport())).toList()</span>
+                );
+    }
+
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">    private Execution initExecution(ExecutionCommand command, @NonNull UUID sessionId) {</span>
+<span class="fc" id="L97">        String commandJson = null;</span>
+        try {
+<span class="fc" id="L99">            commandJson = objectMapper.writeValueAsString(command);</span>
+<span class="nc" id="L100">        } catch (JsonProcessingException e) {</span>
+<span class="nc" id="L101">            log.warn(&quot;Could not serialize command to JSON&quot;, e);</span>
+<span class="fc" id="L102">        }</span>
+
+<span class="fc" id="L104">        Execution execution = Execution.builder()</span>
+<span class="fc" id="L105">                .command(commandJson)</span>
+<span class="fc" id="L106">                .executionId(UUID.randomUUID())</span>
+<span class="fc" id="L107">                .build();</span>
+
+<span class="fc" id="L109">        execution.setSession(sessionRepository.findBySessionKeyOrElseThrow(sessionId));</span>
+<span class="fc" id="L110">        executionRepository.save(execution);</span>
+<span class="fc" id="L111">        executionRepository.flush();</span>
+<span class="fc" id="L112">        return execution;</span>
+    }
+
+    private void distributeCommands(UUID sessionId,
+                                   UUID executionId,
+                                   ExecutionCommand command){
+<span class="fc" id="L118">        log.info(&quot;Starting to distribute commands..&quot;);</span>
+<span class="fc" id="L119">        List&lt;ServiceRegistrationConfigDTO&gt; serviceRegistrationConfigs = serviceRegistryClient.getRegisteredAdaptors();</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">        for(AdaptorSession adaptorSession : adaptorSessionRepository.findBySessionSessionKey(sessionId)){</span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">            if(adaptorSession.getState().equals(SessionState.CLOSED)){</span>
+<span class="fc" id="L122">                log.info(&quot;Ignoring closed adaptor-session {}&quot;, adaptorSession.getId());</span>
+<span class="fc" id="L123">                return;</span>
+            }
+<span class="fc" id="L125">            serviceRegistrationConfigs.stream()</span>
+<span class="fc" id="L126">                    .filter(s -&gt; s.getName().equals(adaptorSession.getAdaptorName()))</span>
+<span class="fc" id="L127">                    .findFirst()</span>
+<span class="fc" id="L128">                    .ifPresentOrElse(s -&gt; commandDistributionService.distributeCommand(adaptorSession.getId(), executionId, s, command),</span>
+<span class="nc" id="L129">                            () -&gt; log.warn(&quot;Adaptor {} not found in service-registry&quot;, adaptorSession.getAdaptorName()));</span>
+<span class="fc" id="L130">        }</span>
+
+<span class="fc" id="L132">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

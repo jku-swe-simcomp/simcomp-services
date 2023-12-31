@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RegistrationController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">service-registry</a> &gt; <a href="index.source.html" class="el_package">at.jku.swe.simcomp.serviceregistry.rest</a> &gt; <span class="el_source">RegistrationController.java</span></div><h1>RegistrationController.java</h1><pre class="source lang-java linenums">package at.jku.swe.simcomp.serviceregistry.rest;
+
+import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
+import at.jku.swe.simcomp.serviceregistry.rest.exceptions.AdaptorAlreadyRegisteredException;
+import at.jku.swe.simcomp.serviceregistry.service.RegistrationService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+/**
+ * Endpoint for registration resources.
+ */
+@RestController
+@RequestMapping(&quot;/api/registration&quot;)
+<span class="fc" id="L17">@Slf4j</span>
+public class RegistrationController {
+    private final RegistrationService registrationService;
+
+<span class="fc" id="L21">    public RegistrationController(RegistrationService registrationService){</span>
+<span class="fc" id="L22">        this.registrationService = registrationService;</span>
+<span class="fc" id="L23">    }</span>
+
+    /**
+     * Registers an adaptor according to the passed config.
+     * @param configDTO the config.
+     * @return a response entity indicating the success of the operation
+     * @throws AdaptorAlreadyRegisteredException if an adaptor with the same {@link ServiceRegistrationConfigDTO#name}
+     * is already registered.
+     */
+    @PostMapping
+    public ResponseEntity&lt;Void&gt; registerService(@RequestBody ServiceRegistrationConfigDTO configDTO) throws AdaptorAlreadyRegisteredException {
+<span class="nc" id="L34">        log.info(&quot;Registering service: {}&quot;, configDTO);</span>
+<span class="nc" id="L35">        registrationService.register(configDTO);</span>
+<span class="nc" id="L36">        return ResponseEntity.ok().build();</span>
+    }
+
+    /**
+     * Unregisters an adaptor by deleting all information about it.
+     * @param name the name (id) of the adaptor
+     * @return a response entity indicating success of the operation.
+     */
+    @DeleteMapping(&quot;/{name}&quot;)
+    public ResponseEntity&lt;Void&gt; unregisterService(@PathVariable String name){
+<span class="nc" id="L46">        log.info(&quot;Unregistering service: {}&quot;, name);</span>
+<span class="nc" id="L47">        registrationService.unregister(name);</span>
+<span class="nc" id="L48">        return ResponseEntity.ok().build();</span>
+    }
+
+    /**
+     * Returns a list with all available registrations.
+     * @return the list
+     */
+    @GetMapping
+    public ResponseEntity&lt;List&lt;ServiceRegistrationConfigDTO&gt;&gt; getAllHealthyAndRegisteredAdaptors(){
+<span class="nc" id="L57">        log.info(&quot;Fetching all adaptor configurations and returning only healthy ones&quot;);</span>
+<span class="nc" id="L58">        return ResponseEntity.ok(registrationService.getAllHealthyRegisteredAdaptors());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

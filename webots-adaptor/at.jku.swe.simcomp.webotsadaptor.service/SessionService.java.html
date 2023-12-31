@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SessionService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">webots-adaptor</a> &gt; <a href="index.source.html" class="el_package">at.jku.swe.simcomp.webotsadaptor.service</a> &gt; <span class="el_source">SessionService.java</span></div><h1>SessionService.java</h1><pre class="source lang-java linenums">package at.jku.swe.simcomp.webotsadaptor.service;
+
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.simulation.SimulationInstanceConfig;
+import at.jku.swe.simcomp.webotsadaptor.domain.simulation.SimulationInstanceRemovalListener;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+/**
+ * The class provides a service to manage sessions
+ * @see WebotsSimulationInstanceService
+ * @see SimulationInstanceRemovalListener
+ */
+@Service
+<span class="fc" id="L22">@Slf4j</span>
+public class SessionService implements SimulationInstanceRemovalListener {
+<span class="fc" id="L24">    private static final ConcurrentHashMap&lt;String, SimulationInstanceConfig&gt; CURRENT_SESSIONS = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="fc" id="L25">    private static final ConcurrentHashMap&lt;String, Thread&gt; SESSION_TERMINATION_THREADS = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="fc" id="L26">    private static final ExecutorService SESSION_TERMINATION_EXECUTOR = Executors.newFixedThreadPool(10);</span>
+<span class="fc" id="L27">    private static final Long SESSION_TERMINATE_AFTER = 600_000L;</span>
+
+    /**
+     * Constructor to create a new instance and adds itself as a simulation removal listener
+     * to a WebotsSimulationInstanceService instance
+     * @param webotsSimulationInstanceService Webots simulation service to which the new
+     *                                        instance is added as simulation removal listener
+     */
+<span class="fc" id="L35">    public SessionService(WebotsSimulationInstanceService webotsSimulationInstanceService){</span>
+<span class="fc" id="L36">        webotsSimulationInstanceService.addSimulationRemovalListener(this);</span>
+<span class="fc" id="L37">    }</span>
+
+    /**
+     * Method to create an arbitrary new session from the pool of available instances
+     * @return the key of the new session
+     * @throws SessionInitializationFailedException if no session can be created
+     */
+    public synchronized String initializeSession() throws SessionInitializationFailedException {
+<span class="fc" id="L45">        Optional&lt;SimulationInstanceConfig&gt; config = getAvailableInstance();</span>
+<span class="fc" id="L46">        return initializeSession(config);</span>
+    }
+
+    /**
+     * Method to create a new session for a specfic instance
+     * @param instanceId the ID of the instance the new session should be created for
+     * @return the key of the new session
+     * @throws SessionInitializationFailedException if no session can be created for the instance
+     */
+    public synchronized String initializeSession(String instanceId) throws SessionInitializationFailedException {
+<span class="fc" id="L56">        Optional&lt;SimulationInstanceConfig&gt; config = getInstance(instanceId);</span>
+<span class="fc" id="L57">        return initializeSession(config);</span>
+    }
+
+    /**
+     * Method to create a new session for an input configuration
+     * @param config the configuration for the new session
+     * @return the key of the new session
+     * @throws SessionInitializationFailedException if no session can be created
+     */
+    public synchronized String initializeSession(Optional&lt;SimulationInstanceConfig&gt; config) throws SessionInitializationFailedException {
+<span class="fc bfc" id="L67" title="All 2 branches covered.">        if(config.isEmpty()){</span>
+<span class="fc" id="L68">            throw new SessionInitializationFailedException(&quot;No simulation instance available&quot;);</span>
+        }
+
+<span class="fc" id="L71">        String sessionKey =  UUID.randomUUID().toString();</span>
+<span class="fc" id="L72">        CURRENT_SESSIONS.put(sessionKey, config.get());</span>
+
+<span class="fc" id="L74">        startSessionTerminationThread(sessionKey);</span>
+<span class="fc" id="L75">        return sessionKey;</span>
+    }
+
+
+    /**
+     * Method to renew a session and thereby be rest the timeout countdown
+     * @param sessionKey the ID of the session that should be renewed
+     * @return the configuration of the renewed session
+     * @throws SessionNotValidException if the session key is not found
+     */
+    public synchronized SimulationInstanceConfig renewSession(String sessionKey) throws SessionNotValidException {
+<span class="fc bfc" id="L86" title="All 2 branches covered.">        if(!CURRENT_SESSIONS.containsKey(sessionKey))</span>
+<span class="fc" id="L87">            throw new SessionNotValidException(&quot;Session %s not valid&quot;.formatted(sessionKey));</span>
+
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">        if(SESSION_TERMINATION_THREADS.containsKey(sessionKey)){</span>
+<span class="nc" id="L90">            SESSION_TERMINATION_THREADS.get(sessionKey).interrupt();</span>
+        }
+
+<span class="fc" id="L93">        startSessionTerminationThread(sessionKey);</span>
+
+<span class="fc" id="L95">        log.info(&quot;Session {} renewed&quot;, sessionKey);</span>
+<span class="fc" id="L96">        return CURRENT_SESSIONS.get(sessionKey);</span>
+    }
+
+    /**
+     * Method to get the configuration of a session based on the session key
+     * @param sessionKey the key of the requested session
+     * @return the configuration of for the requested session key
+     * @throws SessionNotValidException if the session key is not found
+     */
+    public SimulationInstanceConfig getConfigForSession(String sessionKey) throws SessionNotValidException {
+<span class="pc bpc" id="L106" title="1 of 2 branches missed.">        if(!CURRENT_SESSIONS.containsKey(sessionKey))</span>
+<span class="nc" id="L107">            throw new SessionNotValidException(&quot;Session %s not valid&quot;.formatted(sessionKey));</span>
+
+<span class="fc" id="L109">        return CURRENT_SESSIONS.get(sessionKey);</span>
+    }
+
+    /**
+     * Method to close a session
+     * @param sessionKey the key of the session to close
+     * @throws SessionNotValidException if the session key is not found
+     */
+    public synchronized void closeSession (String sessionKey) throws SessionNotValidException {
+<span class="fc bfc" id="L118" title="All 2 branches covered.">        if(SESSION_TERMINATION_THREADS.containsKey(sessionKey)) {</span>
+<span class="fc" id="L119">            SESSION_TERMINATION_THREADS.get(sessionKey).interrupt();</span>
+        }
+
+<span class="fc bfc" id="L122" title="All 2 branches covered.">        if(CURRENT_SESSIONS.containsKey(sessionKey)){</span>
+<span class="fc" id="L123">            CURRENT_SESSIONS.remove(sessionKey);</span>
+<span class="fc" id="L124">            log.info(&quot;Session {} removed&quot;, sessionKey);</span>
+        } else {
+<span class="fc" id="L126">            throw new SessionNotValidException(&quot;Session %s not valid&quot;.formatted(sessionKey));</span>
+        }
+<span class="fc" id="L128">    }</span>
+
+    /**
+     * Method that gets called is a session gets closed. Check if the session to closed
+     * is managed by the session service and closes the session if so.
+     * @param config the configuration of the session that should be closed
+     */
+    @Override
+    public synchronized void onSimulationRemoved(SimulationInstanceConfig config) {
+<span class="fc" id="L137">        log.info(&quot;Received notification about removal of simulation: {}&quot;, config);</span>
+<span class="fc bfc" id="L138" title="All 2 branches covered.">        for(var entry : CURRENT_SESSIONS.entrySet()){</span>
+<span class="pc bpc" id="L139" title="1 of 2 branches missed.">            if(entry.getValue().equals(config)){</span>
+                try {
+<span class="fc" id="L141">                    closeSession(entry.getKey());</span>
+<span class="nc" id="L142">                } catch (SessionNotValidException e) {</span>
+<span class="nc" id="L143">                    log.warn(&quot;Could not close session upon removal of simulation: {}&quot;, config);</span>
+<span class="fc" id="L144">                }</span>
+<span class="fc" id="L145">                return;</span>
+            }
+<span class="nc" id="L147">        }</span>
+<span class="fc" id="L148">    }</span>
+
+    private void startSessionTerminationThread(String sessionKey) {
+<span class="fc" id="L151">        SESSION_TERMINATION_EXECUTOR.execute(() -&gt; {</span>
+<span class="fc" id="L152">            log.info(&quot;Session termination {} started&quot;, sessionKey);</span>
+<span class="fc" id="L153">            log.info(&quot;Session termination {} will terminate in {} seconds&quot;, sessionKey, SESSION_TERMINATE_AFTER / 1000);</span>
+<span class="fc" id="L154">            SESSION_TERMINATION_THREADS.put(sessionKey, Thread.currentThread());</span>
+            try {
+<span class="nc" id="L156">                Thread.sleep(SESSION_TERMINATE_AFTER);</span>
+<span class="nc" id="L157">                CURRENT_SESSIONS.remove(sessionKey);</span>
+<span class="nc" id="L158">                log.info(&quot;Session {} removed by termination thread&quot;, sessionKey);</span>
+<span class="fc" id="L159">            } catch (InterruptedException e) {</span>
+<span class="fc" id="L160">                log.info(&quot;Session termination thread {} interrupted&quot;, sessionKey);</span>
+<span class="nc" id="L161">            }</span>
+<span class="fc" id="L162">        });</span>
+<span class="fc" id="L163">    }</span>
+
+    private Optional&lt;SimulationInstanceConfig&gt; getAvailableInstance() {
+<span class="fc" id="L166">        return WebotsSimulationInstanceService.getInstances().stream()</span>
+<span class="fc bfc" id="L167" title="All 2 branches covered.">                .filter(instance -&gt; !CURRENT_SESSIONS.containsValue(instance))</span>
+<span class="fc" id="L168">                .findFirst();</span>
+    }
+
+    private Optional&lt;SimulationInstanceConfig&gt; getInstance(String instanceId) {
+<span class="fc" id="L172">        return WebotsSimulationInstanceService.getInstances().stream()</span>
+<span class="fc bfc" id="L173" title="All 4 branches covered.">                .filter(instance -&gt; !CURRENT_SESSIONS.containsValue(instance) &amp;&amp; instance.getInstanceId().equals(instanceId))</span>
+<span class="fc" id="L174">                .findFirst();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

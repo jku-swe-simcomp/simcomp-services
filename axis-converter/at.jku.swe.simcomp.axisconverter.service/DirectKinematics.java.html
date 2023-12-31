@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DirectKinematics.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">webots-adaptor</a> &gt; <a href="index.source.html" class="el_package">at.jku.swe.simcomp.axisconverter.service</a> &gt; <span class="el_source">DirectKinematics.java</span></div><h1>DirectKinematics.java</h1><pre class="source lang-java linenums">package at.jku.swe.simcomp.axisconverter.service;
+
+import at.jku.swe.simcomp.commons.adaptor.dto.*;
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Class to apply direct kinematics for niryo ned 2
+ */
+<span class="nc" id="L12">public class DirectKinematics {</span>
+
+    /**
+     * Method to get the position of the robot arm based on the
+     * sixes axes values.
+     * @param axes values of the six axes
+     * @return the position of the head of the robot arm in X, Y,
+     * and Z dimension and its orientation
+     */
+    public static PoseDTO directKinematics(List&lt;JointPositionDTO&gt; axes) {
+
+<span class="fc" id="L23">        double[] axesValues = validateAxes(axes);</span>
+
+<span class="fc" id="L25">        applyBounds(axesValues);</span>
+
+<span class="fc" id="L27">        List&lt;double[][]&gt; matrices = getMultiplicationMatrices(axesValues);</span>
+
+<span class="fc" id="L29">        double[][] totalTMatrix = matrices.get(0);</span>
+
+<span class="fc bfc" id="L31" title="All 2 branches covered.">        for(int i = 1; i &lt; matrices.size(); i++) {</span>
+<span class="fc" id="L32">            totalTMatrix = matrixMultiplication(totalTMatrix, matrices.get(i));</span>
+        }
+
+<span class="fc" id="L35">        double[] coords = matrixVectorMultiplication(totalTMatrix, new double[]{0, 0, 0, 1});</span>
+<span class="fc" id="L36">        double[] orientation = getOrientation(totalTMatrix);</span>
+
+<span class="fc" id="L38">        PositionDTO positionDTO = new PositionDTO(coords[0], coords[1], coords[2]);</span>
+<span class="fc" id="L39">        OrientationDTO orientationDTO = new OrientationDTO(orientation[0], orientation[1], orientation[2]);</span>
+<span class="fc" id="L40">        return new PoseDTO(positionDTO, orientationDTO);</span>
+    }
+
+    private static List&lt;double[][]&gt; getMultiplicationMatrices(double[] axes) {
+<span class="fc" id="L44">        List&lt;double[][]&gt; matrices = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L46">        matrices.add(new double[][]{</span>
+<span class="fc" id="L47">                {Math.cos(axes[0]), -Math.sin(axes[0]), 0, 0},</span>
+<span class="fc" id="L48">                {Math.sin(axes[0]), Math.cos(axes[0]), 0, 0},</span>
+                {0, 0, 1, 103},
+                {0, 0, 0, 1}
+        });
+
+<span class="fc" id="L53">        matrices.add(new double[][]{</span>
+<span class="fc" id="L54">                {Math.cos(axes[1]), 0, Math.sin(axes[1]), 0},</span>
+                {0, 1, 0, 0},
+<span class="fc" id="L56">                {-Math.sin(axes[1]), 0, Math.cos(axes[1]), 80},</span>
+                {0, 0, 0, 1}
+        });
+
+<span class="fc" id="L60">        matrices.add(new double[][]{</span>
+<span class="fc" id="L61">                {Math.cos(axes[2]), 0, Math.sin(axes[2]), 0},</span>
+                {0, 1, 0, 0},
+<span class="fc" id="L63">                {-Math.sin(axes[2]), 0, Math.cos(axes[2]), 210},</span>
+                {0, 0, 0, 1}
+        });
+
+<span class="fc" id="L67">        matrices.add(new double[][]{</span>
+                {1, 0, 0, 41.5},
+<span class="fc" id="L69">                {0, Math.cos(axes[3]), -Math.sin(axes[3]), 0},</span>
+<span class="fc" id="L70">                {0, Math.sin(axes[3]), Math.cos(axes[3]), 30},</span>
+                {0, 0, 0, 1}
+        });
+
+<span class="fc" id="L74">        matrices.add(new double[][]{</span>
+<span class="fc" id="L75">                {Math.cos(axes[4]), 0, Math.sin(axes[4]), 180},</span>
+                {0, 1, 0, 0},
+<span class="fc" id="L77">                {-Math.sin(axes[4]), 0, Math.cos(axes[4]), 0},</span>
+                {0, 0, 0, 1}
+        });
+
+<span class="fc" id="L81">        matrices.add(new double[][]{</span>
+                {1, 0, 0, 23.7},
+<span class="fc" id="L83">                {0, Math.cos(axes[5]), -Math.sin(axes[5]), 0},</span>
+<span class="fc" id="L84">                {0, Math.sin(axes[5]), Math.cos(axes[5]), -5.5},</span>
+                {0, 0, 0, 1}
+        });
+
+<span class="fc" id="L88">        return matrices;</span>
+    }
+
+    private static double[] validateAxes(List&lt;JointPositionDTO&gt; axes) {
+<span class="fc" id="L92">        long axesCount = axes.stream()</span>
+<span class="fc" id="L93">                .map(JointPositionDTO::getJoint)</span>
+<span class="fc" id="L94">                .distinct()</span>
+<span class="fc" id="L95">                .count();</span>
+<span class="fc bfc" id="L96" title="All 2 branches covered.">        if(axesCount != 6) {</span>
+<span class="fc" id="L97">            throw new IllegalArgumentException(&quot;Not all Axis values are set. Please set the axes 1-6.&quot;);</span>
+        }
+
+<span class="fc" id="L100">        double[] axesValues = new double[6];</span>
+<span class="fc" id="L101">        axes.forEach(a -&gt; axesValues[a.getJoint().getIndex()-1] = a.getRadians());</span>
+<span class="fc" id="L102">        return axesValues;</span>
+    }
+
+    private static double[][] matrixMultiplication(double[][] matrixA, double[][] matrixB) {
+<span class="fc" id="L106">        int rowsA = matrixA.length;</span>
+<span class="fc" id="L107">        int colsA = matrixA[0].length;</span>
+<span class="fc" id="L108">        int colsB = matrixB[0].length;</span>
+
+<span class="fc" id="L110">        double[][] result = new double[rowsA][colsB];</span>
+
+<span class="fc bfc" id="L112" title="All 2 branches covered.">        for (int i = 0; i &lt; rowsA; i++) {</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">            for (int j = 0; j &lt; colsB; j++) {</span>
+<span class="fc bfc" id="L114" title="All 2 branches covered.">                for (int k = 0; k &lt; colsA; k++) {</span>
+<span class="fc" id="L115">                    result[i][j] += matrixA[i][k] * matrixB[k][j];</span>
+                }
+            }
+        }
+
+<span class="fc" id="L120">        return result;</span>
+    }
+
+    private static double[] matrixVectorMultiplication(double[][] matrix, double[] vector) {
+<span class="fc" id="L124">        int rows = matrix.length;</span>
+<span class="fc" id="L125">        int cols = matrix[0].length;</span>
+
+<span class="pc bpc" id="L127" title="1 of 2 branches missed.">        if (cols != vector.length) {</span>
+<span class="nc" id="L128">            throw new IllegalArgumentException(&quot;Matrix and vector dimensions do not match for multiplication.&quot;);</span>
+        }
+
+<span class="fc" id="L131">        double[] result = new double[rows];</span>
+
+<span class="fc bfc" id="L133" title="All 2 branches covered.">        for (int i = 0; i &lt; rows; i++) {</span>
+<span class="fc bfc" id="L134" title="All 2 branches covered.">            for (int j = 0; j &lt; cols; j++) {</span>
+<span class="fc" id="L135">                result[i] += matrix[i][j] * vector[j];</span>
+            }
+        }
+
+<span class="fc" id="L139">        return result;</span>
+    }
+
+    private static double[] getOrientation(double[][] matrix) {
+<span class="fc" id="L143">        double alpha = 0;</span>
+<span class="fc" id="L144">        double beta = Math.atan2(Math.sqrt(matrix[0][2] * matrix[0][2] + matrix[1][2] * matrix[1][2]), matrix[2][2]);</span>
+        double gamma;
+<span class="fc" id="L146">        double betaRounde = Math.round(beta*1000)/1000.0;</span>
+
+<span class="fc bfc" id="L148" title="All 2 branches covered.">        if (betaRounde == Math.round(1000*Math.PI / 2)/1000.0) {</span>
+<span class="fc" id="L149">            gamma = Math.atan2(matrix[1][0], matrix[0][0]);</span>
+<span class="pc bpc" id="L150" title="1 of 2 branches missed.">        } else if (betaRounde == Math.round(1000*-Math.PI / 2)/1000.0) {</span>
+<span class="nc" id="L151">            gamma = -Math.atan2(matrix[1][0], matrix[0][0]);</span>
+<span class="fc bfc" id="L152" title="All 2 branches covered.">        } else if (betaRounde == 0) {</span>
+<span class="fc" id="L153">            gamma = 0;</span>
+<span class="fc" id="L154">            alpha = Math.cos(beta) * Math.atan2(matrix[1][0], matrix[0][0]);</span>
+        } else {
+<span class="fc" id="L156">            alpha = Math.atan2(matrix[1][2] / Math.sin(beta), matrix[1][0] / Math.sin(beta));</span>
+<span class="fc" id="L157">            gamma = Math.atan2(-matrix[2][1] / Math.sin(beta), matrix[2][0] / Math.sin(beta));</span>
+        }
+
+<span class="fc" id="L160">        return new double[]{alpha, beta, gamma};</span>
+    }
+
+    private static void applyBounds(double[] axes) {
+<span class="fc" id="L164">        double[][] rangeRotation = {</span>
+                {-160, 160},
+                {-45.8, 45.8},
+                {-86, 74.4},
+                {-114.5, 114.5},
+                {-86, 86},
+                {-143, 143}
+        };
+
+<span class="fc bfc" id="L173" title="All 2 branches covered.">        for (int i = 0; i &lt; axes.length; i++) {</span>
+<span class="fc" id="L174">            axes[i] = boundAngle(axes[i], rangeRotation[i][0], rangeRotation[i][1]);</span>
+        }
+<span class="fc" id="L176">    }</span>
+
+    private static double boundAngle(double x, double lowerBound, double upperBound) {
+<span class="fc" id="L179">        x =  Math.round(x * 10000) / 10000.0;</span>
+<span class="fc" id="L180">        lowerBound = Math.round(lowerBound * 10000) / 10000.0;</span>
+<span class="fc" id="L181">        upperBound = Math.round(upperBound * 10000) / 10000.0;</span>
+
+<span class="fc" id="L183">        x = Math.max(x, lowerBound);</span>
+<span class="fc" id="L184">        return Math.min(x, upperBound);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

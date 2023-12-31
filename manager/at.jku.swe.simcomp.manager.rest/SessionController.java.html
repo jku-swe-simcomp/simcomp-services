@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SessionController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Adaptor Manager</a> &gt; <a href="index.source.html" class="el_package">at.jku.swe.simcomp.manager.rest</a> &gt; <span class="el_source">SessionController.java</span></div><h1>SessionController.java</h1><pre class="source lang-java linenums">package at.jku.swe.simcomp.manager.rest;
+
+import at.jku.swe.simcomp.commons.HttpErrorDTO;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.BadRequestException;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
+import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
+import at.jku.swe.simcomp.commons.manager.dto.session.SessionRequest;
+import at.jku.swe.simcomp.commons.manager.dto.session.SessionResponseDTO;
+import at.jku.swe.simcomp.commons.manager.dto.session.SessionStateDTO;
+import at.jku.swe.simcomp.manager.domain.model.AdaptorSession;
+import at.jku.swe.simcomp.manager.domain.model.Session;
+import at.jku.swe.simcomp.manager.service.SessionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.webjars.NotFoundException;
+
+import java.util.UUID;
+
+@RestController
+@RequestMapping(&quot;/session&quot;)
+<span class="fc" id="L30">@Slf4j</span>
+@Tag(name = &quot;Session Controller&quot;, description = &quot;Endpoints to manage sessions.&quot;)
+public class SessionController {
+    private final SessionService sessionService;
+
+<span class="fc" id="L35">    public SessionController(SessionService sessionService) {</span>
+<span class="fc" id="L36">        this.sessionService = sessionService;</span>
+<span class="fc" id="L37">    }</span>
+
+    @Operation(summary = &quot;Initialize a new session&quot;,
+            description = &quot;Initializes a new session. Not all requested simulation types might be available. &quot; +
+                    &quot;An error is only thrown if no single simulation instance could be obtained, otherwise, the response indicates the obtained simulations.&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;200&quot;,
+                    description = &quot;Success (at least one of the requested simulations obtained)&quot;,
+                    content = @io.swagger.v3.oas.annotations.media.Content(
+                            schema = @Schema(implementation = SessionResponseDTO.class),
+                            examples = @ExampleObject(value = &quot;{\&quot;sessionKey\&quot;:\&quot;f47ac10b-58cc-4372-a567-0e02b2c3d479\&quot;, \&quot;acquiredSimulations\&quot;:[\&quot;WEBOTS\&quot;, \&quot;GAZEBO\&quot;]}&quot;)
+                    )
+            ),
+            @ApiResponse(responseCode = &quot;500&quot;,
+                    description = &quot;Session initialization failed&quot;,
+                    content = @Content(mediaType = &quot;application/json&quot;,
+                            schema = @Schema(implementation = HttpErrorDTO.class),
+                            examples =@ExampleObject(value = &quot;{\&quot;type\&quot;:\&quot;ERROR\&quot;,\&quot;status\&quot;:500, \&quot;message\&quot;:\&quot;Not a single session could be obtained.\&quot;}&quot;)
+                    )),
+            @ApiResponse(responseCode = &quot;500&quot;,
+                    description = &quot;Internal server error&quot;,
+                    content = @Content(mediaType = &quot;application/json&quot;,
+                            schema = @Schema(implementation = HttpErrorDTO.class),
+                            examples =@ExampleObject(value = &quot;{\&quot;type\&quot;:\&quot;ERROR\&quot;,\&quot;status\&quot;:500, \&quot;message\&quot;:\&quot;Internal server error.\&quot;}&quot;)
+                    ))
+    })
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = &quot;The command to be executed&quot;,
+            content = @io.swagger.v3.oas.annotations.media.Content(
+                    schema = @Schema(implementation = ExecutionCommand.class),
+                    examples = {
+                            @ExampleObject(name = &quot;Any simulations&quot;, value = &quot;{ \&quot;type\&quot;: \&quot;ANY\&quot;, \&quot;n\&quot;:2}&quot;),
+                            @ExampleObject(name = &quot;Selected Simulation Types&quot;, value = &quot;{ \&quot;type\&quot;: \&quot;SELECTED_TYPES\&quot;, \&quot;requestedSimulationTypes\&quot;: [\&quot;WEBOTS\&quot;, \&quot;GAZEBO\&quot;]}&quot;),
+                            @ExampleObject(name = &quot;Selected Simulation Instances&quot;, value = &quot;{ \&quot;type\&quot;: \&quot;SELECTED_INSTANCES\&quot;, \&quot;requestedSimulationInstances\&quot;: {\&quot;WEBOTS\&quot;:\&quot;MY_PERSONAL_WEBOTS_INSTANCE\&quot;, \&quot;GAZEBO\&quot;:\&quot;MY_PERSONAL_GAZEBO_INSTANCE\&quot;}}&quot;),
+                    }))
+    @PostMapping(value = &quot;&quot;, produces = &quot;application/json&quot;)
+    public ResponseEntity&lt;SessionResponseDTO&gt; createSession(@RequestBody SessionRequest request) throws SessionInitializationFailedException {
+<span class="nc" id="L73">        log.info(&quot;Initialize Session Request: {}&quot;, request);</span>
+<span class="nc" id="L74">        Session session = (Session) request.accept(sessionService);</span>
+<span class="nc" id="L75">        log.info(&quot;Initialized session: {}&quot;, session);</span>
+<span class="nc" id="L76">        SessionResponseDTO response = new SessionResponseDTO(session.getSessionKey().toString(),</span>
+<span class="nc" id="L77">                session.getAdaptorSessions().stream().map(AdaptorSession::getAdaptorName).toList());</span>
+<span class="nc" id="L78">        return ResponseEntity.ok(response);</span>
+    }
+
+    @Operation(summary = &quot;Add simulation to existing session.&quot;,
+            description = &quot;Try to add a simulation with the given type to an existing simulation&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;200&quot;,
+                    description = &quot;Success (simulation with given type added to session)&quot;
+            ),
+            @ApiResponse(responseCode = &quot;404&quot;,
+                    description = &quot;Session not found&quot;,
+                    content = @Content(mediaType = &quot;application/json&quot;,
+                            schema = @Schema(implementation = HttpErrorDTO.class),
+                            examples ={
+                                    @ExampleObject(value = &quot;{\&quot;type\&quot;:\&quot;ERROR\&quot;,\&quot;status\&quot;:404, \&quot;message\&quot;:\&quot;No session with given id found.\&quot;}&quot;),
+                            }
+                    )),
+            @ApiResponse(responseCode = &quot;400&quot;,
+                    description = &quot;Bad Request&quot;,
+                    content = @Content(mediaType = &quot;application/json&quot;,
+                            schema = @Schema(implementation = HttpErrorDTO.class),
+                            examples ={
+                                    @ExampleObject(value = &quot;{\&quot;type\&quot;:\&quot;ERROR\&quot;,\&quot;status\&quot;:400, \&quot;message\&quot;:\&quot;Simulation instance with same type already part of session.\&quot;}&quot;),
+                                    @ExampleObject(value = &quot;{\&quot;type\&quot;:\&quot;ERROR\&quot;,\&quot;status\&quot;:500, \&quot;message\&quot;:\&quot;This simulation type is not registered.\&quot;}&quot;)
+                            }
+                    )),
+            @ApiResponse(responseCode = &quot;500&quot;,
+                    description = &quot;Internal server error&quot;,
+                    content = @Content(mediaType = &quot;application/json&quot;,
+                            schema = @Schema(implementation = HttpErrorDTO.class),
+                            examples = {
+                                    @ExampleObject(value = &quot;{\&quot;type\&quot;:\&quot;ERROR\&quot;,\&quot;status\&quot;:500, \&quot;message\&quot;:\&quot;Internal server error.\&quot;}&quot;),
+                            }
+                    ))
+    })
+    @PostMapping(&quot;/{sessionKey}/{simulationType}&quot;)
+    public ResponseEntity&lt;Void&gt; addAdaptorSessionToAggregateSession(@Parameter(description = &quot;The id of the session&quot;) @PathVariable UUID sessionKey,
+                                                                    @Parameter(description = &quot;The simulation type to add&quot;) @PathVariable String simulationType) throws BadRequestException, SessionInitializationFailedException, NotFoundException {
+<span class="nc" id="L116">        log.info(&quot;Request to add {} to session {}.&quot;, simulationType, sessionKey);</span>
+<span class="nc" id="L117">        sessionService.addAdaptorSessionToAggregatedSession(sessionKey, simulationType);</span>
+<span class="nc" id="L118">        log.info(&quot;Added {}.&quot;, simulationType);</span>
+
+<span class="nc" id="L120">        return ResponseEntity.ok().build();</span>
+    }
+
+    @Operation(summary = &quot;Reopen a closed simulation of an existing session.&quot;,
+            description = &quot;Try to reopen a closed simulation with the given type of an existing session.&quot; +
+                    &quot;If the simulation with the given type has been initially added with a specific simulation instance, attempts to reopen the same simulation instance.&quot; +
+                    &quot;If the simulation has not been initially added with a specific simulation instance, attempts to obtain any simulation instance with the indicated type.&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;200&quot;,
+                    description = &quot;Success (simulation with given type reopened.)&quot;
+            ),
+            @ApiResponse(responseCode = &quot;404&quot;,
+                    description = &quot;Session not found&quot;,
+                    content = @Content(mediaType = &quot;application/json&quot;,
+                            schema = @Schema(implementation = HttpErrorDTO.class),
+                            examples ={
+                                    @ExampleObject(value = &quot;{\&quot;type\&quot;:\&quot;ERROR\&quot;,\&quot;status\&quot;:404, \&quot;message\&quot;:\&quot;No session with given id found.\&quot;}&quot;),
+                            }
+                    )),
+            @ApiResponse(responseCode = &quot;400&quot;,
+                    description = &quot;Bad Request&quot;,
+                    content = @Content(mediaType = &quot;application/json&quot;,
+                            schema = @Schema(implementation = HttpErrorDTO.class),
+                            examples ={
+                                    @ExampleObject(value = &quot;{\&quot;type\&quot;:\&quot;ERROR\&quot;,\&quot;status\&quot;:400, \&quot;message\&quot;:\&quot;Simulation instance with same type already part of session.\&quot;}&quot;),
+                                    @ExampleObject(value = &quot;{\&quot;type\&quot;:\&quot;ERROR\&quot;,\&quot;status\&quot;:500, \&quot;message\&quot;:\&quot;This simulation type is not registered.\&quot;}&quot;)
+                            }
+                    )),
+            @ApiResponse(responseCode = &quot;500&quot;,
+                    description = &quot;Internal server error&quot;,
+                    content = @Content(mediaType = &quot;application/json&quot;,
+                            schema = @Schema(implementation = HttpErrorDTO.class),
+                            examples = {
+                                    @ExampleObject(value = &quot;{\&quot;type\&quot;:\&quot;ERROR\&quot;,\&quot;status\&quot;:500, \&quot;message\&quot;:\&quot;Internal server error.\&quot;}&quot;),
+                            }
+                    ))
+    })
+    @PatchMapping(&quot;/{sessionKey}/{simulationType}/reopen&quot;)
+    public ResponseEntity&lt;Void&gt; reopenAdaptorSessionOfAggregateSession(@Parameter(description = &quot;The id of the session&quot;)
+                                                                           @PathVariable UUID sessionKey,
+                                                                       @Parameter(description = &quot;The type of the simulation to reopen&quot;)
+                                                                       @PathVariable String simulationType) throws BadRequestException, SessionInitializationFailedException, NotFoundException {
+<span class="nc" id="L162">        log.info(&quot;Request to reopen {} from session {}.&quot;, simulationType, sessionKey);</span>
+<span class="nc" id="L163">        sessionService.reopenAdaptorSessionOfAggregateSession(sessionKey, simulationType);</span>
+<span class="nc" id="L164">        log.info(&quot;Reopened {}.&quot;, simulationType);</span>
+
+<span class="nc" id="L166">        return ResponseEntity.ok().build();</span>
+
+    }
+
+    @Operation(summary = &quot;Close a simulation of an existing session.&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;200&quot;,
+                    description = &quot;Success (simulation with given type closed.)&quot;
+            ),
+            @ApiResponse(responseCode = &quot;404&quot;,
+                    description = &quot;Session not found&quot;,
+                    content = @Content(mediaType = &quot;application/json&quot;,
+                            schema = @Schema(implementation = HttpErrorDTO.class),
+                            examples ={
+                                    @ExampleObject(value = &quot;{\&quot;type\&quot;:\&quot;ERROR\&quot;,\&quot;status\&quot;:404, \&quot;message\&quot;:\&quot;No session with given id found.\&quot;}&quot;),
+                            }
+                    )),
+            @ApiResponse(responseCode = &quot;400&quot;,
+                    description = &quot;Bad Request&quot;,
+                    content = @Content(mediaType = &quot;application/json&quot;,
+                            schema = @Schema(implementation = HttpErrorDTO.class),
+                            examples ={
+                                    @ExampleObject(value = &quot;{\&quot;type\&quot;:\&quot;ERROR\&quot;,\&quot;status\&quot;:400, \&quot;message\&quot;:\&quot;No simulation with given type associated to this session OR simulation with given type already closed.\&quot;}&quot;),
+                            }
+                    )),
+            @ApiResponse(responseCode = &quot;500&quot;,
+                    description = &quot;Internal server error&quot;,
+                    content = @Content(mediaType = &quot;application/json&quot;,
+                            schema = @Schema(implementation = HttpErrorDTO.class),
+                            examples = {
+                                    @ExampleObject(value = &quot;{\&quot;type\&quot;:\&quot;ERROR\&quot;,\&quot;status\&quot;:500, \&quot;message\&quot;:\&quot;Internal server error.\&quot;}&quot;),
+                            }
+                    ))
+    })
+    @PatchMapping(&quot;/{sessionKey}/{simulationType}/close&quot;)
+    public ResponseEntity&lt;Void&gt; closeAdaptorSessionOfAggregateSession(@Parameter(description = &quot;The id of the session&quot;)
+                                                                          @PathVariable UUID sessionKey,
+                                                                      @Parameter(description = &quot;The type of the simulation to close&quot;)
+                                                                      @PathVariable String simulationType) throws BadRequestException, NotFoundException {
+<span class="nc" id="L205">        log.info(&quot;Request to close {} from session {}.&quot;, simulationType, sessionKey);</span>
+<span class="nc" id="L206">        sessionService.closeAdaptorSessionOfAggregateSession(sessionKey, simulationType);</span>
+<span class="nc" id="L207">        log.info(&quot;Removed {}.&quot;, simulationType);</span>
+
+<span class="nc" id="L209">        return ResponseEntity.ok().build();</span>
+    }
+
+    @Operation(summary = &quot;Get information about the state of the sessions and the associated simulations.&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;200&quot;,
+                    description = &quot;Success&quot;,
+                    content = @Content(mediaType = &quot;application/json&quot;,
+                            schema = @Schema(implementation = SessionStateDTO.class),
+                            examples = @ExampleObject(value = &quot;{\&quot;sessionKey\&quot;:\&quot;f47ac10b-58cc-4372-a567-0e02b2c3d479\&quot;, \&quot;sessionState\&quot;:\&quot;OPEN\&quot;, \&quot;simulations\&quot;:{\&quot;WEBOTS\&quot;:\&quot;OPEN\&quot;, \&quot;GAZEBO\&quot;:\&quot;CLOSED\&quot;}}&quot;)
+                    )
+            ),
+            @ApiResponse(responseCode = &quot;404&quot;,
+                    description = &quot;Session not found&quot;,
+                    content = @Content(mediaType = &quot;application/json&quot;,
+                            schema = @Schema(implementation = HttpErrorDTO.class),
+                            examples ={
+                                    @ExampleObject(value = &quot;{\&quot;type\&quot;:\&quot;ERROR\&quot;,\&quot;status\&quot;:404, \&quot;message\&quot;:\&quot;No session with given id found.\&quot;}&quot;),
+                            }
+                    )),
+            @ApiResponse(responseCode = &quot;500&quot;,
+                    description = &quot;Internal server error&quot;,
+                    content = @Content(mediaType = &quot;application/json&quot;,
+                            schema = @Schema(implementation = HttpErrorDTO.class),
+                            examples = {
+                                    @ExampleObject(value = &quot;{\&quot;type\&quot;:\&quot;ERROR\&quot;,\&quot;status\&quot;:500, \&quot;message\&quot;:\&quot;Internal server error.\&quot;}&quot;),
+                            }
+                    ))
+    })
+    @GetMapping(value = &quot;/{sessionKey}&quot;, produces = &quot;application/json&quot;)
+    public ResponseEntity&lt;SessionStateDTO&gt; getSessionState(@Parameter(description = &quot;The id of the session&quot;)
+                                                               @PathVariable UUID sessionKey) throws NotFoundException {
+<span class="nc" id="L241">        log.info(&quot;Get Session State Request: {}&quot;, sessionKey);</span>
+<span class="nc" id="L242">        SessionStateDTO state = sessionService.getSessionState(sessionKey);</span>
+<span class="nc" id="L243">        log.info(&quot;Session state: {}&quot;,state);</span>
+<span class="nc" id="L244">        return ResponseEntity.ok(state);</span>
+    }
+
+    @Operation(summary = &quot;Close a session.&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;200&quot;,
+                    description = &quot;Success&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;,
+                    description = &quot;Session not found&quot;,
+                    content = @Content(mediaType = &quot;application/json&quot;,
+                            schema = @Schema(implementation = HttpErrorDTO.class),
+                            examples ={
+                                    @ExampleObject(value = &quot;{\&quot;type\&quot;:\&quot;ERROR\&quot;,\&quot;status\&quot;:404, \&quot;message\&quot;:\&quot;No session with given id found.\&quot;}&quot;),
+                            }
+                    )),
+            @ApiResponse(responseCode = &quot;400&quot;,
+                    description = &quot;Session already closed&quot;,
+                    content = @Content(mediaType = &quot;application/json&quot;,
+                            schema = @Schema(implementation = HttpErrorDTO.class),
+                            examples ={
+                                    @ExampleObject(value = &quot;{\&quot;type\&quot;:\&quot;ERROR\&quot;,\&quot;status\&quot;:400, \&quot;message\&quot;:\&quot;Session with given id already closed.\&quot;}&quot;),
+                            }
+                    )),
+            @ApiResponse(responseCode = &quot;500&quot;,
+                    description = &quot;Internal server error&quot;,
+                    content = @Content(mediaType = &quot;application/json&quot;,
+                            schema = @Schema(implementation = HttpErrorDTO.class),
+                            examples = {
+                                    @ExampleObject(value = &quot;{\&quot;type\&quot;:\&quot;ERROR\&quot;,\&quot;status\&quot;:500, \&quot;message\&quot;:\&quot;Internal server error.\&quot;}&quot;),
+                            }
+                    ))
+    })
+    @PatchMapping(&quot;/{sessionKey}/close&quot;)
+    public ResponseEntity&lt;Void&gt; closeSession(@Parameter(description = &quot;The id of the session&quot;)
+                                                 @PathVariable UUID sessionKey) throws NotFoundException, BadRequestException {
+<span class="nc" id="L279">        log.info(&quot;Close Session Request: {}&quot;, sessionKey);</span>
+<span class="nc" id="L280">        sessionService.closeSession(sessionKey);</span>
+<span class="nc" id="L281">        return ResponseEntity.ok().build();</span>
+    }
+
+    // exception handlers
+    @ExceptionHandler
+    public ResponseEntity&lt;HttpErrorDTO&gt; handleSessionInitializationFailed(SessionInitializationFailedException e){
+<span class="nc" id="L287">        HttpErrorDTO dto = HttpErrorDTO.builder()</span>
+<span class="nc" id="L288">                .status(500)</span>
+<span class="nc" id="L289">                .message(&quot;Could not initialize session with message: %s&quot;.formatted(e.getMessage()))</span>
+<span class="nc" id="L290">                .build();</span>
+<span class="nc" id="L291">        return ResponseEntity.internalServerError().body(dto);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
