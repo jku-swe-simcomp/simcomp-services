@@ -81,23 +81,23 @@ jobs:
         cp -R ./simcomp-services/axis-converter/target/site/jacoco/* ./simcomp-services/coverage-reports/axis-converter
         cp ./simcomp-services/.github/index.html ./simcomp-services/coverage-reports/index.html
 
+    - name: Deploy Coverage Reports to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        publish_dir: ./simcomp-services/coverage-reports
+
     - name: Create Java Docs for Webots Adaptor
       run: |
         cd ./simcomp-services/webots-adaptor
         mvn clean install javadoc:javadoc
       working-directory: ${{ github.workspace }}
 
-    - name: Publish Javadoc for Webots Adaptor
-      uses: actions/upload-artifact@v2
-      with:
-        name: javadoc_webots_adaptor
-        path: webots-adaptor/target/site/apidocs
-
-    - name: Deploy Coverage Reports to GitHub Pages
+    - name: Deploy Javadoc for Webots Adaptor
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-        publish_dir: ./simcomp-services/coverage-reports
+        publish_dir: ./simcomp-services/webots-adaptor/target/site/apidocs
 
     - name: Log in to the Docker Hub
       uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
