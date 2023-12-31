@@ -11,56 +11,154 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
+/**
+ * Class to implement the visitor pattern for the supported
+ * command types. For each command type a visitor method is
+ * implemented, that executes the command with the respective
+ * command executor.
+ */
 @Service
 public class WebotsCommandExecutionVisitor extends CommandExecutionVisitor {
-    private final SessionService demoSessionService;
+    private final SessionService sessionService;
     private final PoseCommandExecutor poseCommandExecutor;
     private final AdjustJointAngleCommandExecutor adjustJointAngleCommandExecutor;
     private final GrabExecutor grabExecutor;
     private final OpenHandExecutor openHandExecutor;
     private final ResetToHomeExecutor resetToHomeExecutor;
     private final SetJointExecutor setJointExecutor;
-    public WebotsCommandExecutionVisitor(SessionService demoSessionService,
+
+    /**
+     * Constructor to set all command executors, and the session service
+     * @param sessionService session service instance to keep track of the session instances
+     * @param poseCommandExecutor executor for pose command
+     * @param adjustJointAngleCommandExecutor executor of joint adjustment command
+     * @param grabExecutor executor of grab command
+     * @param openHandExecutor executor of open hand command
+     * @param resetToHomeExecutor executor of reset to home command
+     * @param setJointExecutor executor of joint set command
+     */
+    public WebotsCommandExecutionVisitor(SessionService sessionService,
                                          PoseCommandExecutor poseCommandExecutor,
                                          AdjustJointAngleCommandExecutor adjustJointAngleCommandExecutor,
                                          GrabExecutor grabExecutor,
                                          OpenHandExecutor openHandExecutor,
                                          ResetToHomeExecutor resetToHomeExecutor,
-<span class="fc" id="L29">                                         SetJointExecutor setJointExecutor){</span>
-<span class="fc" id="L30">        this.demoSessionService = demoSessionService;</span>
-<span class="fc" id="L31">        this.adjustJointAngleCommandExecutor = adjustJointAngleCommandExecutor;</span>
-<span class="fc" id="L32">        this.poseCommandExecutor = poseCommandExecutor;</span>
-<span class="fc" id="L33">        this.grabExecutor = grabExecutor;</span>
-<span class="fc" id="L34">        this.openHandExecutor = openHandExecutor;</span>
-<span class="fc" id="L35">        this.setJointExecutor = setJointExecutor;</span>
-<span class="fc" id="L36">        this.resetToHomeExecutor = resetToHomeExecutor;</span>
-<span class="fc" id="L37">    }</span>
+<span class="fc" id="L46">                                         SetJointExecutor setJointExecutor){</span>
+<span class="fc" id="L47">        this.sessionService = sessionService;</span>
+<span class="fc" id="L48">        this.adjustJointAngleCommandExecutor = adjustJointAngleCommandExecutor;</span>
+<span class="fc" id="L49">        this.poseCommandExecutor = poseCommandExecutor;</span>
+<span class="fc" id="L50">        this.grabExecutor = grabExecutor;</span>
+<span class="fc" id="L51">        this.openHandExecutor = openHandExecutor;</span>
+<span class="fc" id="L52">        this.setJointExecutor = setJointExecutor;</span>
+<span class="fc" id="L53">        this.resetToHomeExecutor = resetToHomeExecutor;</span>
+<span class="fc" id="L54">    }</span>
 
+    /**
+     * Method to call the executor for adjust joint angle commands, with a new command.
+     * The execution is executed for a session, the session get renewed.
+     *
+     * @param command to adjust a joint angle for the robot arm
+     * @param sessionKey the key of the session
+     *
+     * @return the result of the execution
+     * @throws SessionNotValidException if the session is not registered
+     * @throws RoboOperationFailedException if the simulation could not execute the command
+     * @throws IOException if no connection to the simulation could be built
+     * @throws ParseException if the JSON of the command is not valid
+     */
     @Override
     public ExecutionResultDTO visit(ExecutionCommand.AdjustJointAngleCommand command, String sessionKey) throws SessionNotValidException, RoboOperationFailedException, IOException, ParseException {
-<span class="fc" id="L41">        return adjustJointAngleCommandExecutor.execute(command, demoSessionService.renewSession(sessionKey));</span>
+<span class="fc" id="L71">        return adjustJointAngleCommandExecutor.execute(command, sessionService.renewSession(sessionKey));</span>
     }
 
+    /**
+     * Method to call the executor for pose commands, with a new command.
+     * The execution is executed for a session, the session gets renewed.
+     *
+     * @param command to query the axis values of the robot
+     * @param sessionKey the key of the session
+     *
+     * @return the result of the execution
+     * @throws SessionNotValidException if the session is not registered
+     * @throws RoboOperationFailedException if the simulation could not execute the command
+     * @throws IOException if no connection to the simulation could be built
+     * @throws ParseException if the JSON of the command is not valid
+     */
     @Override
     public ExecutionResultDTO visit(ExecutionCommand.PoseCommand command, String sessionKey) throws SessionNotValidException, RoboOperationFailedException, IOException, ParseException {
-<span class="fc" id="L46">        return poseCommandExecutor.execute(command, demoSessionService.renewSession(sessionKey));</span>
+<span class="fc" id="L89">        return poseCommandExecutor.execute(command, sessionService.renewSession(sessionKey));</span>
     }
 
+    /**
+     * Method to call the executor for grab commands, with a new command.
+     * The execution is executed for a session, the session gets renewed.
+     *
+     * @param command to grab the robot simulation arm
+     * @param sessionKey the key of the session
+     *
+     * @return the result of the execution
+     * @throws SessionNotValidException if the session is not registered
+     * @throws RoboOperationFailedException if the simulation could not execute the command
+     * @throws IOException if no connection to the simulation could be built
+     * @throws ParseException if the JSON of the command is not valid
+     */
     @Override
     public ExecutionResultDTO visit(ExecutionCommand.GrabCommand command, String sessionKey) throws SessionNotValidException, RoboOperationFailedException, IOException, ParseException {
-<span class="fc" id="L51">        return grabExecutor.execute(command, demoSessionService.renewSession(sessionKey));</span>
+<span class="fc" id="L107">        return grabExecutor.execute(command, sessionService.renewSession(sessionKey));</span>
     }
+
+    /**
+     * Method to call the executor for open hand commands, with a new command.
+     * The execution is executed for a session, the session gets renewed.
+     *
+     * @param command to open the hand of the robot simulation arm
+     * @param sessionKey the key of the session
+     *
+     * @return the result of the execution
+     * @throws SessionNotValidException if the session is not registered
+     * @throws RoboOperationFailedException if the simulation could not execute the command
+     * @throws IOException if no connection to the simulation could be built
+     * @throws ParseException if the JSON of the command is not valid
+     */
     @Override
     public ExecutionResultDTO visit(ExecutionCommand.OpenHandCommand command, String sessionKey) throws SessionNotValidException, RoboOperationFailedException, IOException, ParseException {
-<span class="fc" id="L55">        return openHandExecutor.execute(command, demoSessionService.renewSession(sessionKey));</span>
+<span class="fc" id="L125">        return openHandExecutor.execute(command, sessionService.renewSession(sessionKey));</span>
     }
+
+    /**
+     * Method to call the executor for reste to commands, with a new command.
+     * The execution is executed for a session, the session gets renewed.
+     *
+     * @param command to set the robot arm to the home position
+     * @param sessionKey the key of the session
+     *
+     * @return the result of the execution
+     * @throws SessionNotValidException if the session is not registered
+     * @throws RoboOperationFailedException if the simulation could not execute the command
+     * @throws IOException if no connection to the simulation could be built
+     * @throws ParseException if the JSON of the command is not valid
+     */
     @Override
     public ExecutionResultDTO visit(ExecutionCommand.ResetToHomeCommand command, String sessionKey) throws SessionNotValidException, RoboOperationFailedException, IOException, ParseException {
-<span class="fc" id="L59">        return resetToHomeExecutor.execute(command, demoSessionService.renewSession(sessionKey));</span>
+<span class="fc" id="L143">        return resetToHomeExecutor.execute(command, sessionService.renewSession(sessionKey));</span>
     }
+
+    /**
+     * Method to call the executor for set joint position commands, with a new command.
+     * The execution is executed for a session, the session gets renewed.
+     *
+     * @param command to set the joint poistion of one axis of the robot arm
+     * @param sessionKey the key of the session
+     *
+     * @return the result of the execution
+     * @throws SessionNotValidException if the session is not registered
+     * @throws RoboOperationFailedException if the simulation could not execute the command
+     * @throws IOException if no connection to the simulation could be built
+     * @throws ParseException if the JSON of the command is not valid
+     */
     @Override
     public ExecutionResultDTO visit(ExecutionCommand.SetJointPositionCommand command, String sessionKey) throws SessionNotValidException, RoboOperationFailedException, IOException, ParseException {
-<span class="fc" id="L63">        return setJointExecutor.execute(command, demoSessionService.renewSession(sessionKey));</span>
+<span class="fc" id="L161">        return setJointExecutor.execute(command, sessionService.renewSession(sessionKey));</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

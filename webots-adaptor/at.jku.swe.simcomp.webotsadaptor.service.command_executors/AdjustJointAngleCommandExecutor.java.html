@@ -16,21 +16,34 @@ import org.json.simple.JSONObject;
 
 import java.io.IOException;
 
-<span class="fc" id="L19">@Slf4j</span>
+/**
+ * Class to execute an adjust joint angle command.
+ * @see CommandExecutor
+ */
+<span class="fc" id="L23">@Slf4j</span>
 @Service
-<span class="fc" id="L21">public class AdjustJointAngleCommandExecutor implements CommandExecutor&lt;ExecutionCommand.AdjustJointAngleCommand, ExecutionResultDTO&gt; {</span>
+<span class="fc" id="L25">public class AdjustJointAngleCommandExecutor implements CommandExecutor&lt;ExecutionCommand.AdjustJointAngleCommand, ExecutionResultDTO&gt; {</span>
 
+    /**
+     * Method that executes an adjust joint angle command at a simulation
+     * @param command the command to execute
+     * @param config the configuration of the simulation
+     * @return the result of the execution
+     * @throws RoboOperationFailedException if the simulation could not execute the command
+     * @throws IOException if no connection to the simulation could be built
+     * @throws ParseException if the created json is invalid
+     */
     @Override
     public ExecutionResultDTO execute(ExecutionCommand.AdjustJointAngleCommand command, SimulationInstanceConfig config)
             throws RoboOperationFailedException, IOException, ParseException {
 
-<span class="fc" id="L27">        JSONObject json = new JSONObject();</span>
-<span class="fc" id="L28">        @NonNull JointAngleAdjustmentDTO movement = command.jointAngleAdjustment();</span>
-<span class="fc" id="L29">        log.info(&quot;Executing joint adjustment for axis {} by {} radians&quot;, movement.getJoint(), movement.getByRadians());</span>
-<span class="fc" id="L30">        json.put(&quot;operation&quot;, &quot;adjust_axis&quot;);</span>
-<span class="fc" id="L31">        json.put(&quot;axis&quot;, movement.getJoint().getIndex());</span>
-<span class="fc" id="L32">        json.put(&quot;value&quot;, movement.getByRadians());</span>
-<span class="fc" id="L33">        return WebotsExecutionService.executeCommand(json, config);</span>
+<span class="fc" id="L40">        JSONObject json = new JSONObject();</span>
+<span class="fc" id="L41">        @NonNull JointAngleAdjustmentDTO movement = command.jointAngleAdjustment();</span>
+<span class="fc" id="L42">        log.info(&quot;Executing joint adjustment for axis {} by {} radians&quot;, movement.getJoint(), movement.getByRadians());</span>
+<span class="fc" id="L43">        json.put(&quot;operation&quot;, &quot;adjust_axis&quot;);</span>
+<span class="fc" id="L44">        json.put(&quot;axis&quot;, movement.getJoint().getIndex());</span>
+<span class="fc" id="L45">        json.put(&quot;value&quot;, movement.getByRadians());</span>
+<span class="fc" id="L46">        return WebotsExecutionService.executeCommand(json, config);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

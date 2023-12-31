@@ -11,61 +11,106 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+/**
+ * The class keeps track of the all simulation instances registered
+ * for the Webots adapter. The class contains a set of all simulations
+ * and allows to add and remove instances. The class contains a static
+ * set of
+ * @see SimulationInstanceConfig and
+ * @see SimulationInstanceRemovalListener
+ */
 @Service
 public class WebotsSimulationInstanceService implements SimulationInstanceService {
-<span class="fc" id="L16">    private static final Logger log = LogManager.getLogger();</span>
-<span class="fc" id="L17">    private static final Set&lt;SimulationInstanceRemovalListener&gt; SIMULATION_INSTANCE_REMOVAL_LISTENERS = Collections.synchronizedSet(new HashSet&lt;&gt;());</span>
-<span class="fc" id="L18">    private static final Set&lt;SimulationInstanceConfig&gt; instances = Collections.synchronizedSet(new HashSet&lt;&gt;());</span>
+<span class="fc" id="L24">    private static final Logger log = LogManager.getLogger();</span>
+<span class="fc" id="L25">    private static final Set&lt;SimulationInstanceRemovalListener&gt; SIMULATION_INSTANCE_REMOVAL_LISTENERS = Collections.synchronizedSet(new HashSet&lt;&gt;());</span>
+<span class="fc" id="L26">    private static final Set&lt;SimulationInstanceConfig&gt; INSTANCES = Collections.synchronizedSet(new HashSet&lt;&gt;());</span>
     private final String adaptorName;
-<span class="fc" id="L20">    public WebotsSimulationInstanceService(@Value(&quot;${adaptor.endpoint.name}&quot;) String adaptorName) {</span>
-<span class="fc" id="L21">       this.adaptorName = adaptorName;</span>
-<span class="fc" id="L22">    }</span>
 
+    /**
+     * Creates a new instance, the value of the adaptor name must
+     * be equal to WEBOTS
+     * @param adaptorName the name of the adaptor
+     */
+<span class="fc" id="L34">    public WebotsSimulationInstanceService(@Value(&quot;${adaptor.endpoint.name}&quot;) String adaptorName) {</span>
+<span class="fc" id="L35">       this.adaptorName = adaptorName;</span>
+<span class="fc" id="L36">    }</span>
+
+    /**
+     * Method to add a new simulation instance based on a configuration.
+     * The method checks, if the simulation is of type Webots, and if
+     * instanceID, host and port a new.
+     * @param config Configuration with the simulation name, simulation
+     *               type, host and port
+     * @throws BadRequestException gets thrown if the simulation instance
+     * has the wrong type, the host and port a already used, or the instance
+     * ID already exists.
+     */
     @Override
     public void addSimulationInstance(SimulationInstanceConfig config) throws BadRequestException {
-<span class="fc bfc" id="L26" title="All 2 branches covered.">        if(!config.getSimulationType().equals(this.adaptorName)){</span>
-<span class="fc" id="L27">            throw new BadRequestException(&quot;Simulation name does not match the name of this adaptor&quot;);</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">        if(!config.getSimulationType().equals(this.adaptorName)){</span>
+<span class="fc" id="L51">            throw new BadRequestException(&quot;Simulation name does not match the name of this adaptor&quot;);</span>
         }
-<span class="fc bfc" id="L29" title="All 4 branches covered.">        if(instances.stream().anyMatch(instance -&gt; instance.getInstanceHost().equals(config.getInstanceHost()) &amp;&amp;</span>
-<span class="pc bpc" id="L30" title="1 of 2 branches missed.">                instance.getInstancePort().equals(config.getInstancePort()))){</span>
-<span class="fc" id="L31">            throw new BadRequestException(&quot;Simulation instance with same host and port already exists&quot;);</span>
+<span class="fc bfc" id="L53" title="All 4 branches covered.">        if(INSTANCES.stream().anyMatch(instance -&gt; instance.getInstanceHost().equals(config.getInstanceHost()) &amp;&amp;</span>
+<span class="pc bpc" id="L54" title="1 of 2 branches missed.">                instance.getInstancePort().equals(config.getInstancePort()))){</span>
+<span class="fc" id="L55">            throw new BadRequestException(&quot;Simulation instance with same host and port already exists&quot;);</span>
         }
-<span class="fc bfc" id="L33" title="All 2 branches covered.">        if(instances.stream().anyMatch(instance -&gt; instance.getInstanceId().equals(config.getInstanceId()))){</span>
-<span class="fc" id="L34">            throw new BadRequestException(&quot;Simulation instance with same id already exists&quot;);</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">        if(INSTANCES.stream().anyMatch(instance -&gt; instance.getInstanceId().equals(config.getInstanceId()))){</span>
+<span class="fc" id="L58">            throw new BadRequestException(&quot;Simulation instance with same id already exists&quot;);</span>
         }
-<span class="fc" id="L36">        instances.add(config);</span>
-<span class="fc" id="L37">        log.info(&quot;Added simulation instance: {}&quot;, config);</span>
-<span class="fc" id="L38">    }</span>
+<span class="fc" id="L60">        INSTANCES.add(config);</span>
+<span class="fc" id="L61">        log.info(&quot;Added simulation instance: {}&quot;, config);</span>
+<span class="fc" id="L62">    }</span>
 
+    /**
+     * Removes a simulation instance from the set of instance, and
+     * calls the simulation removal listener that the instance got removed.
+     * @param instanceId the ID of the instance to remove.
+     */
     @Override
     public void removeSimulationInstance(String instanceId) {
-<span class="fc" id="L42">        Optional&lt;SimulationInstanceConfig&gt; config = instances.stream().filter(simulation -&gt; simulation.getInstanceId().equals(instanceId)).findFirst();</span>
-<span class="fc bfc" id="L43" title="All 2 branches covered.">        if(config.isPresent()){</span>
-<span class="fc" id="L44">            instances.remove(config.get());</span>
-<span class="fc" id="L45">            notifySimulationRemovalListeners(config.get());</span>
-<span class="fc" id="L46">            log.info(&quot;Removed simulation: {}&quot;, config.get());</span>
+<span class="fc" id="L71">        Optional&lt;SimulationInstanceConfig&gt; config = INSTANCES.stream().filter(simulation -&gt; simulation.getInstanceId().equals(instanceId)).findFirst();</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">        if(config.isPresent()){</span>
+<span class="fc" id="L73">            INSTANCES.remove(config.get());</span>
+<span class="fc" id="L74">            notifySimulationRemovalListeners(config.get());</span>
+<span class="fc" id="L75">            log.info(&quot;Removed simulation: {}&quot;, config.get());</span>
         }else {
-<span class="fc" id="L48">            log.info(&quot;Simulation instance {} not found&quot;, instanceId);</span>
+<span class="fc" id="L77">            log.info(&quot;Simulation instance {} not found&quot;, instanceId);</span>
         }
-<span class="fc" id="L50">    }</span>
+<span class="fc" id="L79">    }</span>
 
+    /**
+     * Nonstatic method to return the set of instances.
+     * @return the set of instances.
+     */
     @Override
-    public Set&lt;SimulationInstanceConfig&gt; getSimulationInstances() throws Exception {
-<span class="fc" id="L54">        return instances;</span>
+    public Set&lt;SimulationInstanceConfig&gt; getSimulationInstances() {
+<span class="fc" id="L87">        return INSTANCES;</span>
     }
 
+    /**
+     * Adds a new removal listener to the static set of removal listeners.
+     * @param listener the new removal listener to add
+     */
     public void addSimulationRemovalListener(SimulationInstanceRemovalListener listener) {
-<span class="fc" id="L58">        SIMULATION_INSTANCE_REMOVAL_LISTENERS.add(listener);</span>
-<span class="fc" id="L59">        log.info(&quot;Added simulation instance removal listener: {}&quot;, listener);</span>
-<span class="fc" id="L60">    }</span>
+<span class="fc" id="L95">        SIMULATION_INSTANCE_REMOVAL_LISTENERS.add(listener);</span>
+<span class="fc" id="L96">        log.info(&quot;Added simulation instance removal listener: {}&quot;, listener);</span>
+<span class="fc" id="L97">    }</span>
 
+    /**
+     * Notifies alls removal listener that a simulation instance was removed.
+     * @param config the simulation instance that was removed.
+     */
     public void notifySimulationRemovalListeners(SimulationInstanceConfig config) {
-<span class="fc" id="L63">        SIMULATION_INSTANCE_REMOVAL_LISTENERS.forEach(listener -&gt; listener.onSimulationRemoved(config));</span>
-<span class="fc" id="L64">        log.info(&quot;Notified simulation instance removal listeners about removal of: {}&quot;, config);</span>
-<span class="fc" id="L65">    }</span>
+<span class="fc" id="L104">        SIMULATION_INSTANCE_REMOVAL_LISTENERS.forEach(listener -&gt; listener.onSimulationRemoved(config));</span>
+<span class="fc" id="L105">        log.info(&quot;Notified simulation instance removal listeners about removal of: {}&quot;, config);</span>
+<span class="fc" id="L106">    }</span>
 
+    /**
+     * Static method to return the set of instances.
+     * @return the set of instances.
+     */
     public static Set&lt;SimulationInstanceConfig&gt; getInstances() {
-<span class="fc" id="L68">        return instances;</span>
+<span class="fc" id="L113">        return INSTANCES;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

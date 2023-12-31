@@ -14,18 +14,31 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 
 
-<span class="fc" id="L17">@Slf4j</span>
+/**
+ * Class to execute a command to get the position of a simulation
+ * @see CommandExecutor
+ */
+<span class="fc" id="L21">@Slf4j</span>
 @Service
-<span class="fc" id="L19">public class PoseCommandExecutor implements CommandExecutor&lt;ExecutionCommand.PoseCommand, ExecutionResultDTO&gt; {</span>
+<span class="fc" id="L23">public class PoseCommandExecutor implements CommandExecutor&lt;ExecutionCommand.PoseCommand, ExecutionResultDTO&gt; {</span>
 
+    /**
+     * Method that executes a pose command at a simulation
+     * @param command the command to execute
+     * @param config the configuration of the simulation
+     * @return the result of the execution
+     * @throws RoboOperationFailedException if the simulation could not execute the command
+     * @throws IOException if no connection to the simulation could be built
+     * @throws ParseException if the created json is invalid
+     */
     @Override
     public ExecutionResultDTO execute(ExecutionCommand.PoseCommand command, SimulationInstanceConfig config)
             throws RoboOperationFailedException, IOException, ParseException {
 
-<span class="fc" id="L25">        log.info(&quot;Executing get position command&quot;);</span>
-<span class="fc" id="L26">        JSONObject json = new JSONObject();</span>
-<span class="fc" id="L27">        json.put(&quot;operation&quot;, &quot;get_position&quot;);</span>
-<span class="fc" id="L28">        return WebotsExecutionService.executeCommand(json, config);</span>
+<span class="fc" id="L38">        log.info(&quot;Executing get position command&quot;);</span>
+<span class="fc" id="L39">        JSONObject json = new JSONObject();</span>
+<span class="fc" id="L40">        json.put(&quot;operation&quot;, &quot;get_position&quot;);</span>
+<span class="fc" id="L41">        return WebotsExecutionService.executeCommand(json, config);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

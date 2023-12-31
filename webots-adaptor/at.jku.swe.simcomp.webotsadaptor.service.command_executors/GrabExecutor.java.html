@@ -13,21 +13,34 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
-<span class="fc" id="L16">@Slf4j</span>
+/**
+ * Class to execute a grab command
+ * @see CommandExecutor
+ */
+<span class="fc" id="L20">@Slf4j</span>
 @Service
-<span class="fc" id="L18">public class GrabExecutor</span>
+<span class="fc" id="L22">public class GrabExecutor</span>
         implements CommandExecutor&lt;ExecutionCommand.GrabCommand, ExecutionResultDTO&gt; {
 
+    /**
+     * Method that executes grab command at a simulation
+     * @param command the command to execute
+     * @param config the configuration of the simulation
+     * @return the result of the execution
+     * @throws RoboOperationFailedException if the simulation could not execute the command
+     * @throws IOException if no connection to the simulation could be built
+     * @throws ParseException if the created json is invalid
+     */
     @Override
     public ExecutionResultDTO execute(ExecutionCommand.GrabCommand command, SimulationInstanceConfig config)
             throws RoboOperationFailedException, IOException, ParseException {
 
-<span class="fc" id="L25">        log.info(&quot;Executing grab command&quot;);</span>
-<span class="fc" id="L26">        JSONObject json = new JSONObject();</span>
-<span class="fc" id="L27">        json.put(&quot;operation&quot;, &quot;set_axis&quot;);</span>
-<span class="fc" id="L28">        json.put(&quot;axis&quot;, &quot;axis7&quot;);</span>
-<span class="fc" id="L29">        json.put(&quot;value&quot;, -0.1);</span>
-<span class="fc" id="L30">        return WebotsExecutionService.executeCommand(json, config);</span>
+<span class="fc" id="L38">        log.info(&quot;Executing grab command&quot;);</span>
+<span class="fc" id="L39">        JSONObject json = new JSONObject();</span>
+<span class="fc" id="L40">        json.put(&quot;operation&quot;, &quot;set_axis&quot;);</span>
+<span class="fc" id="L41">        json.put(&quot;axis&quot;, &quot;axis7&quot;);</span>
+<span class="fc" id="L42">        json.put(&quot;value&quot;, -0.1);</span>
+<span class="fc" id="L43">        return WebotsExecutionService.executeCommand(json, config);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -12,35 +12,72 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
+/**
+ * Class to build and communication endpoint for the session management.
+ * Interaction with a SessionService instance to manage the sessions.
+ * @see SessionService
+ */
 @Service
 public class WebotsAdaptorEndpointService implements AdaptorEndpointService {
-    private final SessionService sessionService;
-<span class="fc" id="L18">    public WebotsAdaptorEndpointService(SessionService sessionService) {</span>
-<span class="fc" id="L19">        this.sessionService = sessionService;</span>
-<span class="fc" id="L20">    }</span>
+    private final SessionService SESSION_SERVICE;
 
+    /**
+     * Constructor to create a new endpoint for a session service class.
+     * @param sessionService the service to keep manage the session
+     */
+<span class="fc" id="L28">    public WebotsAdaptorEndpointService(SessionService sessionService) {</span>
+<span class="fc" id="L29">        this.SESSION_SERVICE = sessionService;</span>
+<span class="fc" id="L30">    }</span>
+
+    /**
+     * Method to initialize an arbitrary new session.
+     * @return the ID of the new session.
+     * @throws SessionInitializationFailedException if the session cannot be initialized
+     */
     @Override
     public String initSession() throws SessionInitializationFailedException {
-<span class="fc" id="L24">        return sessionService.initializeSession();</span>
+<span class="fc" id="L39">        return SESSION_SERVICE.initializeSession();</span>
     }
 
+    /**
+     * Method to initialize a new session with a defined instanceID
+     * @param instanceId for the new session
+     * @return the ID of the new session
+     * @throws SessionInitializationFailedException if the session cannot be initialized
+     */
     @Override
     public String initSession(String instanceId) throws SessionInitializationFailedException {
-<span class="fc" id="L29">        return sessionService.initializeSession(instanceId);</span>
+<span class="fc" id="L50">        return SESSION_SERVICE.initializeSession(instanceId);</span>
     }
 
+    /**
+     * Method to close a session
+     * @param sessionId the ID of the session to close
+     * @throws SessionNotValidException if the ID no valid session is found
+     */
     @Override
     public void closeSession(String sessionId) throws SessionNotValidException {
-<span class="fc" id="L34">        sessionService.closeSession(sessionId);</span>
-<span class="fc" id="L35">    }</span>
+<span class="fc" id="L60">        SESSION_SERVICE.closeSession(sessionId);</span>
+<span class="fc" id="L61">    }</span>
 
+    /**
+     * Method to get an attribute for a session. Currently, only the axes values
+     * are available.
+     * @param attributeKey the value that is queried for the session
+     * @param sessionId the ID of the requested session
+     * @return the value of the request attribute
+     * @throws SessionNotValidException if the session is not valid
+     * @throws RoboOperationFailedException if the request cannot be executed at the simulation
+     * @throws IOException if the connection to the simulation cannot be built
+     * @throws ParseException if the JSON of the simulation query is not valid
+     */
     @Override
     public AttributeValue getAttributeValue(AttributeKey attributeKey, String sessionId) throws SessionNotValidException, RoboOperationFailedException, IOException, ParseException {
-<span class="fc" id="L39">        SimulationInstanceConfig config = sessionService.getConfigForSession(sessionId);</span>
+<span class="fc" id="L76">        SimulationInstanceConfig config = SESSION_SERVICE.getConfigForSession(sessionId);</span>
         // Note: can add more cases for different attributes
-<span class="fc bfc" id="L41" title="All 2 branches covered.">        return switch(attributeKey){</span>
-<span class="fc" id="L42">            case JOINT_POSITIONS -&gt;  new AttributeValue.JointPositions(WebotsExecutionService.getPositions(config));</span>
-<span class="fc" id="L43">            default -&gt; throw new UnsupportedOperationException(&quot;Attribute %s not supported by this service&quot;.formatted(attributeKey));</span>
+<span class="fc bfc" id="L78" title="All 2 branches covered.">        return switch(attributeKey){</span>
+<span class="fc" id="L79">            case JOINT_POSITIONS -&gt;  new AttributeValue.JointPositions(WebotsExecutionService.getPositions(config));</span>
+<span class="fc" id="L80">            default -&gt; throw new UnsupportedOperationException(&quot;Attribute %s not supported by this service&quot;.formatted(attributeKey));</span>
         };
     }
 }

@@ -15,24 +15,36 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
-<span class="fc" id="L18">@Slf4j</span>
+/**
+ * Class to execute a set joint position command
+ */
+<span class="fc" id="L21">@Slf4j</span>
 @Service
-<span class="fc" id="L20">public class SetJointExecutor</span>
+<span class="fc" id="L23">public class SetJointExecutor</span>
         implements CommandExecutor&lt;ExecutionCommand.SetJointPositionCommand, ExecutionResultDTO&gt; {
 
+    /**
+     * Method that executes a set joint position command at a simulation
+     * @param command the command to execute
+     * @param config the configuration of the simulation
+     * @return the result of the execution
+     * @throws RoboOperationFailedException if the simulation could not execute the command
+     * @throws IOException if no connection to the simulation could be built
+     * @throws ParseException if the created json is invalid
+     */
     @Override
     public ExecutionResultDTO execute(ExecutionCommand.SetJointPositionCommand command, SimulationInstanceConfig config)
             throws RoboOperationFailedException, IOException, ParseException {
 
-<span class="fc" id="L27">        System.out.println(&quot;Connecting to &quot; + config.getInstanceHost() + &quot; on port &quot; + config.getInstancePort());</span>
+<span class="fc" id="L39">        System.out.println(&quot;Connecting to &quot; + config.getInstanceHost() + &quot; on port &quot; + config.getInstancePort());</span>
 
-<span class="fc" id="L29">        JSONObject json = new JSONObject();</span>
-<span class="fc" id="L30">        @NonNull JointPositionDTO movement = command.jointPosition();</span>
-<span class="fc" id="L31">        log.info(&quot;Executing joint adjustment for axis {} by {} radians&quot;, movement.getJoint(), movement.getRadians());</span>
-<span class="fc" id="L32">        json.put(&quot;operation&quot;, &quot;set_axis&quot;);</span>
-<span class="fc" id="L33">        json.put(&quot;axis&quot;, movement.getJoint().getIndex());</span>
-<span class="fc" id="L34">        json.put(&quot;value&quot;, movement.getRadians());</span>
-<span class="fc" id="L35">        return WebotsExecutionService.executeCommand(json, config);</span>
+<span class="fc" id="L41">        JSONObject json = new JSONObject();</span>
+<span class="fc" id="L42">        @NonNull JointPositionDTO movement = command.jointPosition();</span>
+<span class="fc" id="L43">        log.info(&quot;Executing joint adjustment for axis {} by {} radians&quot;, movement.getJoint(), movement.getRadians());</span>
+<span class="fc" id="L44">        json.put(&quot;operation&quot;, &quot;set_axis&quot;);</span>
+<span class="fc" id="L45">        json.put(&quot;axis&quot;, movement.getJoint().getIndex());</span>
+<span class="fc" id="L46">        json.put(&quot;value&quot;, movement.getRadians());</span>
+<span class="fc" id="L47">        return WebotsExecutionService.executeCommand(json, config);</span>
     }
 }
 
