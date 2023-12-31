@@ -83,7 +83,7 @@ jobs:
 
     - name: Create Java Docs
       run: |
-        cd ./webots-adaptor
+        cd ./simcomp-services/webots-adaptor
         mvn clean install javadoc:javadoc
       working-directory: ${{ github.workspace }}
 
