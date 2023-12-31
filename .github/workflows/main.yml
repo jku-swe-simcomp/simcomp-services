@@ -81,17 +81,17 @@ jobs:
         cp -R ./simcomp-services/axis-converter/target/site/jacoco/* ./simcomp-services/coverage-reports/axis-converter
         cp ./simcomp-services/.github/index.html ./simcomp-services/coverage-reports/index.html
 
-    - name: Create Java Docs for Webots
+    - name: Create Java Docs for Webots Adaptor
       run: |
         cd ./simcomp-services/webots-adaptor
         mvn clean install javadoc:javadoc
       working-directory: ${{ github.workspace }}
 
-    - name: Store Java Docs
-      run: |
-        mkdir -p ./simcomp-services/java_docs/webots-adapter
-        
-        cp -R ./simcomp-services/webots-adaptor/target/site/apidocs/* ./simcomp-services/java_docs/webots-adapter
+    - name: Publish Javadoc for Webots Adaptor
+      uses: actions/upload-artifact@v2
+      with:
+        name: javadoc_webots_adaptor
+        path: webots-adaptor/target/site/apidocs
 
     - name: Deploy Coverage Reports to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
