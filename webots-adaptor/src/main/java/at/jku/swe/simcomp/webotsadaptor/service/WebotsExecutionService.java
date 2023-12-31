@@ -18,11 +18,33 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Class to interact with a Webots Simulation. Allows the execution of
+ * commands in JSON format, and to query the current position.
+ * For the interaction with the simulation the host and the port a required.
+ * All methods of the class a static.
+ */
 @Slf4j
 public class WebotsExecutionService {
 
+    /**
+     * Method to execute a command at a Webots simulation. Executes the command
+     * and returns a success message if the execution was successful. The method
+     * throws an exception if the command cannot be executed.
+     *
+     * @param command The command to be executed in JSON format
+     * @param config Contains the location of the simulation (host and port)
+     *
+     * @return success message if the command was executed, otherwise an exception
+     * is thrown
+     * @throws RoboOperationFailedException if the simulation cannot execute the
+     * command and returns a not successful message
+     * @throws IOException if the connection to the simulation is not working
+     * @throws ParseException if the input is no valid JSON
+     */
     public static ExecutionResultDTO executeCommand(JSONObject command, SimulationInstanceConfig config) throws RoboOperationFailedException, IOException, ParseException {
         log.info("Connecting to {} on port {}", config.getInstanceHost(), config.getInstancePort());
+        log.info("Execute request {}", command);
         try {
             JSONObject responseJson = accessWebots(command, config);
 
@@ -43,6 +65,21 @@ public class WebotsExecutionService {
         }
     }
 
+
+    /**
+     * Method to get the current axis values of a Webots simulation. The method
+     * queries the six axis values from the simulation and returns them as a list.
+     * The first value in the list is the value of the first axis and so an.
+     *
+     * @param config Contains the location of the simulation (host and port)
+     *
+     * @return a List of six double values representing the current values of the
+     * six axes.
+     * @throws RoboOperationFailedException if the simulation cannot execute the
+     * command and returns a not successful message
+     * @throws IOException if the connection to the simulation is not working
+     * @throws ParseException if the input is no valid JSON
+     */
     public static List<Double> getPositions(SimulationInstanceConfig config) throws RoboOperationFailedException, IOException, ParseException {
         log.info("Connecting to {} on port {}, to get the current position", config.getInstanceHost(), config.getInstancePort());
         try {
