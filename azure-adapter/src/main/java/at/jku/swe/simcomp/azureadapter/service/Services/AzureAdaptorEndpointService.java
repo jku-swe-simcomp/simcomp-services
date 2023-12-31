@@ -9,30 +9,33 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AzureAdaptorEndpointService implements AdaptorEndpointService {
-    private final AzureSessionService demoSessionService;
-    public AzureAdaptorEndpointService(AzureSessionService demoSessionService) {
-        this.demoSessionService = demoSessionService;
+    private final AzureSessionService azureSessionService;
+    public AzureAdaptorEndpointService(AzureSessionService azureSessionService) {
+        this.azureSessionService = azureSessionService;
     }
 
     @Override
     public String initSession() throws SessionInitializationFailedException {
-        return demoSessionService.initializeSession();
+        return azureSessionService.initializeSession();
     }
 
     @Override
     public String initSession(String instanceId) throws SessionInitializationFailedException {
-        return demoSessionService.initializeSession(instanceId);
+        return azureSessionService.initializeSession(instanceId);
     }
 
     @Override
     public void closeSession(String sessionId) throws SessionNotValidException {
-        demoSessionService.closeSession(sessionId);
+        azureSessionService.closeSession(sessionId);
     }
 
     @Override
     public AttributeValue getAttributeValue(AttributeKey attributeKey, String sessionId) throws SessionNotValidException {
-        demoSessionService.renewSession(sessionId);
+        azureSessionService.renewSession(sessionId);
         // Note: can add more cases for different attributes
+        /*
+         * TODO: Changes like needed
+         */
         return switch(attributeKey){
             case JOINT_POSITIONS -> new AttributeValue.JointPositions(AzureCommandExecutionVisitor.currentJointPositions);
             default -> throw new UnsupportedOperationException("Attribute %s not supported by this service".formatted(attributeKey));

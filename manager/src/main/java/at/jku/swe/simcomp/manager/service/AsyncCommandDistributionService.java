@@ -91,6 +91,9 @@ public class AsyncCommandDistributionService {
             if(e.getCode() == 401){
                 throw new SessionNotValidException("");
             }
+        }catch(Exception e){
+            log.error("Execution of command failed for adaptor-session {}", serviceRegistrationConfig.getName());
+            updateExecutionResponse(responseId, 500, e.getMessage(), ExecutionResponseState.ERROR);
         }
     }
 

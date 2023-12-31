@@ -37,7 +37,7 @@ public class ExecutionResponse {
     @Enumerated(EnumType.STRING)
     private ExecutionResponseState state;
 
-    @Column
+    @Column(length = 2550)
     private String report;
 
     @Column(name = "created_at", nullable = false, updatable = false)
