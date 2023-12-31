@@ -82,14 +82,16 @@ jobs:
         cp ./simcomp-services/.github/index.html ./simcomp-services/coverage-reports/index.html
 
     - name: Create Java Docs
-      uses: actions/upload-artifact@v3
-      run: mvn javadoc:javadoc
+      run: |
+        cd project1
+        mvn clean install javadoc:javadoc
+      working-directory: ${{ github.workspace }}
 
     - name: Deploy Coverage Reports to GitHub Pages
-      run: |
-        cd webots-adaptor
-        mvn clean install javadoc:javadoc
-        working-directory: ${{ github.workspace }}
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        publish_dir: ./simcomp-services/coverage-reports
 
     - name: Log in to the Docker Hub
       uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
