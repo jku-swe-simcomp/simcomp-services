@@ -1,0 +1,16 @@
+at.jku.swe.simcomp.commons
+at.jku.swe.simcomp.commons.adaptor.attribute
+at.jku.swe.simcomp.commons.adaptor.dto
+at.jku.swe.simcomp.commons.adaptor.endpoint
+at.jku.swe.simcomp.commons.adaptor.endpoint.exception
+at.jku.swe.simcomp.commons.adaptor.endpoint.simulation
+at.jku.swe.simcomp.commons.adaptor.execution.command
+at.jku.swe.simcomp.commons.adaptor.execution.command.visitor
+at.jku.swe.simcomp.commons.adaptor.execution.command.visitor.impl
+at.jku.swe.simcomp.commons.adaptor.execution.command.visitor.impl.exception
+at.jku.swe.simcomp.commons.adaptor.registration
+at.jku.swe.simcomp.commons.adaptor.registration.exception
+at.jku.swe.simcomp.commons.manager.dto
+at.jku.swe.simcomp.commons.manager.dto.execution
+at.jku.swe.simcomp.commons.manager.dto.session
+at.jku.swe.simcomp.commons.registry.dto

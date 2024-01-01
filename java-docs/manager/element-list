@@ -1,0 +1,9 @@
+at.jku.swe.simcomp.manager
+at.jku.swe.simcomp.manager.config
+at.jku.swe.simcomp.manager.domain.model
+at.jku.swe.simcomp.manager.domain.repository
+at.jku.swe.simcomp.manager.rest
+at.jku.swe.simcomp.manager.rest.exception
+at.jku.swe.simcomp.manager.service
+at.jku.swe.simcomp.manager.service.client
+at.jku.swe.simcomp.manager.service.scheduler

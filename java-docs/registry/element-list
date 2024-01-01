@@ -1,0 +1,6 @@
+at.jku.swe.simcomp.serviceregistry
+at.jku.swe.simcomp.serviceregistry.domain.model
+at.jku.swe.simcomp.serviceregistry.domain.repository
+at.jku.swe.simcomp.serviceregistry.rest
+at.jku.swe.simcomp.serviceregistry.rest.exceptions
+at.jku.swe.simcomp.serviceregistry.service
