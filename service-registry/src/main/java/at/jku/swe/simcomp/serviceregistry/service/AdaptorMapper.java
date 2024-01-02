@@ -8,8 +8,16 @@ import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
 
+/**
+ * Mapper for mapping between DTOs and entities, for {@link Adaptor} and {@link ServiceRegistrationConfigDTO}.
+ */
 @Service
 public class AdaptorMapper {
+    /**
+     * Maps an {@link Adaptor} to a {@link ServiceRegistrationConfigDTO}.
+     * @param adaptor the adaptor to map
+     * @return the mapped dto
+     */
     public ServiceRegistrationConfigDTO entityToDto(Adaptor adaptor){
         ServiceRegistrationConfigDTO config = new ServiceRegistrationConfigDTO();
         config.setName(adaptor.getName());
@@ -19,6 +27,12 @@ public class AdaptorMapper {
                 .map(SupportedActionType::getActionType).collect(Collectors.toSet()));
         return config;
     }
+
+    /**
+     * Maps a {@link ServiceRegistrationConfigDTO} to an {@link Adaptor}.
+     * @param config the dto to map
+     * @return the mapped entity
+     */
     public Adaptor dtoToEntity(ServiceRegistrationConfigDTO config){
         Adaptor adaptor = new Adaptor();
         adaptor.setName(config.getName());

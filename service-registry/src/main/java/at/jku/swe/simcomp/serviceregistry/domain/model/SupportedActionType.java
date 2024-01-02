@@ -5,6 +5,9 @@ import at.jku.swe.simcomp.commons.adaptor.execution.command.ActionType;
 import jakarta.persistence.*;
 import lombok.*;
 
+/**
+ * Entity that represents a supported action of an adaptor.
+ */
 @Entity
 @Table(name = "supported_action")
 @Data

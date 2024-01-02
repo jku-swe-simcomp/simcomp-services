@@ -18,6 +18,10 @@ import java.util.List;
 public class RegistrationController {
     private final RegistrationService registrationService;
 
+/**
+     * Constructor.
+     * @param registrationService the registration service
+     */
     public RegistrationController(RegistrationService registrationService){
         this.registrationService = registrationService;
     }
@@ -26,7 +30,7 @@ public class RegistrationController {
      * Registers an adaptor according to the passed config.
      * @param configDTO the config.
      * @return a response entity indicating the success of the operation
-     * @throws AdaptorAlreadyRegisteredException if an adaptor with the same {@link ServiceRegistrationConfigDTO#name}
+     * @throws AdaptorAlreadyRegisteredException if an adaptor with the same {@link ServiceRegistrationConfigDTO#getName() name}
      * is already registered.
      */
     @PostMapping
@@ -50,7 +54,7 @@ public class RegistrationController {
 
     /**
      * Returns a list with all available registrations.
-     * @return the list
+     * @return the list of registrations
      */
     @GetMapping
     public ResponseEntity<List<ServiceRegistrationConfigDTO>> getAllHealthyAndRegisteredAdaptors(){

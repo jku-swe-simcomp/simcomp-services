@@ -9,6 +9,9 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Entity that represents an adaptor.
+ */
 @Entity
 @Table(name = "adaptor")
 @Data
