@@ -7,30 +7,42 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+/**
+ * Client for performing health checks on adaptors.
+ */
 @Service
-<span class="fc" id="L11">@Slf4j</span>
+<span class="fc" id="L14">@Slf4j</span>
 public class AdaptorClient {
     private final RestTemplate restTemplate;
 
-<span class="fc" id="L15">    public AdaptorClient(RestTemplate restTemplate) {</span>
-<span class="fc" id="L16">        this.restTemplate = restTemplate;</span>
-<span class="fc" id="L17">    }</span>
+    /**
+     * Constructor
+     * @param restTemplate the injected rest template
+     */
+<span class="fc" id="L22">    public AdaptorClient(RestTemplate restTemplate) {</span>
+<span class="fc" id="L23">        this.restTemplate = restTemplate;</span>
+<span class="fc" id="L24">    }</span>
 
+    /**
+     * Performs a health check on the given adaptor.
+     * @param adaptor the adaptor to check
+     * @return true if the health check was successful, false otherwise
+     */
     public boolean isHealthy(Adaptor adaptor){
-<span class="fc" id="L20">        String url = getHealthCheckUrl(adaptor);</span>
-<span class="fc" id="L21">        log.info(&quot;Performing health check on adaptor %s with url %s&quot;.formatted(adaptor.getName(), url));</span>
+<span class="fc" id="L32">        String url = getHealthCheckUrl(adaptor);</span>
+<span class="fc" id="L33">        log.info(&quot;Performing health check on adaptor %s with url %s&quot;.formatted(adaptor.getName(), url));</span>
         try {
-<span class="fc" id="L23">            restTemplate.getForEntity(url, String.class);</span>
-<span class="fc" id="L24">            log.info(&quot;Health check finished. Result is true&quot;);</span>
-<span class="fc" id="L25">            return true;</span>
-<span class="fc" id="L26">        } catch (Exception e) {</span>
-<span class="fc" id="L27">            log.warn(e.getMessage());</span>
-<span class="fc" id="L28">            return false;</span>
+<span class="fc" id="L35">            restTemplate.getForEntity(url, String.class);</span>
+<span class="fc" id="L36">            log.info(&quot;Health check finished. Result is true&quot;);</span>
+<span class="fc" id="L37">            return true;</span>
+<span class="fc" id="L38">        } catch (Exception e) {</span>
+<span class="fc" id="L39">            log.warn(e.getMessage());</span>
+<span class="fc" id="L40">            return false;</span>
         }
     }
 
     private String getHealthCheckUrl(Adaptor adaptor){
-<span class="fc" id="L33">        return &quot;http://&quot; + adaptor.getHost() + &quot;:&quot; + adaptor.getPort() + AdaptorEndpointConstants.HEALTH_CHECK_PATH;</span>
+<span class="fc" id="L45">        return &quot;http://&quot; + adaptor.getHost() + &quot;:&quot; + adaptor.getPort() + AdaptorEndpointConstants.HEALTH_CHECK_PATH;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

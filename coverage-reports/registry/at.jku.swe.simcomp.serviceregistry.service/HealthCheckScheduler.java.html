@@ -6,31 +6,43 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+/**
+ * Scheduler for performing health checks on adaptors.
+ */
 @Component
-<span class="fc" id="L10">@Slf4j</span>
+<span class="fc" id="L13">@Slf4j</span>
 public class HealthCheckScheduler {
     private final AdaptorRepository adaptorRepository;
     private final AdaptorClient adaptorClient;
-<span class="fc" id="L14">    public HealthCheckScheduler(AdaptorRepository adaptorRepository, AdaptorClient adaptorClient) {</span>
-<span class="fc" id="L15">       this.adaptorRepository = adaptorRepository;</span>
-<span class="fc" id="L16">       this.adaptorClient = adaptorClient;</span>
-<span class="fc" id="L17">    }</span>
 
+    /**
+     * Constructor
+     * @param adaptorRepository the injected adaptor repository
+     * @param adaptorClient the injected adaptor client
+     */
+<span class="fc" id="L23">    public HealthCheckScheduler(AdaptorRepository adaptorRepository, AdaptorClient adaptorClient) {</span>
+<span class="fc" id="L24">       this.adaptorRepository = adaptorRepository;</span>
+<span class="fc" id="L25">       this.adaptorClient = adaptorClient;</span>
+<span class="fc" id="L26">    }</span>
+
+    /**
+     * Performs a health check on all adaptors and sets their status accordingly.
+     */
     @Scheduled(fixedRate = 60000)
     public void performHealthCheckAndSetStatus(){
-<span class="fc" id="L21">        log.info(&quot;Performing health check on all adaptors&quot;);</span>
-<span class="nc" id="L22">        adaptorRepository.findAll().forEach(adaptor -&gt; {</span>
-<span class="nc" id="L23">            boolean isHealthy = adaptorClient.isHealthy(adaptor);</span>
-<span class="nc bnc" id="L24" title="All 2 branches missed.">            if(isHealthy){</span>
-<span class="nc" id="L25">                log.info(&quot;Adaptor {} is healthy&quot;, adaptor.getName());</span>
-<span class="nc" id="L26">                adaptor.setStatus(AdaptorStatus.HEALTHY);</span>
+<span class="fc" id="L33">        log.info(&quot;Performing health check on all adaptors&quot;);</span>
+<span class="nc" id="L34">        adaptorRepository.findAll().forEach(adaptor -&gt; {</span>
+<span class="nc" id="L35">            boolean isHealthy = adaptorClient.isHealthy(adaptor);</span>
+<span class="nc bnc" id="L36" title="All 2 branches missed.">            if(isHealthy){</span>
+<span class="nc" id="L37">                log.info(&quot;Adaptor {} is healthy&quot;, adaptor.getName());</span>
+<span class="nc" id="L38">                adaptor.setStatus(AdaptorStatus.HEALTHY);</span>
             } else {
-<span class="nc" id="L28">                log.info(&quot;Adaptor {} is unhealthy&quot;, adaptor.getName());</span>
-<span class="nc" id="L29">                adaptor.setStatus(AdaptorStatus.UNHEALTHY);</span>
+<span class="nc" id="L40">                log.info(&quot;Adaptor {} is unhealthy&quot;, adaptor.getName());</span>
+<span class="nc" id="L41">                adaptor.setStatus(AdaptorStatus.UNHEALTHY);</span>
             }
-<span class="nc" id="L31">            adaptorRepository.save(adaptor);</span>
-<span class="nc" id="L32">        });</span>
-<span class="nc" id="L33">        log.info(&quot;Health check finished&quot;);</span>
-<span class="nc" id="L34">    }</span>
+<span class="nc" id="L43">            adaptorRepository.save(adaptor);</span>
+<span class="nc" id="L44">        });</span>
+<span class="nc" id="L45">        log.info(&quot;Health check finished&quot;);</span>
+<span class="nc" id="L46">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

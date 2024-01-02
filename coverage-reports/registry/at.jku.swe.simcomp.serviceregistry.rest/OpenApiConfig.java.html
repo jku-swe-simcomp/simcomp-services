@@ -4,12 +4,19 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+/**
+ * Redirects the root path to the swagger-ui.html
+ */
 @Configuration
-<span class="fc" id="L8">public class OpenApiConfig implements WebMvcConfigurer {</span>
+<span class="fc" id="L11">public class OpenApiConfig implements WebMvcConfigurer {</span>
+    /**
+     * Redirects the root path to the swagger-ui.html
+     * @param registry the registry
+     */
     @Override
     public void addViewControllers(final ViewControllerRegistry registry) {
-<span class="fc" id="L11">        registry.addRedirectViewController(&quot;/&quot;, &quot;/swagger-ui.html&quot;);</span>
-<span class="fc" id="L12">    }</span>
+<span class="fc" id="L18">        registry.addRedirectViewController(&quot;/&quot;, &quot;/swagger-ui.html&quot;);</span>
+<span class="fc" id="L19">    }</span>
 }
 
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

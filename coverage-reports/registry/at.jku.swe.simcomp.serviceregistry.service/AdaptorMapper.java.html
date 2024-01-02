@@ -8,34 +8,48 @@ import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
 
+/**
+ * Mapper for mapping between DTOs and entities, for {@link Adaptor} and {@link ServiceRegistrationConfigDTO}.
+ */
 @Service
-<span class="fc" id="L12">public class AdaptorMapper {</span>
+<span class="fc" id="L15">public class AdaptorMapper {</span>
+    /**
+     * Maps an {@link Adaptor} to a {@link ServiceRegistrationConfigDTO}.
+     * @param adaptor the adaptor to map
+     * @return the mapped dto
+     */
     public ServiceRegistrationConfigDTO entityToDto(Adaptor adaptor){
-<span class="fc" id="L14">        ServiceRegistrationConfigDTO config = new ServiceRegistrationConfigDTO();</span>
-<span class="fc" id="L15">        config.setName(adaptor.getName());</span>
-<span class="fc" id="L16">        config.setHost(adaptor.getHost());</span>
-<span class="fc" id="L17">        config.setPort(adaptor.getPort());</span>
-<span class="fc" id="L18">        config.setSupportedActions(adaptor.getSupportedActions().stream()</span>
-<span class="fc" id="L19">                .map(SupportedActionType::getActionType).collect(Collectors.toSet()));</span>
-<span class="fc" id="L20">        return config;</span>
+<span class="fc" id="L22">        ServiceRegistrationConfigDTO config = new ServiceRegistrationConfigDTO();</span>
+<span class="fc" id="L23">        config.setName(adaptor.getName());</span>
+<span class="fc" id="L24">        config.setHost(adaptor.getHost());</span>
+<span class="fc" id="L25">        config.setPort(adaptor.getPort());</span>
+<span class="fc" id="L26">        config.setSupportedActions(adaptor.getSupportedActions().stream()</span>
+<span class="fc" id="L27">                .map(SupportedActionType::getActionType).collect(Collectors.toSet()));</span>
+<span class="fc" id="L28">        return config;</span>
     }
-    public Adaptor dtoToEntity(ServiceRegistrationConfigDTO config){
-<span class="fc" id="L23">        Adaptor adaptor = new Adaptor();</span>
-<span class="fc" id="L24">        adaptor.setName(config.getName());</span>
-<span class="fc" id="L25">        adaptor.setHost(config.getHost());</span>
-<span class="fc" id="L26">        adaptor.setPort(config.getPort());</span>
-<span class="fc" id="L27">        adaptor.setStatus(AdaptorStatus.HEALTHY);</span>
-<span class="fc" id="L28">        adaptor.setSupportedActions(config.getSupportedActions().stream()</span>
-<span class="fc" id="L29">                .map(type -&gt; {</span>
-<span class="fc" id="L30">                    SupportedActionType supportedActionType = new SupportedActionType();</span>
-<span class="fc" id="L31">                    supportedActionType.setActionType(type);</span>
-<span class="fc" id="L32">                    supportedActionType.setAdaptor(adaptor);</span>
-<span class="fc" id="L33">                    return  supportedActionType;</span>
-<span class="fc" id="L34">                }).toList());</span>
-<span class="fc" id="L35">        adaptor.getSupportedActions()</span>
-<span class="fc" id="L36">                .forEach(supportedAction -&gt; supportedAction.setAdaptor(adaptor));</span>
 
-<span class="fc" id="L38">        return adaptor;</span>
+    /**
+     * Maps a {@link ServiceRegistrationConfigDTO} to an {@link Adaptor}.
+     * @param config the dto to map
+     * @return the mapped entity
+     */
+    public Adaptor dtoToEntity(ServiceRegistrationConfigDTO config){
+<span class="fc" id="L37">        Adaptor adaptor = new Adaptor();</span>
+<span class="fc" id="L38">        adaptor.setName(config.getName());</span>
+<span class="fc" id="L39">        adaptor.setHost(config.getHost());</span>
+<span class="fc" id="L40">        adaptor.setPort(config.getPort());</span>
+<span class="fc" id="L41">        adaptor.setStatus(AdaptorStatus.HEALTHY);</span>
+<span class="fc" id="L42">        adaptor.setSupportedActions(config.getSupportedActions().stream()</span>
+<span class="fc" id="L43">                .map(type -&gt; {</span>
+<span class="fc" id="L44">                    SupportedActionType supportedActionType = new SupportedActionType();</span>
+<span class="fc" id="L45">                    supportedActionType.setActionType(type);</span>
+<span class="fc" id="L46">                    supportedActionType.setAdaptor(adaptor);</span>
+<span class="fc" id="L47">                    return  supportedActionType;</span>
+<span class="fc" id="L48">                }).toList());</span>
+<span class="fc" id="L49">        adaptor.getSupportedActions()</span>
+<span class="fc" id="L50">                .forEach(supportedAction -&gt; supportedAction.setAdaptor(adaptor));</span>
+
+<span class="fc" id="L52">        return adaptor;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -10,15 +10,24 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Service for registering and unregistering adaptors.
+ */
 @Service
-<span class="fc" id="L14">@Slf4j</span>
+<span class="fc" id="L17">@Slf4j</span>
 public class RegistrationService {
     private final AdaptorRepository adaptorRepository;
     private final AdaptorMapper adaptorMapper;
-<span class="fc" id="L18">    public RegistrationService(AdaptorRepository adaptorRepository, AdaptorMapper adaptorMapper){</span>
-<span class="fc" id="L19">        this.adaptorRepository = adaptorRepository;</span>
-<span class="fc" id="L20">        this.adaptorMapper = adaptorMapper;</span>
-<span class="fc" id="L21">    }</span>
+
+    /**
+     * Constructor
+     * @param adaptorRepository the injected adaptor repository
+     * @param adaptorMapper the injected adaptor mapper
+     */
+<span class="fc" id="L27">    public RegistrationService(AdaptorRepository adaptorRepository, AdaptorMapper adaptorMapper){</span>
+<span class="fc" id="L28">        this.adaptorRepository = adaptorRepository;</span>
+<span class="fc" id="L29">        this.adaptorMapper = adaptorMapper;</span>
+<span class="fc" id="L30">    }</span>
 
     /**
      * Persists the registration in the database.
@@ -26,32 +35,32 @@ public class RegistrationService {
      * @throws AdaptorAlreadyRegisteredException if a registration with the same name is already in the database.
      */
     public void register(ServiceRegistrationConfigDTO config) throws AdaptorAlreadyRegisteredException {
-<span class="fc bfc" id="L29" title="All 2 branches covered.">        if(adaptorRepository.findById(config.getName()).isPresent()){</span>
-<span class="fc" id="L30">            throw new AdaptorAlreadyRegisteredException(&quot;The adaptor with the name %s is already registered&quot;.formatted(config.getName()));</span>
+<span class="fc bfc" id="L38" title="All 2 branches covered.">        if(adaptorRepository.findById(config.getName()).isPresent()){</span>
+<span class="fc" id="L39">            throw new AdaptorAlreadyRegisteredException(&quot;The adaptor with the name %s is already registered&quot;.formatted(config.getName()));</span>
         }
-<span class="fc" id="L32">        Adaptor adaptor = adaptorMapper.dtoToEntity(config);</span>
-<span class="fc" id="L33">        adaptorRepository.save(adaptor);</span>
-<span class="fc" id="L34">        log.info(&quot;Registered service {}&quot;, adaptor);</span>
-<span class="fc" id="L35">    }</span>
+<span class="fc" id="L41">        Adaptor adaptor = adaptorMapper.dtoToEntity(config);</span>
+<span class="fc" id="L42">        adaptorRepository.save(adaptor);</span>
+<span class="fc" id="L43">        log.info(&quot;Registered service {}&quot;, adaptor);</span>
+<span class="fc" id="L44">    }</span>
 
     /**
      * Deletes the registration for the adaptor with the passed name
      * @param adaptorId the name/id of the adaptor.
      */
     public void unregister(String adaptorId){
-<span class="fc" id="L42">        adaptorRepository.deleteById(adaptorId);</span>
-<span class="fc" id="L43">        log.info(&quot;Unregistered service with name {}&quot;, adaptorId);</span>
-<span class="fc" id="L44">    }</span>
+<span class="fc" id="L51">        adaptorRepository.deleteById(adaptorId);</span>
+<span class="fc" id="L52">        log.info(&quot;Unregistered service with name {}&quot;, adaptorId);</span>
+<span class="fc" id="L53">    }</span>
 
     /**
      * Returns all registrations available.
      * @return the list with all registrations
      */
     public List&lt;ServiceRegistrationConfigDTO&gt; getAllHealthyRegisteredAdaptors(){
-<span class="fc" id="L51">       return adaptorRepository.findAll()</span>
-<span class="fc" id="L52">               .stream()</span>
-<span class="fc" id="L53">               .filter(adaptor -&gt; adaptor.getStatus().equals(AdaptorStatus.HEALTHY))</span>
-<span class="fc" id="L54">               .map(adaptorMapper::entityToDto).toList();</span>
+<span class="fc" id="L60">       return adaptorRepository.findAll()</span>
+<span class="fc" id="L61">               .stream()</span>
+<span class="fc" id="L62">               .filter(adaptor -&gt; adaptor.getStatus().equals(AdaptorStatus.HEALTHY))</span>
+<span class="fc" id="L63">               .map(adaptorMapper::entityToDto).toList();</span>
     }
 
 

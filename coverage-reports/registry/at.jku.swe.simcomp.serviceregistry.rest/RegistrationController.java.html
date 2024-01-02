@@ -18,22 +18,26 @@ import java.util.List;
 public class RegistrationController {
     private final RegistrationService registrationService;
 
-<span class="fc" id="L21">    public RegistrationController(RegistrationService registrationService){</span>
-<span class="fc" id="L22">        this.registrationService = registrationService;</span>
-<span class="fc" id="L23">    }</span>
+/**
+     * Constructor.
+     * @param registrationService the registration service
+     */
+<span class="fc" id="L25">    public RegistrationController(RegistrationService registrationService){</span>
+<span class="fc" id="L26">        this.registrationService = registrationService;</span>
+<span class="fc" id="L27">    }</span>
 
     /**
      * Registers an adaptor according to the passed config.
      * @param configDTO the config.
      * @return a response entity indicating the success of the operation
-     * @throws AdaptorAlreadyRegisteredException if an adaptor with the same {@link ServiceRegistrationConfigDTO#name}
+     * @throws AdaptorAlreadyRegisteredException if an adaptor with the same {@link ServiceRegistrationConfigDTO#getName() name}
      * is already registered.
      */
     @PostMapping
     public ResponseEntity&lt;Void&gt; registerService(@RequestBody ServiceRegistrationConfigDTO configDTO) throws AdaptorAlreadyRegisteredException {
-<span class="nc" id="L34">        log.info(&quot;Registering service: {}&quot;, configDTO);</span>
-<span class="nc" id="L35">        registrationService.register(configDTO);</span>
-<span class="nc" id="L36">        return ResponseEntity.ok().build();</span>
+<span class="nc" id="L38">        log.info(&quot;Registering service: {}&quot;, configDTO);</span>
+<span class="nc" id="L39">        registrationService.register(configDTO);</span>
+<span class="nc" id="L40">        return ResponseEntity.ok().build();</span>
     }
 
     /**
@@ -43,19 +47,19 @@ public class RegistrationController {
      */
     @DeleteMapping(&quot;/{name}&quot;)
     public ResponseEntity&lt;Void&gt; unregisterService(@PathVariable String name){
-<span class="nc" id="L46">        log.info(&quot;Unregistering service: {}&quot;, name);</span>
-<span class="nc" id="L47">        registrationService.unregister(name);</span>
-<span class="nc" id="L48">        return ResponseEntity.ok().build();</span>
+<span class="nc" id="L50">        log.info(&quot;Unregistering service: {}&quot;, name);</span>
+<span class="nc" id="L51">        registrationService.unregister(name);</span>
+<span class="nc" id="L52">        return ResponseEntity.ok().build();</span>
     }
 
     /**
      * Returns a list with all available registrations.
-     * @return the list
+     * @return the list of registrations
      */
     @GetMapping
     public ResponseEntity&lt;List&lt;ServiceRegistrationConfigDTO&gt;&gt; getAllHealthyAndRegisteredAdaptors(){
-<span class="nc" id="L57">        log.info(&quot;Fetching all adaptor configurations and returning only healthy ones&quot;);</span>
-<span class="nc" id="L58">        return ResponseEntity.ok(registrationService.getAllHealthyRegisteredAdaptors());</span>
+<span class="nc" id="L61">        log.info(&quot;Fetching all adaptor configurations and returning only healthy ones&quot;);</span>
+<span class="nc" id="L62">        return ResponseEntity.ok(registrationService.getAllHealthyRegisteredAdaptors());</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -5,24 +5,27 @@ import at.jku.swe.simcomp.commons.adaptor.execution.command.ActionType;
 import jakarta.persistence.*;
 import lombok.*;
 
+/**
+ * Entity that represents a supported action of an adaptor.
+ */
 @Entity
 @Table(name = &quot;supported_action&quot;)
-<span class="pc bnc" id="L10" title="All 30 branches missed.">@Data</span>
-<span class="fc" id="L11">@NoArgsConstructor</span>
-<span class="nc" id="L12">@AllArgsConstructor</span>
-<span class="nc" id="L13">@Builder</span>
+<span class="pc bnc" id="L13" title="All 30 branches missed.">@Data</span>
+<span class="fc" id="L14">@NoArgsConstructor</span>
+<span class="nc" id="L15">@AllArgsConstructor</span>
+<span class="nc" id="L16">@Builder</span>
 public class SupportedActionType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-<span class="nc" id="L17">    private Long id;</span>
+<span class="nc" id="L20">    private Long id;</span>
 
     @Enumerated(EnumType.STRING)
     @Column(name = &quot;action&quot;, nullable = false)
-<span class="fc" id="L21">    private ActionType actionType;</span>
+<span class="fc" id="L24">    private ActionType actionType;</span>
 
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = &quot;adaptor_name&quot;)
-<span class="nc" id="L26">    private Adaptor adaptor;</span>
+<span class="nc" id="L29">    private Adaptor adaptor;</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
