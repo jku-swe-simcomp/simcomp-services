@@ -9,6 +9,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class represents a session of an adaptor.
+ */
 @Getter
 @Setter
 @Builder

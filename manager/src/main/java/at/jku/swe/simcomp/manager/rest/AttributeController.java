@@ -23,6 +23,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * REST Controller for managing attributes.
+ * Refer to the OpenAPI documentation for more information.
+ */
 @RestController
 @RequestMapping("/session/{sessionId}/attribute/{attributeKey}")
 @Slf4j

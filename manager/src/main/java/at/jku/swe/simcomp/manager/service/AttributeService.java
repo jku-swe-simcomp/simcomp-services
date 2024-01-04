@@ -18,7 +18,9 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
+/**
+ * This service is responsible for fetching attribute values from the adaptors.
+ */
 @Service
 @Slf4j
 public class AttributeService {
@@ -29,6 +31,15 @@ public class AttributeService {
     private final KinematicsService kinematicsService;
     private final Boolean isDirectKinematicsEnabled;
 
+    /**
+     * Constructor
+     * @param serviceRegistryClient the service registry client
+     * @param adaptorClient the adaptor client
+     * @param sessionRepository the session repository
+     * @param adaptorSessionRepository the adaptor session repository
+     * @param kinematicsService the kinematics service
+     * @param isDirectKinematicsEnabled the flag to enable direct kinematic, defaults to false.
+     */
     public AttributeService(ServiceRegistryClient serviceRegistryClient,
                             AdaptorClient adaptorClient,
                             SessionRepository sessionRepository,
@@ -40,9 +51,17 @@ public class AttributeService {
         this.sessionRepository = sessionRepository;
         this.adaptorSessionRepository = adaptorSessionRepository;
         this.kinematicsService = kinematicsService;
-        this.isDirectKinematicsEnabled = Objects.requireNonNullElse(isDirectKinematicsEnabled, true);
+        this.isDirectKinematicsEnabled = Objects.requireNonNullElse(isDirectKinematicsEnabled, false);
     }
 
+    /**
+     * Fetches the attribute values for a given session and attribute key for all contained adaptor sessions.
+     * If the attribute key is POSE, POSITION or ORIENTATION and direct kinematics is enabled, the joint positions are fetched and
+     * used to calculate the attributes using direct kinematics offered by the kinematics-service (axis-converter).
+     * @param sessionId the session id
+     * @param attributeKey the attribute key
+     * @return the attribute values
+     */
     public Map<String, AttributeValue> getAttributeValues(UUID sessionId,
                                                           AttributeKey attributeKey){
         return isDirectKinematicsEnabled ? switch(attributeKey){
@@ -69,6 +88,7 @@ public class AttributeService {
                 }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
+    // private region methods
 
     private Map<String, AttributeValue> fetchAttributeValuesFromAdaptors(UUID sessionId,
                                                           AttributeKey attributeKey){

@@ -20,6 +20,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * REST Controller for managing simulation instances.
+ * Refer to the OpenAPI documentation for more information.
+ */
 @RestController
 @RequestMapping("/simulation")
 @Slf4j

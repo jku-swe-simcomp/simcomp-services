@@ -21,6 +21,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+/**
+ * This service is responsible for distributing commands {@link ExecutionCommand} to the adaptors.
+ */
 @Service
 @Slf4j
 public class AsyncCommandDistributionService {
@@ -30,6 +33,14 @@ public class AsyncCommandDistributionService {
     private final AdaptorSessionRepository adaptorSessionRepository;
     private final ExecutionCommandValidationVisitor executionCommandValidationVisitor;
 
+    /**
+     * Constructor
+     * @param executionRepository the execution repository
+     * @param adaptorClient the adaptor client
+     * @param executionResponseRepository the execution response repository
+     * @param adaptorSessionRepository the adaptor session repository
+     * @param executionCommandValidationVisitor the execution command validation visitor
+     */
     public AsyncCommandDistributionService(ExecutionRepository executionRepository,
                                            AdaptorClient adaptorClient,
                                            ExecutionResponseRepository executionResponseRepository,
@@ -41,6 +52,18 @@ public class AsyncCommandDistributionService {
         this.adaptorSessionRepository = adaptorSessionRepository;
         this.executionCommandValidationVisitor = executionCommandValidationVisitor;
     }
+
+    /**
+     * Distributes a command to an adaptor-session.
+     * If the command is supported by the adaptor-session, the command is distributed and the execution response is updated accordingly.
+     * If the command is not supported by the adaptor-session, the command is not distributed and the execution response is updated accordingly.
+     * If the state of the adaptor-session is CLOSED, the command is not distributed and the execution response is updated accordingly.
+     * If the adaptor returns a 401 unauthorized, the command is not distributed and the execution response is updated accordingly; also the adaptor-session is marked as CLOSED.
+     * @param adaptorSessionId the adaptor-session id
+     * @param executionId the execution id
+     * @param serviceRegistrationConfig the service registration config
+     * @param command the command
+     */
     @Async
     public void distributeCommand(@NonNull Long adaptorSessionId,
                                   @NonNull UUID executionId,

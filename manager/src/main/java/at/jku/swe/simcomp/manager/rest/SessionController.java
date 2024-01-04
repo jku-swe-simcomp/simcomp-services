@@ -25,6 +25,10 @@ import org.webjars.NotFoundException;
 
 import java.util.UUID;
 
+/**
+ * REST Controller for managing sessions.
+ * Refer to the OpenAPI documentation for more information.
+ */
 @RestController
 @RequestMapping("/session")
 @Slf4j

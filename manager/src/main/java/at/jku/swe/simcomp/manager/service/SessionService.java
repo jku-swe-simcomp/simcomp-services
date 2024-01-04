@@ -24,6 +24,9 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * This service is responsible for managing sessions {@link Session}.
+ */
 @Service
 @Slf4j
 public class SessionService implements SessionRequestVisitor {
@@ -31,6 +34,14 @@ public class SessionService implements SessionRequestVisitor {
     private final AdaptorSessionRepository adaptorSessionRepository;
     private final ServiceRegistryClient serviceRegistryClient;
     private final AdaptorClient adaptorClient;
+
+    /**
+     * Constructor
+     * @param sessionRepository the session repository
+     * @param adaptorClient the adaptor client
+     * @param serviceRegistryClient the service registry client
+     * @param adaptorSessionRepository the adaptor session repository
+     */
     public SessionService(SessionRepository sessionRepository,
                           AdaptorClient adaptorClient,
                           ServiceRegistryClient serviceRegistryClient,
@@ -41,6 +52,12 @@ public class SessionService implements SessionRequestVisitor {
         this.adaptorSessionRepository = adaptorSessionRepository;
     }
 
+    /**
+     * Initializes a session for a given session request.
+     * @param request the session request
+     * @return the initialized session entity
+     * @throws SessionInitializationFailedException if the session could not be initialized
+     */
     @Override
     public Session initSession(SessionRequest.SelectedSimulationTypesSessionRequest request) throws SessionInitializationFailedException {
         var adaptorConfigs = getRegisteredAdaptors().stream()
@@ -50,11 +67,23 @@ public class SessionService implements SessionRequestVisitor {
         return requestAdaptorSessionsAndConstructAndPersistAggregatedSession(adaptorConfigs, Integer.MAX_VALUE);
     }
 
+    /**
+     * Initializes a session for a given session request.
+     * @param request the session request
+     * @return the initialized session entity
+     * @throws SessionInitializationFailedException if the session could not be initialized
+     */
     @Override
     public Session initSession(SessionRequest.AnySimulationSessionRequest request) throws SessionInitializationFailedException {
         return requestAdaptorSessionsAndConstructAndPersistAggregatedSession(getRegisteredAdaptors(), request.n());
     }
 
+    /**
+     * Initializes a session for a given session request.
+     * @param request the session request
+     * @return the initialized session entity
+     * @throws SessionInitializationFailedException if the session could not be initialized
+     */
     @Override
     public Session initSession(SessionRequest.SelectedSimulationInstancesSessionRequest request) throws SessionInitializationFailedException {
         var adaptorConfigsToRequestedInstanceId = getRegisteredAdaptors().stream()
@@ -74,6 +103,12 @@ public class SessionService implements SessionRequestVisitor {
         return sessionRepository.save(aggregatedSession);
     }
 
+    /**
+     * Closes a session by setting its state to closed.
+     * @param aggregatedSessionKey the session id
+     * @throws NotFoundException if the session could not be found
+     * @throws BadRequestException if the session is already closed
+     */
     public void closeSession(UUID aggregatedSessionKey) throws NotFoundException, BadRequestException {
         Session session = sessionRepository.findBySessionKeyOrElseThrow(aggregatedSessionKey);
         if(session.getState().equals(SessionState.CLOSED)){
@@ -85,6 +120,12 @@ public class SessionService implements SessionRequestVisitor {
         //TODO: RESET_TO_HOME before closing adaptor-sessions? Or responsibility of the adaptor?
     }
 
+    /**
+     * Returns the state of a session.
+     * @param sessionKey the session id
+     * @return the session state, including the state of the contained adaptor-sessions.
+     * @throws NotFoundException if the session could not be found
+     */
     public SessionStateDTO getSessionState(UUID sessionKey) throws NotFoundException{
         Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionKey);
         return new SessionStateDTO(session.getSessionKey().toString(), session.getState(),
@@ -93,6 +134,14 @@ public class SessionService implements SessionRequestVisitor {
 
     }
 
+    /**
+     * Adds a simulation (=adaptor session) to an existing session.
+     * @param sessionKey the session id
+     * @param adaptorName the simulation name
+     * @throws BadRequestException if the session is already closed or the simulation (type) is already part of the session
+     * @throws NotFoundException if the session or the simulation could not be found
+     * @throws SessionInitializationFailedException if the simulation (adaptor-session) could not be initialized
+     */
     public void addAdaptorSessionToAggregatedSession(UUID sessionKey, String adaptorName) throws BadRequestException, NotFoundException, SessionInitializationFailedException {
         Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionKey);
         if(session.getState().equals(SessionState.CLOSED)){
@@ -121,6 +170,13 @@ public class SessionService implements SessionRequestVisitor {
         sessionRepository.save(session);
     }
 
+    /**
+     * Removes a simulation (=adaptor session) from an existing session.
+     * @param sessionKey the session id
+     * @param adaptorName the simulation name
+     * @throws BadRequestException if the session is already closed or the simulation (type) is not part of the session, or the adaptor-session is already closed
+     * @throws NotFoundException if the session could not be found
+     */
     public void closeAdaptorSessionOfAggregateSession(UUID sessionKey, String adaptorName) throws BadRequestException, NotFoundException {
         Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionKey);
         if(session.getState().equals(SessionState.CLOSED)){
@@ -137,6 +193,14 @@ public class SessionService implements SessionRequestVisitor {
         closeAdaptorSession(adaptorSession, getRegisteredAdaptors());
     }
 
+    /**
+     * Reopens a simulation (=adaptor session) from an existing session.
+     * @param sessionKey the session id
+     * @param adaptorName the simulation name
+     * @throws BadRequestException if the session is already closed or the simulation (type) is not part of the session, or the adaptor-session is already open
+     * @throws NotFoundException if the session could not be found
+     * @throws SessionInitializationFailedException if the simulation (adaptor-session) could not be initialized
+     */
     public void reopenAdaptorSessionOfAggregateSession(UUID sessionKey, String adaptorName) throws BadRequestException, SessionInitializationFailedException {
         Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionKey);
         if(session.getState().equals(SessionState.CLOSED)){
@@ -175,8 +239,8 @@ public class SessionService implements SessionRequestVisitor {
         sessionRepository.save(session);
         // TODO: reconstruct latest known state of adaptor session
     }
-    // private region methods
 
+    // private region methods
     private Session requestAdaptorSessionsAndConstructAndPersistAggregatedSession(List<ServiceRegistrationConfigDTO> adaptorConfigs, Integer maximumNumberOfSimulations) throws SessionInitializationFailedException {
         var acquiredSessions = tryObtainAdaptorSessions(adaptorConfigs, maximumNumberOfSimulations);
         var aggregatedSession = constructAggregatedSession(acquiredSessions);

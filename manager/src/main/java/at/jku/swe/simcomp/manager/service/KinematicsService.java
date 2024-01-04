@@ -11,15 +11,29 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This service is responsible for the kinematics.
+ * This class wraps the axis-converter client to provide the functionality.
+ * It uses the axis-converter to calculate the inverse and direct kinematics.
+ */
 @Service
 public class KinematicsService {
 
     private final AxisConverterClient axisConverterClient;
 
+    /**
+     * Constructor
+     * @param axisConverterClient the axis converter client
+     */
     public KinematicsService(AxisConverterClient axisConverterClient) {
         this.axisConverterClient = axisConverterClient;
     }
 
+    /**
+     * Transforms a pose command to a composite command containing set-joint-position commands.
+     * @param poseCommand the pose command
+     * @return the transformed command
+     */
     public ExecutionCommand.CompositeCommand poseToComposite(ExecutionCommand.PoseCommand poseCommand){
         List<JointPositionDTO> jointPositions = axisConverterClient.inverseKinematics(new PoseDTO(poseCommand.position(), poseCommand.orientation()));
         if(jointPositions.size() != 6){
@@ -30,6 +44,11 @@ public class KinematicsService {
         return new ExecutionCommand.CompositeCommand(jointPositionCommands);
     }
 
+    /**
+     * Transforms joint-positions to the pose using direct kinematics.
+     * @param jointPositions the joint positions
+     * @return the pose
+     */
     public AttributeValue.Pose jointPositionsToPose(AttributeValue.JointPositions jointPositions){
         List<JointPositionDTO> jointPositionDTOs = toJointPositionDTOs(jointPositions);
         PoseDTO poseDTO = axisConverterClient.directKinematics(jointPositionDTOs);

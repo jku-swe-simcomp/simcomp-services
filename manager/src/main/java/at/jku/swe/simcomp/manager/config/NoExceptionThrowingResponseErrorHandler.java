@@ -1,4 +1,4 @@
-package at.jku.swe.simcomp.manager.service.client;
+package at.jku.swe.simcomp.manager.config;
 
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;

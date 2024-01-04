@@ -22,6 +22,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * REST Controller for managing executions.
+ * Refer to the OpenAPI documentation for more information.
+ */
 @RestController
 @RequestMapping("/session")
 @Slf4j

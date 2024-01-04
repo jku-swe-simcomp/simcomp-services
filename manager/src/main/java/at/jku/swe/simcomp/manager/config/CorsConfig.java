@@ -6,6 +6,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+/**
+ * The cors configuration.
+ * @deprecated probably not needed at all as current configuration aligns with the default configuration of Spring Boot.
+ */
 @Configuration
 public class CorsConfig {
     @Bean
