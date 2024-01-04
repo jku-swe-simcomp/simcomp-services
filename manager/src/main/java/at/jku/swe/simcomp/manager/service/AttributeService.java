@@ -38,7 +38,7 @@ public class AttributeService {
      * @param sessionRepository the session repository
      * @param adaptorSessionRepository the adaptor session repository
      * @param kinematicsService the kinematics service
-     * @param isDirectKinematicsEnabled the flag to enable direct kinematic, defaults to false.
+     * @param isDirectKinematicsEnabled the flag to enable direct kinematic, defaults to true.
      */
     public AttributeService(ServiceRegistryClient serviceRegistryClient,
                             AdaptorClient adaptorClient,
@@ -51,7 +51,7 @@ public class AttributeService {
         this.sessionRepository = sessionRepository;
         this.adaptorSessionRepository = adaptorSessionRepository;
         this.kinematicsService = kinematicsService;
-        this.isDirectKinematicsEnabled = Objects.requireNonNullElse(isDirectKinematicsEnabled, false);
+        this.isDirectKinematicsEnabled = Objects.requireNonNullElse(isDirectKinematicsEnabled, true);
     }
 
     /**
