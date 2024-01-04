@@ -2,12 +2,16 @@
 
 import lombok.Getter;
 
+/**
+ * Exception that is thrown when a command execution failed.
+ * Contains the error code that was returned by the execution.
+ */
 @Getter
 public class CommandExecutionFailedException extends Exception{
-<span class="fc" id="L7">    private final Integer code;</span>
+<span class="fc" id="L11">    private final Integer code;</span>
     public CommandExecutionFailedException(String message, Integer code) {
-<span class="fc" id="L9">        super(message);</span>
-<span class="fc" id="L10">        this.code = code;</span>
-<span class="fc" id="L11">    }</span>
+<span class="fc" id="L13">        super(message);</span>
+<span class="fc" id="L14">        this.code = code;</span>
+<span class="fc" id="L15">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

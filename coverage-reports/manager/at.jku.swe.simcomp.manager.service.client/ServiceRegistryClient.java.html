@@ -11,29 +11,43 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * This client is responsible for communicating with the service registry.
+ */
 @Service
-<span class="fc" id="L15">@Slf4j</span>
+<span class="fc" id="L18">@Slf4j</span>
 public class ServiceRegistryClient {
     private final RestTemplate restTemplate;
     private final Boolean isInverseKinematicsEnabled;
-    public ServiceRegistryClient(RestTemplate restTemplate,
-<span class="fc" id="L20">                                 @Value(&quot;${application.kinematics.inverse.enabled}&quot;) Boolean isInverseKinematicsEnabled) {</span>
-<span class="fc" id="L21">        this.restTemplate = restTemplate;</span>
-<span class="fc" id="L22">        this.isInverseKinematicsEnabled = Objects.requireNonNullElse(isInverseKinematicsEnabled, false);</span>
-<span class="fc" id="L23">    }</span>
 
+    /**
+     * Constructor
+     * @param restTemplate RestTemplate
+     * @param isInverseKinematicsEnabled the flag to enable inverse kinematic, defaults to false.
+     */
+    public ServiceRegistryClient(RestTemplate restTemplate,
+<span class="fc" id="L29">                                 @Value(&quot;${application.kinematics.inverse.enabled}&quot;) Boolean isInverseKinematicsEnabled) {</span>
+<span class="fc" id="L30">        this.restTemplate = restTemplate;</span>
+<span class="fc" id="L31">        this.isInverseKinematicsEnabled = Objects.requireNonNullElse(isInverseKinematicsEnabled, false);</span>
+<span class="fc" id="L32">    }</span>
+
+    /**
+     * This method calls the service registry to fetch all available adaptors.
+     * If inverse kinematics is enabled, the pose action is added to the supported actions.
+     * @return the list of available adaptors
+     */
     public List&lt;ServiceRegistrationConfigDTO&gt; getRegisteredAdaptors() {
-<span class="fc" id="L26">        log.debug(&quot;Fetching available adaptors...&quot;);</span>
+<span class="fc" id="L40">        log.debug(&quot;Fetching available adaptors...&quot;);</span>
         // Note: default-object for endpoint does not make sense, but is required for the unit-tests
-<span class="fc" id="L28">        ServiceRegistrationConfigDTO[] configs = restTemplate.getForObject(Objects.requireNonNullElse(System.getenv(&quot;SERVICE_REGISTRY_ENDPOINT&quot;), &quot;&quot;),</span>
+<span class="fc" id="L42">        ServiceRegistrationConfigDTO[] configs = restTemplate.getForObject(Objects.requireNonNullElse(System.getenv(&quot;SERVICE_REGISTRY_ENDPOINT&quot;), &quot;&quot;),</span>
                 ServiceRegistrationConfigDTO[].class);
-<span class="fc" id="L30">        log.debug(&quot;Available adaptor configurations: {}&quot;, configs);</span>
-<span class="fc" id="L31">        List&lt;ServiceRegistrationConfigDTO&gt; configList = Arrays.asList(configs);</span>
-<span class="pc bpc" id="L32" title="1 of 2 branches missed.">        if(isInverseKinematicsEnabled){</span>
-<span class="nc" id="L33">            log.info(&quot;Adding Pose as supported actions as inverse kinematics is enabled&quot;);</span>
-<span class="nc" id="L34">            configList.forEach(c -&gt; c.getSupportedActions().add(ActionType.POSE));</span>
+<span class="fc" id="L44">        log.debug(&quot;Available adaptor configurations: {}&quot;, configs);</span>
+<span class="fc" id="L45">        List&lt;ServiceRegistrationConfigDTO&gt; configList = Arrays.asList(configs);</span>
+<span class="pc bpc" id="L46" title="1 of 2 branches missed.">        if(isInverseKinematicsEnabled){</span>
+<span class="nc" id="L47">            log.info(&quot;Adding Pose as supported actions as inverse kinematics is enabled&quot;);</span>
+<span class="nc" id="L48">            configList.forEach(c -&gt; c.getSupportedActions().add(ActionType.POSE));</span>
         }
-<span class="fc" id="L36">        return configList;</span>
+<span class="fc" id="L50">        return configList;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

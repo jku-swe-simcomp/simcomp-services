@@ -26,145 +26,201 @@ import java.util.List;
 import java.util.Optional;
 import static at.jku.swe.simcomp.commons.adaptor.endpoint.AdaptorEndpointConstants.*;
 
+/**
+ * This service is responsible for communicating with the adaptors.
+ */
 @Service
-<span class="fc" id="L30">@Slf4j</span>
+<span class="fc" id="L33">@Slf4j</span>
 public class AdaptorClient {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
+
+    /**
+     * Constructor
+     * @param restTemplate the rest template
+     * @param objectMapper the object mapper
+     */
     public AdaptorClient(@Qualifier(&quot;noExceptionThrowingRestTemplate&quot;) RestTemplate restTemplate,
-<span class="fc" id="L35">                         ObjectMapper objectMapper) {</span>
-<span class="fc" id="L36">        this.restTemplate = restTemplate;</span>
-<span class="fc" id="L37">        this.objectMapper = objectMapper;</span>
-<span class="fc" id="L38">    }</span>
+<span class="fc" id="L44">                         ObjectMapper objectMapper) {</span>
+<span class="fc" id="L45">        this.restTemplate = restTemplate;</span>
+<span class="fc" id="L46">        this.objectMapper = objectMapper;</span>
+<span class="fc" id="L47">    }</span>
 
-<span class="pc bpc" id="L40" title="1 of 2 branches missed.">    public Optional&lt;String&gt; getSession(@NonNull ServiceRegistrationConfigDTO adaptorConfig) {</span>
-<span class="fc" id="L41">        String url = getDomain(adaptorConfig) + INIT_SESSION_PATH;</span>
+    /**
+     * Tries to initialize a session with the given adaptor.
+     * @param adaptorConfig the adaptor config
+     * @return the session key if successful, empty otherwise
+     */
+<span class="pc bpc" id="L54" title="1 of 2 branches missed.">    public Optional&lt;String&gt; getSession(@NonNull ServiceRegistrationConfigDTO adaptorConfig) {</span>
+<span class="fc" id="L55">        String url = getDomain(adaptorConfig) + INIT_SESSION_PATH;</span>
         try {
-<span class="fc" id="L43">            ResponseEntity&lt;String&gt; response = restTemplate.postForEntity(url, new HttpEntity&lt;&gt;(null), String.class);</span>
+<span class="fc" id="L57">            ResponseEntity&lt;String&gt; response = restTemplate.postForEntity(url, new HttpEntity&lt;&gt;(null), String.class);</span>
 
-<span class="fc bfc" id="L45" title="All 2 branches covered.">            if (response.getStatusCode() == HttpStatus.OK) {</span>
-<span class="fc" id="L46">                log.info(&quot;Obtained adaptor session of {} with key {}&quot;, adaptorConfig.getName(), response.getBody());</span>
-<span class="fc" id="L47">                return Optional.ofNullable(response.getBody());</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">            if (response.getStatusCode() == HttpStatus.OK) {</span>
+<span class="fc" id="L60">                log.info(&quot;Obtained adaptor session of {} with key {}&quot;, adaptorConfig.getName(), response.getBody());</span>
+<span class="fc" id="L61">                return Optional.ofNullable(response.getBody());</span>
             } else {
-<span class="fc" id="L49">                log.info(&quot;Non-200 response when trying to obtain session for {}: {}&quot;, adaptorConfig.getName(), response.getBody());</span>
-<span class="fc" id="L50">                return Optional.empty();</span>
+<span class="fc" id="L63">                log.info(&quot;Non-200 response when trying to obtain session for {}: {}&quot;, adaptorConfig.getName(), response.getBody());</span>
+<span class="fc" id="L64">                return Optional.empty();</span>
             }
-<span class="fc" id="L52">        } catch (Exception e) {</span>
-<span class="fc" id="L53">            log.error(&quot;Error during REST call to initialize adaptor session. {}&quot;, e.getMessage());</span>
-<span class="fc" id="L54">            return Optional.empty();</span>
+<span class="fc" id="L66">        } catch (Exception e) {</span>
+<span class="fc" id="L67">            log.error(&quot;Error during REST call to initialize adaptor session. {}&quot;, e.getMessage());</span>
+<span class="fc" id="L68">            return Optional.empty();</span>
         }
     }
 
-<span class="pc bpc" id="L58" title="1 of 2 branches missed.">    public Optional&lt;String&gt; getSession(@NonNull ServiceRegistrationConfigDTO adaptorConfig,</span>
-<span class="pc bpc" id="L59" title="1 of 2 branches missed.">                                       @NonNull String instanceId) {</span>
-<span class="fc" id="L60">        String url = getDomain(adaptorConfig) + getInitSessionPathWithInstanceId(instanceId);</span>
+    /**
+     * Tries to initialize a session with the given adaptor for a given simulation instance.
+     * @param adaptorConfig the adaptor config
+     * @param instanceId the simulation instance id
+     * @return the session key if successful, empty otherwise
+     */
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">    public Optional&lt;String&gt; getSession(@NonNull ServiceRegistrationConfigDTO adaptorConfig,</span>
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">                                       @NonNull String instanceId) {</span>
+<span class="fc" id="L80">        String url = getDomain(adaptorConfig) + getInitSessionPathWithInstanceId(instanceId);</span>
         try {
-<span class="fc" id="L62">            ResponseEntity&lt;String&gt; response = restTemplate.postForEntity(url, new HttpEntity&lt;&gt;(null), String.class);</span>
+<span class="fc" id="L82">            ResponseEntity&lt;String&gt; response = restTemplate.postForEntity(url, new HttpEntity&lt;&gt;(null), String.class);</span>
 
-<span class="fc bfc" id="L64" title="All 2 branches covered.">            if (response.getStatusCode() == HttpStatus.OK) {</span>
-<span class="fc" id="L65">                log.info(&quot;Obtained adaptor session for simulation {}, instance {} with key {}&quot;, adaptorConfig.getName(), instanceId, response.getBody());</span>
-<span class="fc" id="L66">                return Optional.ofNullable(response.getBody());</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">            if (response.getStatusCode() == HttpStatus.OK) {</span>
+<span class="fc" id="L85">                log.info(&quot;Obtained adaptor session for simulation {}, instance {} with key {}&quot;, adaptorConfig.getName(), instanceId, response.getBody());</span>
+<span class="fc" id="L86">                return Optional.ofNullable(response.getBody());</span>
             } else {
-<span class="fc" id="L68">                log.info(&quot;Non-200 response when trying to obtain instance {} of {} session: {}&quot;, instanceId, adaptorConfig.getName(), response.getBody());</span>
-<span class="fc" id="L69">                return Optional.empty();</span>
+<span class="fc" id="L88">                log.info(&quot;Non-200 response when trying to obtain instance {} of {} session: {}&quot;, instanceId, adaptorConfig.getName(), response.getBody());</span>
+<span class="fc" id="L89">                return Optional.empty();</span>
             }
-<span class="fc" id="L71">        } catch (Exception e) {</span>
-<span class="fc" id="L72">            log.error(&quot;Error during REST call to initialize adaptor session for instance {} of {}. {}&quot;, instanceId, adaptorConfig.getName(), e.getMessage());</span>
-<span class="fc" id="L73">            return Optional.empty();</span>
+<span class="fc" id="L91">        } catch (Exception e) {</span>
+<span class="fc" id="L92">            log.error(&quot;Error during REST call to initialize adaptor session for instance {} of {}. {}&quot;, instanceId, adaptorConfig.getName(), e.getMessage());</span>
+<span class="fc" id="L93">            return Optional.empty();</span>
         }
     }
 
-<span class="pc bpc" id="L77" title="1 of 2 branches missed.">    public void closeSession(@NonNull ServiceRegistrationConfigDTO adaptorConfig,</span>
-<span class="pc bpc" id="L78" title="1 of 2 branches missed.">                             @NonNull String sessionKey){</span>
-<span class="fc" id="L79">        String url = getDomain(adaptorConfig) + getCloseSessionPathForSessionId(sessionKey);</span>
+    /**
+     * Closes a session with the given adaptor.
+     * @param adaptorConfig the adaptor config identifying the adaptor
+     * @param sessionKey the key of the session to be closed
+     */
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">    public void closeSession(@NonNull ServiceRegistrationConfigDTO adaptorConfig,</span>
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">                             @NonNull String sessionKey){</span>
+<span class="fc" id="L104">        String url = getDomain(adaptorConfig) + getCloseSessionPathForSessionId(sessionKey);</span>
         try {
-<span class="fc" id="L81">            restTemplate.delete(url);</span>
-<span class="fc" id="L82">        } catch (Exception e) {</span>
-<span class="fc" id="L83">            log.error(&quot;Error during REST call to delete adaptor session. {}&quot;, e.getMessage());</span>
-<span class="fc" id="L84">        }</span>
-<span class="fc" id="L85">    }</span>
+<span class="fc" id="L106">            restTemplate.delete(url);</span>
+<span class="fc" id="L107">        } catch (Exception e) {</span>
+<span class="fc" id="L108">            log.error(&quot;Error during REST call to delete adaptor session. {}&quot;, e.getMessage());</span>
+<span class="fc" id="L109">        }</span>
+<span class="fc" id="L110">    }</span>
 
-<span class="pc bpc" id="L87" title="1 of 2 branches missed.">    public ExecutionResultDTO executeCommand(@NonNull ServiceRegistrationConfigDTO adaptorConfig,</span>
-<span class="pc bpc" id="L88" title="1 of 2 branches missed.">                                             @NonNull ExecutionCommand command,</span>
-<span class="pc bpc" id="L89" title="1 of 2 branches missed.">                                             @NonNull String adaptorSessionKey) throws CommandExecutionFailedException {</span>
-<span class="fc" id="L90">        String url = getDomain(adaptorConfig) + getExecuteActionPathForSessionId(adaptorSessionKey);</span>
+    /**
+     * Executes a command for a given adaptor session.
+     * @param adaptorConfig the adaptor config identifying the adaptor
+     * @param command the command to be executed
+     * @param adaptorSessionKey the session key of the adaptor session
+     * @return the execution result
+     * @throws CommandExecutionFailedException if the command execution failed
+     */
+<span class="pc bpc" id="L120" title="1 of 2 branches missed.">    public ExecutionResultDTO executeCommand(@NonNull ServiceRegistrationConfigDTO adaptorConfig,</span>
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">                                             @NonNull ExecutionCommand command,</span>
+<span class="pc bpc" id="L122" title="1 of 2 branches missed.">                                             @NonNull String adaptorSessionKey) throws CommandExecutionFailedException {</span>
+<span class="fc" id="L123">        String url = getDomain(adaptorConfig) + getExecuteActionPathForSessionId(adaptorSessionKey);</span>
         ResponseEntity&lt;String&gt; response;
         try{
-<span class="fc" id="L93">            response = restTemplate.postForEntity(url, new HttpEntity&lt;&gt;(command, null), String.class);</span>
-<span class="fc" id="L94">        }catch (Exception e){</span>
-<span class="fc" id="L95">            throw new CommandExecutionFailedException(&quot;Could not execute command %s for adaptor %s: %s&quot;.formatted(command, adaptorConfig.getName(), e.getMessage()), 500);</span>
-<span class="fc" id="L96">        }</span>
+<span class="fc" id="L126">            response = restTemplate.postForEntity(url, new HttpEntity&lt;&gt;(command, null), String.class);</span>
+<span class="fc" id="L127">        }catch (Exception e){</span>
+<span class="fc" id="L128">            throw new CommandExecutionFailedException(&quot;Could not execute command %s for adaptor %s: %s&quot;.formatted(command, adaptorConfig.getName(), e.getMessage()), 500);</span>
+<span class="fc" id="L129">        }</span>
 
         try{
-<span class="fc bfc" id="L99" title="All 2 branches covered.">            if (response.getStatusCode() == HttpStatus.OK) {</span>
-<span class="fc" id="L100">                log.info(&quot;Executed command for adaptor {}: {}&quot;, adaptorConfig.getName(), response.getBody());</span>
-<span class="fc" id="L101">                return objectMapper.readValue(response.getBody(), ExecutionResultDTO.class);</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">            if (response.getStatusCode() == HttpStatus.OK) {</span>
+<span class="fc" id="L133">                log.info(&quot;Executed command for adaptor {}: {}&quot;, adaptorConfig.getName(), response.getBody());</span>
+<span class="fc" id="L134">                return objectMapper.readValue(response.getBody(), ExecutionResultDTO.class);</span>
             } else {
-<span class="fc" id="L103">                log.info(&quot;Non-200 response when trying to execute command for adaptor {}: {}&quot;, adaptorConfig.getName(), response.getBody());</span>
-<span class="fc" id="L104">                HttpErrorDTO error = objectMapper.readValue(response.getBody(), HttpErrorDTO.class);</span>
-<span class="fc bfc" id="L105" title="All 2 branches covered.">                if(error == null){</span>
-<span class="fc" id="L106">                    throw new CommandExecutionFailedException(&quot;Could not deserialize response %s from %s&quot;.formatted(response.getBody(), adaptorConfig.getName()), 500);</span>
+<span class="fc" id="L136">                log.info(&quot;Non-200 response when trying to execute command for adaptor {}: {}&quot;, adaptorConfig.getName(), response.getBody());</span>
+<span class="fc" id="L137">                HttpErrorDTO error = objectMapper.readValue(response.getBody(), HttpErrorDTO.class);</span>
+<span class="fc bfc" id="L138" title="All 2 branches covered.">                if(error == null){</span>
+<span class="fc" id="L139">                    throw new CommandExecutionFailedException(&quot;Could not deserialize response %s from %s&quot;.formatted(response.getBody(), adaptorConfig.getName()), 500);</span>
                 }
-<span class="fc" id="L108">                throw new CommandExecutionFailedException(error.getMessage(), (int) error.getStatus());</span>
+<span class="fc" id="L141">                throw new CommandExecutionFailedException(error.getMessage(), (int) error.getStatus());</span>
             }
-<span class="nc" id="L110">        }catch (JsonProcessingException e){</span>
-<span class="nc" id="L111">            throw new CommandExecutionFailedException(&quot;Could not deserialize response %s from %s&quot;.formatted(response.getBody(), adaptorConfig.getName()), 500);</span>
+<span class="nc" id="L143">        }catch (JsonProcessingException e){</span>
+<span class="nc" id="L144">            throw new CommandExecutionFailedException(&quot;Could not deserialize response %s from %s&quot;.formatted(response.getBody(), adaptorConfig.getName()), 500);</span>
         }
     }
 
-<span class="pc bpc" id="L115" title="1 of 2 branches missed.">    public Optional&lt;AttributeValue&gt; getAttributeValue(@NonNull String sessionId,</span>
-<span class="pc bpc" id="L116" title="1 of 2 branches missed.">                                                      @NonNull AttributeKey attributeKey,</span>
-<span class="pc bpc" id="L117" title="1 of 2 branches missed.">                                                      @NonNull ServiceRegistrationConfigDTO config) throws SessionNotValidException {</span>
-<span class="fc" id="L118">        String url = getDomain(config) + getGetAttributePathForAttributeName(sessionId, attributeKey);</span>
-<span class="fc" id="L119">        ResponseEntity&lt;String&gt; responseEntity = null;</span>
+    /**
+     * Fetches the attribute-value from an adaptor for a given session
+     * @param config the adaptor config identifying the adaptor
+     * @param attributeKey the attribute key
+     * @param sessionId the session id
+     * @return the attribute value if successful, empty otherwise
+     */
+<span class="pc bpc" id="L155" title="1 of 2 branches missed.">    public Optional&lt;AttributeValue&gt; getAttributeValue(@NonNull String sessionId,</span>
+<span class="pc bpc" id="L156" title="1 of 2 branches missed.">                                                      @NonNull AttributeKey attributeKey,</span>
+<span class="pc bpc" id="L157" title="1 of 2 branches missed.">                                                      @NonNull ServiceRegistrationConfigDTO config) throws SessionNotValidException {</span>
+<span class="fc" id="L158">        String url = getDomain(config) + getGetAttributePathForAttributeName(sessionId, attributeKey);</span>
+<span class="fc" id="L159">        ResponseEntity&lt;String&gt; responseEntity = null;</span>
         try{
-<span class="fc" id="L121">            responseEntity = restTemplate.getForEntity(url, String.class);</span>
-<span class="fc" id="L122">        }catch (Exception e){</span>
-<span class="fc" id="L123">            log.warn(&quot;Could not obtain attribute value for adaptor session {} of {}: {}&quot;, sessionId, config.getName(), e.getMessage());</span>
-<span class="fc" id="L124">            return Optional.empty();</span>
-<span class="fc" id="L125">        }</span>
+<span class="fc" id="L161">            responseEntity = restTemplate.getForEntity(url, String.class);</span>
+<span class="fc" id="L162">        }catch (Exception e){</span>
+<span class="fc" id="L163">            log.warn(&quot;Could not obtain attribute value for adaptor session {} of {}: {}&quot;, sessionId, config.getName(), e.getMessage());</span>
+<span class="fc" id="L164">            return Optional.empty();</span>
+<span class="fc" id="L165">        }</span>
 
-<span class="fc bfc" id="L127" title="All 2 branches covered.">        if (responseEntity.getStatusCode().is2xxSuccessful()) {</span>
-<span class="fc" id="L128">            log.debug(&quot;Obtained attribute value for adaptor session {} of {} with key {}: {}&quot;, sessionId, config.getName(), attributeKey, responseEntity.getBody());</span>
+<span class="fc bfc" id="L167" title="All 2 branches covered.">        if (responseEntity.getStatusCode().is2xxSuccessful()) {</span>
+<span class="fc" id="L168">            log.debug(&quot;Obtained attribute value for adaptor session {} of {} with key {}: {}&quot;, sessionId, config.getName(), attributeKey, responseEntity.getBody());</span>
             try {
-<span class="fc" id="L130">                return Optional.ofNullable(objectMapper.readValue(responseEntity.getBody(), AttributeValue.class));</span>
-<span class="nc" id="L131">            } catch (JsonProcessingException e) {</span>
-<span class="nc" id="L132">                log.warn(&quot;Could not deserialize response {} from {}&quot;, responseEntity.getBody(), config.getName());</span>
-<span class="nc" id="L133">            }</span>
+<span class="fc" id="L170">                return Optional.ofNullable(objectMapper.readValue(responseEntity.getBody(), AttributeValue.class));</span>
+<span class="nc" id="L171">            } catch (JsonProcessingException e) {</span>
+<span class="nc" id="L172">                log.warn(&quot;Could not deserialize response {} from {}&quot;, responseEntity.getBody(), config.getName());</span>
+<span class="nc" id="L173">            }</span>
         }else{
-<span class="fc" id="L135">            log.warn(&quot;Non-2xx response when trying to obtain attribute value for adaptor session {} of {}: {}&quot;, sessionId, config.getName(), responseEntity.getBody());</span>
-<span class="pc bpc" id="L136" title="1 of 2 branches missed.">            if(responseEntity.getStatusCode() == HttpStatus.UNAUTHORIZED){</span>
-<span class="fc" id="L137">                throw new SessionNotValidException(&quot;Session %s for adaptor %s is not valid&quot;.formatted(sessionId, config.getName()));</span>
+<span class="fc" id="L175">            log.warn(&quot;Non-2xx response when trying to obtain attribute value for adaptor session {} of {}: {}&quot;, sessionId, config.getName(), responseEntity.getBody());</span>
+<span class="pc bpc" id="L176" title="1 of 2 branches missed.">            if(responseEntity.getStatusCode() == HttpStatus.UNAUTHORIZED){</span>
+<span class="fc" id="L177">                throw new SessionNotValidException(&quot;Session %s for adaptor %s is not valid&quot;.formatted(sessionId, config.getName()));</span>
             }
         }
-<span class="nc" id="L140">        return Optional.empty();</span>
+<span class="nc" id="L180">        return Optional.empty();</span>
     }
 
-<span class="pc bpc" id="L143" title="1 of 2 branches missed.">    public void registerSimulationInstanceForAdaptor(@NonNull ServiceRegistrationConfigDTO serviceRegistrationConfigDTO,</span>
-<span class="pc bpc" id="L144" title="1 of 2 branches missed.">                                                     @NonNull SimulationInstanceConfig config) throws Exception {</span>
-<span class="fc" id="L145">        String url = getDomain(serviceRegistrationConfigDTO) + SIMULATION_INSTANCE_PATH;</span>
-<span class="fc" id="L146">        HttpEntity&lt;SimulationInstanceConfig&gt; requestEntity = new HttpEntity&lt;&gt;(config, null);</span>
-<span class="fc" id="L147">        var response = restTemplate.postForEntity(url, requestEntity, Void.class);</span>
-<span class="fc bfc" id="L148" title="All 2 branches covered.">        if(!response.getStatusCode().is2xxSuccessful()){</span>
-<span class="fc" id="L149">            throw new Exception(&quot;Could not register simulation instance %s for adaptor %s with message %s&quot;.formatted(config, serviceRegistrationConfigDTO.getName(), response.getBody()));</span>
+    /**
+     * Registers a simulation instance for a given adaptor.
+     * @param serviceRegistrationConfigDTO the adaptor config
+     * @param config the simulation instance config
+     * @throws Exception if registration fails
+     */
+<span class="pc bpc" id="L189" title="1 of 2 branches missed.">    public void registerSimulationInstanceForAdaptor(@NonNull ServiceRegistrationConfigDTO serviceRegistrationConfigDTO,</span>
+<span class="pc bpc" id="L190" title="1 of 2 branches missed.">                                                     @NonNull SimulationInstanceConfig config) throws Exception {</span>
+<span class="fc" id="L191">        String url = getDomain(serviceRegistrationConfigDTO) + SIMULATION_INSTANCE_PATH;</span>
+<span class="fc" id="L192">        HttpEntity&lt;SimulationInstanceConfig&gt; requestEntity = new HttpEntity&lt;&gt;(config, null);</span>
+<span class="fc" id="L193">        var response = restTemplate.postForEntity(url, requestEntity, Void.class);</span>
+<span class="fc bfc" id="L194" title="All 2 branches covered.">        if(!response.getStatusCode().is2xxSuccessful()){</span>
+<span class="fc" id="L195">            throw new Exception(&quot;Could not register simulation instance %s for adaptor %s with message %s&quot;.formatted(config, serviceRegistrationConfigDTO.getName(), response.getBody()));</span>
         }
-<span class="fc" id="L151">    }</span>
+<span class="fc" id="L197">    }</span>
 
+    /**
+     * Returns all simulation instances for a given adaptor.
+     * @param config the adaptor config identifying the adaptor
+     * @return the simulation instances
+     */
     public List&lt;SimulationInstanceConfig&gt; getSimulationInstances(ServiceRegistrationConfigDTO config) {
-<span class="fc" id="L154">        String url = getDomain(config) + SIMULATION_INSTANCE_PATH;</span>
-<span class="fc" id="L155">        ResponseEntity&lt;List&lt;SimulationInstanceConfig&gt;&gt; responseEntity = restTemplate.exchange(</span>
+<span class="fc" id="L205">        String url = getDomain(config) + SIMULATION_INSTANCE_PATH;</span>
+<span class="fc" id="L206">        ResponseEntity&lt;List&lt;SimulationInstanceConfig&gt;&gt; responseEntity = restTemplate.exchange(</span>
                 url,
                 HttpMethod.GET,
                 null,
-<span class="fc" id="L159">                new ParameterizedTypeReference&lt;&gt;() {}</span>
+<span class="fc" id="L210">                new ParameterizedTypeReference&lt;&gt;() {}</span>
         );
-<span class="fc" id="L161">        return responseEntity.getBody();</span>
+<span class="fc" id="L212">        return responseEntity.getBody();</span>
     }
 
-<span class="pc bpc" id="L164" title="1 of 2 branches missed.">    public void deleteSimulationInstance(@NonNull ServiceRegistrationConfigDTO serviceRegistrationConfigDTO,</span>
-<span class="pc bpc" id="L165" title="1 of 2 branches missed.">                                         @NonNull String instanceId){</span>
-<span class="fc" id="L166">        String url = getDomain(serviceRegistrationConfigDTO)+ getDeleteSimulationInstancePathForInstanceId(instanceId);</span>
-<span class="fc" id="L167">        restTemplate.delete(url);</span>
-<span class="fc" id="L168">    }</span>
+    /**
+     * Deletes a simulation instance for a given adaptor.
+     * @param serviceRegistrationConfigDTO the adaptor config identifying the adaptor
+     * @param instanceId the simulation instance id identifying the simulation instance to be deleted
+     */
+<span class="pc bpc" id="L220" title="1 of 2 branches missed.">    public void deleteSimulationInstance(@NonNull ServiceRegistrationConfigDTO serviceRegistrationConfigDTO,</span>
+<span class="pc bpc" id="L221" title="1 of 2 branches missed.">                                         @NonNull String instanceId){</span>
+<span class="fc" id="L222">        String url = getDomain(serviceRegistrationConfigDTO)+ getDeleteSimulationInstancePathForInstanceId(instanceId);</span>
+<span class="fc" id="L223">        restTemplate.delete(url);</span>
+<span class="fc" id="L224">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

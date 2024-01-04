@@ -4,12 +4,19 @@ import at.jku.swe.simcomp.commons.adaptor.execution.command.visitor.impl.Executi
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Configuration for the execution command validation.
+ */
 @Configuration
-<span class="fc" id="L8">public class ExecutionCommandValidation {</span>
+<span class="fc" id="L11">public class ExecutionCommandValidation {</span>
 
+    /**
+     * Bean for the execution command validation visitor.
+     * @return the execution command validation visitor
+     */
     @Bean
     ExecutionCommandValidationVisitor getExecutionCommandValidator(){
-<span class="fc" id="L12">        return new ExecutionCommandValidationVisitor();</span>
+<span class="fc" id="L19">        return new ExecutionCommandValidationVisitor();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

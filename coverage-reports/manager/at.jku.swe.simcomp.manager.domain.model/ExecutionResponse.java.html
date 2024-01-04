@@ -6,55 +6,58 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+/**
+ * This class represents a response from an adaptor for an execution.
+ */
 @Getter
-<span class="pc" id="L10">@Setter</span>
+<span class="pc" id="L13">@Setter</span>
 @Entity
 @Table(name = &quot;execution_response&quot;)
-<span class="fc" id="L13">@AllArgsConstructor</span>
-<span class="fc" id="L14">@NoArgsConstructor</span>
-<span class="nc" id="L15">@ToString</span>
-<span class="pc" id="L16">@Builder</span>
+<span class="fc" id="L16">@AllArgsConstructor</span>
+<span class="fc" id="L17">@NoArgsConstructor</span>
+<span class="nc" id="L18">@ToString</span>
+<span class="pc" id="L19">@Builder</span>
 public class ExecutionResponse {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = &quot;id&quot;, nullable = false)
-<span class="fc" id="L21">    private Long id;</span>
+<span class="fc" id="L24">    private Long id;</span>
 
     @ManyToOne
     @JoinColumn(name=&quot;execution_id&quot;, nullable=false, updatable = false)
     @ToString.Exclude
-<span class="nc" id="L26">    private Execution execution;</span>
+<span class="nc" id="L29">    private Execution execution;</span>
 
     @ManyToOne
     @JoinColumn(name=&quot;adaptor_session_id&quot;, nullable=false, updatable = false)
     @ToString.Exclude
-<span class="fc" id="L31">    private AdaptorSession adaptorSession;</span>
+<span class="fc" id="L34">    private AdaptorSession adaptorSession;</span>
 
     @Column(name = &quot;response_code&quot;)
-<span class="fc" id="L34">    private Long responseCode;</span>
+<span class="fc" id="L37">    private Long responseCode;</span>
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-<span class="fc" id="L38">    private ExecutionResponseState state;</span>
+<span class="fc" id="L41">    private ExecutionResponseState state;</span>
 
     @Column(length = 2550)
-<span class="fc" id="L41">    private String report;</span>
+<span class="fc" id="L44">    private String report;</span>
 
     @Column(name = &quot;created_at&quot;, nullable = false, updatable = false)
-<span class="nc" id="L44">    private LocalDateTime createdAt;</span>
+<span class="nc" id="L47">    private LocalDateTime createdAt;</span>
 
     @Column(name = &quot;updated_at&quot;, nullable = false)
-<span class="nc" id="L47">    private LocalDateTime updatedAt;</span>
+<span class="nc" id="L50">    private LocalDateTime updatedAt;</span>
 
     @PrePersist
     protected void onCreate() {
-<span class="nc" id="L51">        createdAt = LocalDateTime.now();</span>
-<span class="nc" id="L52">        updatedAt = createdAt;</span>
-<span class="nc" id="L53">    }</span>
+<span class="nc" id="L54">        createdAt = LocalDateTime.now();</span>
+<span class="nc" id="L55">        updatedAt = createdAt;</span>
+<span class="nc" id="L56">    }</span>
 
     @PreUpdate
     protected void onUpdate() {
-<span class="nc" id="L57">        updatedAt = LocalDateTime.now();</span>
-<span class="nc" id="L58">    }</span>
+<span class="nc" id="L60">        updatedAt = LocalDateTime.now();</span>
+<span class="nc" id="L61">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

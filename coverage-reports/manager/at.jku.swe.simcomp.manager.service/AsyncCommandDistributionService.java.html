@@ -21,8 +21,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+/**
+ * This service is responsible for distributing commands {@link ExecutionCommand} to the adaptors.
+ */
 @Service
-<span class="fc" id="L25">@Slf4j</span>
+<span class="fc" id="L28">@Slf4j</span>
 public class AsyncCommandDistributionService {
     private final AdaptorClient adaptorClient;
     private final ExecutionRepository executionRepository;
@@ -30,50 +33,70 @@ public class AsyncCommandDistributionService {
     private final AdaptorSessionRepository adaptorSessionRepository;
     private final ExecutionCommandValidationVisitor executionCommandValidationVisitor;
 
+    /**
+     * Constructor
+     * @param executionRepository the execution repository
+     * @param adaptorClient the adaptor client
+     * @param executionResponseRepository the execution response repository
+     * @param adaptorSessionRepository the adaptor session repository
+     * @param executionCommandValidationVisitor the execution command validation visitor
+     */
     public AsyncCommandDistributionService(ExecutionRepository executionRepository,
                                            AdaptorClient adaptorClient,
                                            ExecutionResponseRepository executionResponseRepository,
                                            AdaptorSessionRepository adaptorSessionRepository,
-<span class="fc" id="L37">                                           ExecutionCommandValidationVisitor executionCommandValidationVisitor) {</span>
-<span class="fc" id="L38">        this.executionRepository = executionRepository;</span>
-<span class="fc" id="L39">        this.adaptorClient = adaptorClient;</span>
-<span class="fc" id="L40">        this.executionResponseRepository = executionResponseRepository;</span>
-<span class="fc" id="L41">        this.adaptorSessionRepository = adaptorSessionRepository;</span>
-<span class="fc" id="L42">        this.executionCommandValidationVisitor = executionCommandValidationVisitor;</span>
-<span class="fc" id="L43">    }</span>
-    @Async
-<span class="pc bpc" id="L45" title="1 of 2 branches missed.">    public void distributeCommand(@NonNull Long adaptorSessionId,</span>
-<span class="pc bpc" id="L46" title="1 of 2 branches missed.">                                  @NonNull UUID executionId,</span>
-<span class="pc bpc" id="L47" title="1 of 2 branches missed.">                                  @NonNull ServiceRegistrationConfigDTO serviceRegistrationConfig,</span>
-<span class="pc bpc" id="L48" title="1 of 2 branches missed.">                                  @NonNull ExecutionCommand command) {</span>
-<span class="fc" id="L49">        AdaptorSession adaptorSession = adaptorSessionRepository.findById(adaptorSessionId)</span>
-<span class="fc" id="L50">                .orElseThrow();</span>
+<span class="fc" id="L48">                                           ExecutionCommandValidationVisitor executionCommandValidationVisitor) {</span>
+<span class="fc" id="L49">        this.executionRepository = executionRepository;</span>
+<span class="fc" id="L50">        this.adaptorClient = adaptorClient;</span>
+<span class="fc" id="L51">        this.executionResponseRepository = executionResponseRepository;</span>
+<span class="fc" id="L52">        this.adaptorSessionRepository = adaptorSessionRepository;</span>
+<span class="fc" id="L53">        this.executionCommandValidationVisitor = executionCommandValidationVisitor;</span>
+<span class="fc" id="L54">    }</span>
 
-<span class="fc bfc" id="L52" title="All 2 branches covered.">        if(adaptorSession.getState().equals(SessionState.CLOSED)){</span>
-<span class="fc" id="L53">            log.info(&quot;Ignoring closed adaptor-session {}&quot;, adaptorSession.getId());</span>
-<span class="fc" id="L54">            return;</span>
+    /**
+     * Distributes a command to an adaptor-session.
+     * If the command is supported by the adaptor-session, the command is distributed and the execution response is updated accordingly.
+     * If the command is not supported by the adaptor-session, the command is not distributed and the execution response is updated accordingly.
+     * If the state of the adaptor-session is CLOSED, the command is not distributed and the execution response is updated accordingly.
+     * If the adaptor returns a 401 unauthorized, the command is not distributed and the execution response is updated accordingly; also the adaptor-session is marked as CLOSED.
+     * @param adaptorSessionId the adaptor-session id
+     * @param executionId the execution id
+     * @param serviceRegistrationConfig the service registration config
+     * @param command the command
+     */
+    @Async
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">    public void distributeCommand(@NonNull Long adaptorSessionId,</span>
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">                                  @NonNull UUID executionId,</span>
+<span class="pc bpc" id="L70" title="1 of 2 branches missed.">                                  @NonNull ServiceRegistrationConfigDTO serviceRegistrationConfig,</span>
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">                                  @NonNull ExecutionCommand command) {</span>
+<span class="fc" id="L72">        AdaptorSession adaptorSession = adaptorSessionRepository.findById(adaptorSessionId)</span>
+<span class="fc" id="L73">                .orElseThrow();</span>
+
+<span class="fc bfc" id="L75" title="All 2 branches covered.">        if(adaptorSession.getState().equals(SessionState.CLOSED)){</span>
+<span class="fc" id="L76">            log.info(&quot;Ignoring closed adaptor-session {}&quot;, adaptorSession.getId());</span>
+<span class="fc" id="L77">            return;</span>
         }
 
-<span class="fc" id="L57">        Long responseId = initDefaultExecutionResponse(adaptorSession, executionId);</span>
+<span class="fc" id="L80">        Long responseId = initDefaultExecutionResponse(adaptorSession, executionId);</span>
 
         try {
-<span class="fc bfc" id="L60" title="All 2 branches covered.">            if(Boolean.FALSE.equals(command.accept(executionCommandValidationVisitor, serviceRegistrationConfig.getSupportedActions()))){</span>
-<span class="fc" id="L61">                log.warn(&quot;Command {} not supported by {}. Aborting.&quot;, command, serviceRegistrationConfig);</span>
-<span class="fc" id="L62">                updateExecutionResponse(responseId, 400, &quot;Command was not even distributed to simulation as the simulation indicated it does not support at least one of the attempted actions.&quot;, ExecutionResponseState.ERROR);</span>
-<span class="fc" id="L63">                return;</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">            if(Boolean.FALSE.equals(command.accept(executionCommandValidationVisitor, serviceRegistrationConfig.getSupportedActions()))){</span>
+<span class="fc" id="L84">                log.warn(&quot;Command {} not supported by {}. Aborting.&quot;, command, serviceRegistrationConfig);</span>
+<span class="fc" id="L85">                updateExecutionResponse(responseId, 400, &quot;Command was not even distributed to simulation as the simulation indicated it does not support at least one of the attempted actions.&quot;, ExecutionResponseState.ERROR);</span>
+<span class="fc" id="L86">                return;</span>
             }
-<span class="nc" id="L65">        } catch (Exception e) {</span>
-<span class="nc" id="L66">            log.info(&quot;Command validation threw exception: {}. Continuing with distribution nevertheless..&quot;, e.getMessage());</span>
-<span class="fc" id="L67">        }</span>
+<span class="nc" id="L88">        } catch (Exception e) {</span>
+<span class="nc" id="L89">            log.info(&quot;Command validation threw exception: {}. Continuing with distribution nevertheless..&quot;, e.getMessage());</span>
+<span class="fc" id="L90">        }</span>
 
-<span class="fc" id="L69">        log.info(&quot;Distributing command {} to adaptor-session {}&quot;, executionId, adaptorSession.getAdaptorName());</span>
+<span class="fc" id="L92">        log.info(&quot;Distributing command {} to adaptor-session {}&quot;, executionId, adaptorSession.getAdaptorName());</span>
         try {
-<span class="fc" id="L71">            sendCommandAndUpdateResponse(responseId, serviceRegistrationConfig, command, adaptorSession.getSessionKey());</span>
-<span class="fc" id="L72">        } catch (SessionNotValidException e) {</span>
-<span class="fc" id="L73">            log.info(&quot;Marking simulation session %s from aggregate session %s as closed, as it returned 401 unauthorized.&quot;.formatted(adaptorSession.getAdaptorName(), adaptorSession.getSession().getSessionKey()));</span>
-<span class="fc" id="L74">            adaptorSessionRepository.updateSessionStateById(adaptorSessionId, SessionState.CLOSED);</span>
-<span class="fc" id="L75">        }</span>
-<span class="fc" id="L76">    }</span>
+<span class="fc" id="L94">            sendCommandAndUpdateResponse(responseId, serviceRegistrationConfig, command, adaptorSession.getSessionKey());</span>
+<span class="fc" id="L95">        } catch (SessionNotValidException e) {</span>
+<span class="fc" id="L96">            log.info(&quot;Marking simulation session %s from aggregate session %s as closed, as it returned 401 unauthorized.&quot;.formatted(adaptorSession.getAdaptorName(), adaptorSession.getSession().getSessionKey()));</span>
+<span class="fc" id="L97">            adaptorSessionRepository.updateSessionStateById(adaptorSessionId, SessionState.CLOSED);</span>
+<span class="fc" id="L98">        }</span>
+<span class="fc" id="L99">    }</span>
 
     // private region methods
 
@@ -82,39 +105,39 @@ public class AsyncCommandDistributionService {
                                               ExecutionCommand command,
                                               String adaptorSessionKey) throws SessionNotValidException {
         try{
-<span class="fc" id="L85">            ExecutionResultDTO executionResult = adaptorClient.executeCommand(serviceRegistrationConfig, command, adaptorSessionKey);</span>
-<span class="fc" id="L86">            updateExecutionResponse(responseId, 200, executionResult.getReport(), ExecutionResponseState.SUCCESS);</span>
-<span class="fc" id="L87">            log.info(&quot;Execution of command for adaptor-session {} finished: {}. &quot;, serviceRegistrationConfig.getName(), executionResult);</span>
-<span class="fc" id="L88">        }catch (CommandExecutionFailedException e){</span>
-<span class="fc" id="L89">            log.error(&quot;Execution of command failed for adaptor-session {}&quot;, serviceRegistrationConfig.getName());</span>
-<span class="fc" id="L90">            updateExecutionResponse(responseId, e.getCode(), e.getMessage(), ExecutionResponseState.ERROR);</span>
-<span class="pc bpc" id="L91" title="1 of 2 branches missed.">            if(e.getCode() == 401){</span>
-<span class="fc" id="L92">                throw new SessionNotValidException(&quot;&quot;);</span>
+<span class="fc" id="L108">            ExecutionResultDTO executionResult = adaptorClient.executeCommand(serviceRegistrationConfig, command, adaptorSessionKey);</span>
+<span class="fc" id="L109">            updateExecutionResponse(responseId, 200, executionResult.getReport(), ExecutionResponseState.SUCCESS);</span>
+<span class="fc" id="L110">            log.info(&quot;Execution of command for adaptor-session {} finished: {}. &quot;, serviceRegistrationConfig.getName(), executionResult);</span>
+<span class="fc" id="L111">        }catch (CommandExecutionFailedException e){</span>
+<span class="fc" id="L112">            log.error(&quot;Execution of command failed for adaptor-session {}&quot;, serviceRegistrationConfig.getName());</span>
+<span class="fc" id="L113">            updateExecutionResponse(responseId, e.getCode(), e.getMessage(), ExecutionResponseState.ERROR);</span>
+<span class="pc bpc" id="L114" title="1 of 2 branches missed.">            if(e.getCode() == 401){</span>
+<span class="fc" id="L115">                throw new SessionNotValidException(&quot;&quot;);</span>
             }
-<span class="nc" id="L94">        }catch(Exception e){</span>
-<span class="nc" id="L95">            log.error(&quot;Execution of command failed for adaptor-session {}&quot;, serviceRegistrationConfig.getName());</span>
-<span class="nc" id="L96">            updateExecutionResponse(responseId, 500, e.getMessage(), ExecutionResponseState.ERROR);</span>
-<span class="pc" id="L97">        }</span>
-<span class="fc" id="L98">    }</span>
+<span class="nc" id="L117">        }catch(Exception e){</span>
+<span class="nc" id="L118">            log.error(&quot;Execution of command failed for adaptor-session {}&quot;, serviceRegistrationConfig.getName());</span>
+<span class="nc" id="L119">            updateExecutionResponse(responseId, 500, e.getMessage(), ExecutionResponseState.ERROR);</span>
+<span class="pc" id="L120">        }</span>
+<span class="fc" id="L121">    }</span>
 
     private Long initDefaultExecutionResponse(AdaptorSession adaptorSession,
                                                            UUID executionId) {
-<span class="fc" id="L102">        ExecutionResponse executionResponse = ExecutionResponse.builder()</span>
-<span class="fc" id="L103">                .adaptorSession(adaptorSession)</span>
-<span class="fc" id="L104">                .execution(executionRepository.findByExecutionUUIDOrElseThrow(executionId))</span>
-<span class="fc" id="L105">                .state(ExecutionResponseState.RUNNING)</span>
-<span class="fc" id="L106">                .build();</span>
-<span class="fc" id="L107">        executionResponse = executionResponseRepository.save(executionResponse);</span>
-<span class="fc" id="L108">        executionRepository.flush();</span>
-<span class="fc" id="L109">        return executionResponse.getId();</span>
+<span class="fc" id="L125">        ExecutionResponse executionResponse = ExecutionResponse.builder()</span>
+<span class="fc" id="L126">                .adaptorSession(adaptorSession)</span>
+<span class="fc" id="L127">                .execution(executionRepository.findByExecutionUUIDOrElseThrow(executionId))</span>
+<span class="fc" id="L128">                .state(ExecutionResponseState.RUNNING)</span>
+<span class="fc" id="L129">                .build();</span>
+<span class="fc" id="L130">        executionResponse = executionResponseRepository.save(executionResponse);</span>
+<span class="fc" id="L131">        executionRepository.flush();</span>
+<span class="fc" id="L132">        return executionResponse.getId();</span>
     }
 
     private void updateExecutionResponse(Long executionResponseId,
                                          Integer code,
                                          String message,
                                          ExecutionResponseState state) {
-<span class="fc" id="L116">        executionResponseRepository.updateExecutionResponse(executionResponseId, code, state, message);</span>
-<span class="fc" id="L117">    }</span>
+<span class="fc" id="L139">        executionResponseRepository.updateExecutionResponse(executionResponseId, code, state, message);</span>
+<span class="fc" id="L140">    }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

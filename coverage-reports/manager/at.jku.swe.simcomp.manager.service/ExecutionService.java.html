@@ -22,8 +22,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * This service is responsible for executing commands {@link ExecutionCommand} for a given session.
+ */
 @Service
-<span class="fc" id="L26">@Slf4j</span>
+<span class="fc" id="L29">@Slf4j</span>
 public class ExecutionService {
     private final AdaptorSessionRepository adaptorSessionRepository;
     private final SessionRepository sessionRepository;
@@ -34,6 +37,17 @@ public class ExecutionService {
     private final ExecutionCommandKinematicsVisitor kinematicsVisitor;
     private final boolean isInverseKinematicsEnabled;
 
+    /**
+     * Constructor
+     * @param sessionRepository the session repository
+     * @param objectMapper the object mapper
+     * @param executionRepository the execution repository
+     * @param commandDistributionService the command distribution service
+     * @param serviceRegistryClient the service registry client
+     * @param adaptorSessionRepository the adaptor session repository
+     * @param kinematicsVisitor the kinematics visitor
+     * @param isInverseKinematicsEnabled the flag to enable inverse kinematic, defaults to false.
+     */
     public ExecutionService(SessionRepository sessionRepository,
                             ObjectMapper objectMapper,
                             ExecutionRepository executionRepository,
@@ -41,95 +55,113 @@ public class ExecutionService {
                             ServiceRegistryClient serviceRegistryClient,
                             AdaptorSessionRepository adaptorSessionRepository,
                             ExecutionCommandKinematicsVisitor kinematicsVisitor,
-<span class="fc" id="L44">                            @Value(&quot;${application.kinematics.inverse.enabled}&quot;) Boolean isInverseKinematicsEnabled) {</span>
-<span class="fc" id="L45">        this.sessionRepository = sessionRepository;</span>
-<span class="fc" id="L46">        this.objectMapper = objectMapper;</span>
-<span class="fc" id="L47">        this.executionRepository = executionRepository;</span>
-<span class="fc" id="L48">        this.commandDistributionService = commandDistributionService;</span>
-<span class="fc" id="L49">        this.serviceRegistryClient = serviceRegistryClient;</span>
-<span class="fc" id="L50">        this.adaptorSessionRepository = adaptorSessionRepository;</span>
-<span class="fc" id="L51">        this.kinematicsVisitor = kinematicsVisitor;</span>
-<span class="fc" id="L52">        this.isInverseKinematicsEnabled = Objects.requireNonNullElse(isInverseKinematicsEnabled, false);</span>
-<span class="fc" id="L53">    }</span>
+<span class="fc" id="L58">                            @Value(&quot;${application.kinematics.inverse.enabled}&quot;) Boolean isInverseKinematicsEnabled) {</span>
+<span class="fc" id="L59">        this.sessionRepository = sessionRepository;</span>
+<span class="fc" id="L60">        this.objectMapper = objectMapper;</span>
+<span class="fc" id="L61">        this.executionRepository = executionRepository;</span>
+<span class="fc" id="L62">        this.commandDistributionService = commandDistributionService;</span>
+<span class="fc" id="L63">        this.serviceRegistryClient = serviceRegistryClient;</span>
+<span class="fc" id="L64">        this.adaptorSessionRepository = adaptorSessionRepository;</span>
+<span class="fc" id="L65">        this.kinematicsVisitor = kinematicsVisitor;</span>
+<span class="fc" id="L66">        this.isInverseKinematicsEnabled = Objects.requireNonNullElse(isInverseKinematicsEnabled, false);</span>
+<span class="fc" id="L67">    }</span>
 
+    /**
+     * Fetches all executions for a given session.
+     * @param sessionKey the session key
+     * @return the executions
+     */
     public List&lt;ExecutionDTO&gt; getAllExecutionsForSession(UUID sessionKey) {
-<span class="nc" id="L56">        return executionRepository.findBySessionSessionKey(sessionKey).stream().map(this::fromModel).toList();</span>
+<span class="nc" id="L75">        return executionRepository.findBySessionSessionKey(sessionKey).stream().map(this::fromModel).toList();</span>
     }
 
-<span class="pc bpc" id="L59" title="2 of 4 branches missed.">    public UUID executeCommand(@NonNull final UUID sessionId, @NonNull ExecutionCommand command) throws BadRequestException {</span>
-<span class="fc" id="L60">        Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionId);</span>
-<span class="fc bfc" id="L61" title="All 2 branches covered.">        if(session.getState().equals(SessionState.CLOSED)){</span>
-<span class="fc" id="L62">            throw new BadRequestException(&quot;Session %s already closed.&quot;.formatted(sessionId));</span>
+    /**
+     * Executes a command for a given session by distributing the commands to the adaptors.
+     * If inverse kinematics is enabled, the command is transformed using the kinematics service (axis-converter).
+     * @param sessionId the session id
+     * @param command the command
+     * @return the execution id
+     * @throws BadRequestException if the session is closed
+     */
+<span class="pc bpc" id="L86" title="2 of 4 branches missed.">    public UUID executeCommand(@NonNull final UUID sessionId, @NonNull ExecutionCommand command) throws BadRequestException {</span>
+<span class="fc" id="L87">        Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionId);</span>
+<span class="fc bfc" id="L88" title="All 2 branches covered.">        if(session.getState().equals(SessionState.CLOSED)){</span>
+<span class="fc" id="L89">            throw new BadRequestException(&quot;Session %s already closed.&quot;.formatted(sessionId));</span>
         }
-<span class="fc" id="L64">        log.info(&quot;Executing command {} for session {}&quot;, command, sessionId);</span>
-<span class="fc" id="L65">        Execution execution = initExecution(command, sessionId);</span>
-<span class="fc" id="L66">        log.info(&quot;Created execution {} for session {}&quot;, execution.getExecutionId(), sessionId);</span>
-<span class="pc bpc" id="L67" title="1 of 2 branches missed.">        if(isInverseKinematicsEnabled){</span>
+<span class="fc" id="L91">        log.info(&quot;Executing command {} for session {}&quot;, command, sessionId);</span>
+<span class="fc" id="L92">        Execution execution = initExecution(command, sessionId);</span>
+<span class="fc" id="L93">        log.info(&quot;Created execution {} for session {}&quot;, execution.getExecutionId(), sessionId);</span>
+<span class="pc bpc" id="L94" title="1 of 2 branches missed.">        if(isInverseKinematicsEnabled){</span>
             try {
-<span class="nc" id="L69">                command = command.accept(kinematicsVisitor, null);</span>
-<span class="nc" id="L70">                log.info(&quot;Transformed command using kinematics: {}.&quot;, command);</span>
-<span class="nc" id="L71">            } catch (Exception e) {</span>
-<span class="nc" id="L72">                log.warn(&quot;Kinematics operation failed, using original command.&quot;);</span>
-<span class="nc" id="L73">            }</span>
+<span class="nc" id="L96">                command = command.accept(kinematicsVisitor, null);</span>
+<span class="nc" id="L97">                log.info(&quot;Transformed command using kinematics: {}.&quot;, command);</span>
+<span class="nc" id="L98">            } catch (Exception e) {</span>
+<span class="nc" id="L99">                log.warn(&quot;Kinematics operation failed, using original command.&quot;);</span>
+<span class="nc" id="L100">            }</span>
         }
-<span class="fc" id="L75">        distributeCommands(sessionId, execution.getExecutionId(), command);</span>
-<span class="fc" id="L76">        return execution.getExecutionId();</span>
+<span class="fc" id="L102">        distributeCommands(sessionId, execution.getExecutionId(), command);</span>
+<span class="fc" id="L103">        return execution.getExecutionId();</span>
     }
 
+    /**
+     * Fetches an execution for a given execution id.
+     * @param executionId the execution id
+     * @return the execution
+     */
     public ExecutionDTO getExecution(UUID executionId) {
-<span class="fc" id="L80">        Execution execution = executionRepository.findByExecutionUUIDOrElseThrow(executionId);</span>
-<span class="fc" id="L81">        return fromModel(execution);</span>
+<span class="fc" id="L112">        Execution execution = executionRepository.findByExecutionUUIDOrElseThrow(executionId);</span>
+<span class="fc" id="L113">        return fromModel(execution);</span>
     }
 
 
     // private region methods
     private ExecutionDTO fromModel(Execution execution) {
-<span class="fc" id="L87">        return new ExecutionDTO(execution.getExecutionId().toString(),</span>
-<span class="fc" id="L88">                execution.getSession().getSessionKey().toString(),</span>
-<span class="fc" id="L89">                execution.getCommand(),</span>
-<span class="fc" id="L90">                execution.getCreatedAt(),</span>
-<span class="fc" id="L91">                execution.getResponses().stream()</span>
-<span class="fc" id="L92">                        .map(r -&gt; new ExecutionResponseDTO(r.getAdaptorSession().getAdaptorName(), r.getResponseCode(), r.getState(), r.getReport())).toList()</span>
+<span class="fc" id="L119">        return new ExecutionDTO(execution.getExecutionId().toString(),</span>
+<span class="fc" id="L120">                execution.getSession().getSessionKey().toString(),</span>
+<span class="fc" id="L121">                execution.getCommand(),</span>
+<span class="fc" id="L122">                execution.getCreatedAt(),</span>
+<span class="fc" id="L123">                execution.getResponses().stream()</span>
+<span class="fc" id="L124">                        .map(r -&gt; new ExecutionResponseDTO(r.getAdaptorSession().getAdaptorName(), r.getResponseCode(), r.getState(), r.getReport())).toList()</span>
                 );
     }
 
-<span class="pc bpc" id="L96" title="1 of 2 branches missed.">    private Execution initExecution(ExecutionCommand command, @NonNull UUID sessionId) {</span>
-<span class="fc" id="L97">        String commandJson = null;</span>
+<span class="pc bpc" id="L128" title="1 of 2 branches missed.">    private Execution initExecution(ExecutionCommand command, @NonNull UUID sessionId) {</span>
+<span class="fc" id="L129">        String commandJson = null;</span>
         try {
-<span class="fc" id="L99">            commandJson = objectMapper.writeValueAsString(command);</span>
-<span class="nc" id="L100">        } catch (JsonProcessingException e) {</span>
-<span class="nc" id="L101">            log.warn(&quot;Could not serialize command to JSON&quot;, e);</span>
-<span class="fc" id="L102">        }</span>
+<span class="fc" id="L131">            commandJson = objectMapper.writeValueAsString(command);</span>
+<span class="nc" id="L132">        } catch (JsonProcessingException e) {</span>
+<span class="nc" id="L133">            log.warn(&quot;Could not serialize command to JSON&quot;, e);</span>
+<span class="fc" id="L134">        }</span>
 
-<span class="fc" id="L104">        Execution execution = Execution.builder()</span>
-<span class="fc" id="L105">                .command(commandJson)</span>
-<span class="fc" id="L106">                .executionId(UUID.randomUUID())</span>
-<span class="fc" id="L107">                .build();</span>
+<span class="fc" id="L136">        Execution execution = Execution.builder()</span>
+<span class="fc" id="L137">                .command(commandJson)</span>
+<span class="fc" id="L138">                .executionId(UUID.randomUUID())</span>
+<span class="fc" id="L139">                .build();</span>
 
-<span class="fc" id="L109">        execution.setSession(sessionRepository.findBySessionKeyOrElseThrow(sessionId));</span>
-<span class="fc" id="L110">        executionRepository.save(execution);</span>
-<span class="fc" id="L111">        executionRepository.flush();</span>
-<span class="fc" id="L112">        return execution;</span>
+<span class="fc" id="L141">        execution.setSession(sessionRepository.findBySessionKeyOrElseThrow(sessionId));</span>
+<span class="fc" id="L142">        executionRepository.save(execution);</span>
+<span class="fc" id="L143">        executionRepository.flush();</span>
+<span class="fc" id="L144">        return execution;</span>
     }
 
     private void distributeCommands(UUID sessionId,
                                    UUID executionId,
                                    ExecutionCommand command){
-<span class="fc" id="L118">        log.info(&quot;Starting to distribute commands..&quot;);</span>
-<span class="fc" id="L119">        List&lt;ServiceRegistrationConfigDTO&gt; serviceRegistrationConfigs = serviceRegistryClient.getRegisteredAdaptors();</span>
-<span class="fc bfc" id="L120" title="All 2 branches covered.">        for(AdaptorSession adaptorSession : adaptorSessionRepository.findBySessionSessionKey(sessionId)){</span>
-<span class="fc bfc" id="L121" title="All 2 branches covered.">            if(adaptorSession.getState().equals(SessionState.CLOSED)){</span>
-<span class="fc" id="L122">                log.info(&quot;Ignoring closed adaptor-session {}&quot;, adaptorSession.getId());</span>
-<span class="fc" id="L123">                return;</span>
+<span class="fc" id="L150">        log.info(&quot;Starting to distribute commands..&quot;);</span>
+<span class="fc" id="L151">        List&lt;ServiceRegistrationConfigDTO&gt; serviceRegistrationConfigs = serviceRegistryClient.getRegisteredAdaptors();</span>
+<span class="fc bfc" id="L152" title="All 2 branches covered.">        for(AdaptorSession adaptorSession : adaptorSessionRepository.findBySessionSessionKey(sessionId)){</span>
+<span class="fc bfc" id="L153" title="All 2 branches covered.">            if(adaptorSession.getState().equals(SessionState.CLOSED)){</span>
+<span class="fc" id="L154">                log.info(&quot;Ignoring closed adaptor-session {}&quot;, adaptorSession.getId());</span>
+<span class="fc" id="L155">                return;</span>
             }
-<span class="fc" id="L125">            serviceRegistrationConfigs.stream()</span>
-<span class="fc" id="L126">                    .filter(s -&gt; s.getName().equals(adaptorSession.getAdaptorName()))</span>
-<span class="fc" id="L127">                    .findFirst()</span>
-<span class="fc" id="L128">                    .ifPresentOrElse(s -&gt; commandDistributionService.distributeCommand(adaptorSession.getId(), executionId, s, command),</span>
-<span class="nc" id="L129">                            () -&gt; log.warn(&quot;Adaptor {} not found in service-registry&quot;, adaptorSession.getAdaptorName()));</span>
-<span class="fc" id="L130">        }</span>
+<span class="fc" id="L157">            serviceRegistrationConfigs.stream()</span>
+<span class="fc" id="L158">                    .filter(s -&gt; s.getName().equals(adaptorSession.getAdaptorName()))</span>
+<span class="fc" id="L159">                    .findFirst()</span>
+<span class="fc" id="L160">                    .ifPresentOrElse(s -&gt; commandDistributionService.distributeCommand(adaptorSession.getId(), executionId, s, command),</span>
+<span class="nc" id="L161">                            () -&gt; log.warn(&quot;Adaptor {} not found in service-registry&quot;, adaptorSession.getAdaptorName()));</span>
+<span class="fc" id="L162">        }</span>
 
-<span class="fc" id="L132">    }</span>
+<span class="fc" id="L164">    }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

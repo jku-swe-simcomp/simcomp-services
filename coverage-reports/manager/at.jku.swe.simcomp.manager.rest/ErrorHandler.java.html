@@ -7,32 +7,36 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.webjars.NotFoundException;
 
+/**
+ * Global error handler for REST endpoints.
+ * This class is used to handle exceptions that occur in the REST endpoints.
+ */
 @ControllerAdvice
-<span class="fc" id="L11">public class ErrorHandler {</span>
+<span class="fc" id="L15">public class ErrorHandler {</span>
     @ExceptionHandler
     public ResponseEntity&lt;HttpErrorDTO&gt; handleNotFound(NotFoundException e){
-<span class="nc" id="L14">        HttpErrorDTO dto = HttpErrorDTO.builder()</span>
-<span class="nc" id="L15">                .status(404)</span>
-<span class="nc" id="L16">                .message(e.getMessage())</span>
-<span class="nc" id="L17">                .build();</span>
-<span class="nc" id="L18">        return ResponseEntity.status(404).body(dto);</span>
+<span class="nc" id="L18">        HttpErrorDTO dto = HttpErrorDTO.builder()</span>
+<span class="nc" id="L19">                .status(404)</span>
+<span class="nc" id="L20">                .message(e.getMessage())</span>
+<span class="nc" id="L21">                .build();</span>
+<span class="nc" id="L22">        return ResponseEntity.status(404).body(dto);</span>
     }
 
     @ExceptionHandler
     public ResponseEntity&lt;HttpErrorDTO&gt; handleBadRequest(BadRequestException e){
-<span class="nc" id="L23">        HttpErrorDTO dto = HttpErrorDTO.builder()</span>
-<span class="nc" id="L24">                .status(400)</span>
-<span class="nc" id="L25">                .message(e.getMessage())</span>
-<span class="nc" id="L26">                .build();</span>
-<span class="nc" id="L27">        return ResponseEntity.status(400).body(dto);</span>
+<span class="nc" id="L27">        HttpErrorDTO dto = HttpErrorDTO.builder()</span>
+<span class="nc" id="L28">                .status(400)</span>
+<span class="nc" id="L29">                .message(e.getMessage())</span>
+<span class="nc" id="L30">                .build();</span>
+<span class="nc" id="L31">        return ResponseEntity.status(400).body(dto);</span>
     }
     @ExceptionHandler
     public ResponseEntity&lt;HttpErrorDTO&gt; handleException(Exception e){
-<span class="nc" id="L31">        HttpErrorDTO dto = HttpErrorDTO.builder()</span>
-<span class="nc" id="L32">                .status(500)</span>
-<span class="nc" id="L33">                .message(e.getMessage())</span>
-<span class="nc" id="L34">                .build();</span>
-<span class="nc" id="L35">        return ResponseEntity.status(500).body(dto);</span>
+<span class="nc" id="L35">        HttpErrorDTO dto = HttpErrorDTO.builder()</span>
+<span class="nc" id="L36">                .status(500)</span>
+<span class="nc" id="L37">                .message(e.getMessage())</span>
+<span class="nc" id="L38">                .build();</span>
+<span class="nc" id="L39">        return ResponseEntity.status(500).body(dto);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -20,79 +20,92 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * This scheduler fetches the joint positions for all open adaptor sessions.
+ */
 @Component
-<span class="fc" id="L24">@Slf4j</span>
+<span class="fc" id="L27">@Slf4j</span>
 public class JointPositionFetchingScheduler {
     private final AdaptorSessionRepository adaptorSessionRepository;
     private final AdaptorClient adaptorClient;
     private final ServiceRegistryClient serviceRegistryClient;
 
+    /**
+     * Constructor
+     * @param adaptorSessionRepository repository for adaptor sessions
+     * @param adaptorClient client for adaptor communication
+     * @param serviceRegistryClient client for service registry communication
+     */
     public JointPositionFetchingScheduler(AdaptorSessionRepository adaptorSessionRepository,
                                           AdaptorClient adaptorClient,
-<span class="fc" id="L32">                                          ServiceRegistryClient serviceRegistryClient){</span>
-<span class="fc" id="L33">        this.adaptorSessionRepository = adaptorSessionRepository;</span>
-<span class="fc" id="L34">        this.adaptorClient = adaptorClient;</span>
-<span class="fc" id="L35">        this.serviceRegistryClient = serviceRegistryClient;</span>
-<span class="fc" id="L36">    }</span>
+<span class="fc" id="L41">                                          ServiceRegistryClient serviceRegistryClient){</span>
+<span class="fc" id="L42">        this.adaptorSessionRepository = adaptorSessionRepository;</span>
+<span class="fc" id="L43">        this.adaptorClient = adaptorClient;</span>
+<span class="fc" id="L44">        this.serviceRegistryClient = serviceRegistryClient;</span>
+<span class="fc" id="L45">    }</span>
 
+    /**
+     * Fetches the joint positions from all open adaptor sessions.
+     * Persists the positions in the database, see {@link JointPositions}
+     */
     @Scheduled(fixedRate = 30000)
     public void fetchJointPositionsForOpenAdaptorSessions(){
-<span class="fc" id="L40">        log.info(&quot;Fetching joint positions for open adaptor sessions..&quot;);</span>
-<span class="nc" id="L41">        List&lt;ServiceRegistrationConfigDTO&gt; adaptorConfigs = serviceRegistryClient.getRegisteredAdaptors();</span>
-<span class="nc" id="L42">        List&lt;AdaptorSession&gt; openSessions = adaptorSessionRepository.findByState(SessionState.OPEN);</span>
-<span class="nc" id="L43">        Map&lt;AdaptorSession, ServiceRegistrationConfigDTO&gt; sessionConfigMap = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L53">        log.info(&quot;Fetching joint positions for open adaptor sessions..&quot;);</span>
+<span class="nc" id="L54">        List&lt;ServiceRegistrationConfigDTO&gt; adaptorConfigs = serviceRegistryClient.getRegisteredAdaptors();</span>
+<span class="nc" id="L55">        List&lt;AdaptorSession&gt; openSessions = adaptorSessionRepository.findByState(SessionState.OPEN);</span>
+<span class="nc" id="L56">        Map&lt;AdaptorSession, ServiceRegistrationConfigDTO&gt; sessionConfigMap = new HashMap&lt;&gt;();</span>
 
-<span class="nc bnc" id="L45" title="All 2 branches missed.">        for (AdaptorSession session : openSessions) {</span>
-<span class="nc" id="L46">            ServiceRegistrationConfigDTO matchingConfig = findMatchingConfig(session, adaptorConfigs);</span>
-<span class="nc bnc" id="L47" title="All 2 branches missed.">            if (matchingConfig != null) {</span>
-<span class="nc" id="L48">                sessionConfigMap.put(session, matchingConfig);</span>
-            }
-<span class="nc" id="L50">        }</span>
-
-<span class="nc" id="L52">        sessionConfigMap.forEach(this::fetchJointPosition);</span>
-<span class="nc" id="L53">        log.debug(&quot;Finished fetching joint positions for open adaptor sessions&quot;);</span>
-<span class="nc" id="L54">    }</span>
-
-    private ServiceRegistrationConfigDTO findMatchingConfig(AdaptorSession session, List&lt;ServiceRegistrationConfigDTO&gt; adaptorConfigs) {
-<span class="nc" id="L57">        String adaptorName = session.getAdaptorName();</span>
-
-<span class="nc bnc" id="L59" title="All 2 branches missed.">        for (ServiceRegistrationConfigDTO config : adaptorConfigs) {</span>
-<span class="nc bnc" id="L60" title="All 2 branches missed.">            if (adaptorName.equals(config.getName())) {</span>
-<span class="nc" id="L61">                return config;</span>
+<span class="nc bnc" id="L58" title="All 2 branches missed.">        for (AdaptorSession session : openSessions) {</span>
+<span class="nc" id="L59">            ServiceRegistrationConfigDTO matchingConfig = findMatchingConfig(session, adaptorConfigs);</span>
+<span class="nc bnc" id="L60" title="All 2 branches missed.">            if (matchingConfig != null) {</span>
+<span class="nc" id="L61">                sessionConfigMap.put(session, matchingConfig);</span>
             }
 <span class="nc" id="L63">        }</span>
 
-<span class="nc" id="L65">        log.warn(&quot;No matching adaptor config found for session {} with adaptor name {}&quot;, session.getId(), adaptorName);</span>
-<span class="nc" id="L66">        return null;</span>
+<span class="nc" id="L65">        sessionConfigMap.forEach(this::fetchJointPosition);</span>
+<span class="nc" id="L66">        log.debug(&quot;Finished fetching joint positions for open adaptor sessions&quot;);</span>
+<span class="nc" id="L67">    }</span>
+    // private region methods
+    private ServiceRegistrationConfigDTO findMatchingConfig(AdaptorSession session, List&lt;ServiceRegistrationConfigDTO&gt; adaptorConfigs) {
+<span class="nc" id="L70">        String adaptorName = session.getAdaptorName();</span>
+
+<span class="nc bnc" id="L72" title="All 2 branches missed.">        for (ServiceRegistrationConfigDTO config : adaptorConfigs) {</span>
+<span class="nc bnc" id="L73" title="All 2 branches missed.">            if (adaptorName.equals(config.getName())) {</span>
+<span class="nc" id="L74">                return config;</span>
+            }
+<span class="nc" id="L76">        }</span>
+
+<span class="nc" id="L78">        log.warn(&quot;No matching adaptor config found for session {} with adaptor name {}&quot;, session.getId(), adaptorName);</span>
+<span class="nc" id="L79">        return null;</span>
     }
 
     private void fetchJointPosition(AdaptorSession session, ServiceRegistrationConfigDTO config) {
-<span class="nc" id="L70">        log.info(&quot;Fetching joint positions for session {} with key {} from adaptor {}&quot;,</span>
-<span class="nc" id="L71">                session.getId(), session.getSessionKey(), config.getName());</span>
+<span class="nc" id="L83">        log.info(&quot;Fetching joint positions for session {} with key {} from adaptor {}&quot;,</span>
+<span class="nc" id="L84">                session.getId(), session.getSessionKey(), config.getName());</span>
         try {
-<span class="nc" id="L73">            adaptorClient.getAttributeValue(session.getSessionKey(), AttributeKey.JOINT_POSITIONS, config)</span>
-<span class="nc" id="L74">                    .ifPresent(attributeValue -&gt; {</span>
-<span class="nc bnc" id="L75" title="All 2 branches missed.">                        if(attributeValue instanceof AttributeValue.JointPositions jointPositions){</span>
-<span class="nc" id="L76">                            session.addJointPositions(fromDTO(jointPositions));</span>
-<span class="nc" id="L77">                            adaptorSessionRepository.save(session);</span>
+<span class="nc" id="L86">            adaptorClient.getAttributeValue(session.getSessionKey(), AttributeKey.JOINT_POSITIONS, config)</span>
+<span class="nc" id="L87">                    .ifPresent(attributeValue -&gt; {</span>
+<span class="nc bnc" id="L88" title="All 2 branches missed.">                        if(attributeValue instanceof AttributeValue.JointPositions jointPositions){</span>
+<span class="nc" id="L89">                            session.addJointPositions(fromDTO(jointPositions));</span>
+<span class="nc" id="L90">                            adaptorSessionRepository.save(session);</span>
                         }else {
-<span class="nc" id="L79">                            log.warn(&quot;Returned attribute value is not of type JointPositions but of type {}: {}&quot;, attributeValue.getClass().getSimpleName(), attributeValue);</span>
+<span class="nc" id="L92">                            log.warn(&quot;Returned attribute value is not of type JointPositions but of type {}: {}&quot;, attributeValue.getClass().getSimpleName(), attributeValue);</span>
                         }
-<span class="nc" id="L81">                    });</span>
-<span class="nc" id="L82">        } catch (SessionNotValidException e) {</span>
-<span class="nc" id="L83">            log.warn(&quot;Session {} of {} is not valid anymore. Ignoring it until official request from user.&quot;, session.getId(), config.getName());</span>
-<span class="nc" id="L84">        }</span>
-<span class="nc" id="L85">    }</span>
+<span class="nc" id="L94">                    });</span>
+<span class="nc" id="L95">        } catch (SessionNotValidException e) {</span>
+<span class="nc" id="L96">            log.warn(&quot;Session {} of {} is not valid anymore. Ignoring it until official request from user.&quot;, session.getId(), config.getName());</span>
+<span class="nc" id="L97">        }</span>
+<span class="nc" id="L98">    }</span>
 
     private JointPositions fromDTO(AttributeValue.JointPositions jointPositions) {
-<span class="nc" id="L88">        return JointPositions.builder()</span>
-<span class="nc" id="L89">                .axis1(jointPositions.jointPositions().get(0))</span>
-<span class="nc" id="L90">                .axis2(jointPositions.jointPositions().get(1))</span>
-<span class="nc" id="L91">                .axis3(jointPositions.jointPositions().get(2))</span>
-<span class="nc" id="L92">                .axis4(jointPositions.jointPositions().get(3))</span>
-<span class="nc" id="L93">                .axis5(jointPositions.jointPositions().get(4))</span>
-<span class="nc" id="L94">                .axis6(jointPositions.jointPositions().get(5))</span>
-<span class="nc" id="L95">                .build();</span>
+<span class="nc" id="L101">        return JointPositions.builder()</span>
+<span class="nc" id="L102">                .axis1(jointPositions.jointPositions().get(0))</span>
+<span class="nc" id="L103">                .axis2(jointPositions.jointPositions().get(1))</span>
+<span class="nc" id="L104">                .axis3(jointPositions.jointPositions().get(2))</span>
+<span class="nc" id="L105">                .axis4(jointPositions.jointPositions().get(3))</span>
+<span class="nc" id="L106">                .axis5(jointPositions.jointPositions().get(4))</span>
+<span class="nc" id="L107">                .axis6(jointPositions.jointPositions().get(5))</span>
+<span class="nc" id="L108">                .build();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

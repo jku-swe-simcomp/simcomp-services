@@ -5,47 +5,50 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+/**
+ * This class represents the joint-positions of a simulation for a adaptor session.
+ */
 @Getter
-<span class="nc" id="L9">@Setter</span>
+<span class="nc" id="L12">@Setter</span>
 @Entity
 @Table(name = &quot;joint_positions&quot;)
-<span class="nc" id="L12">@ToString</span>
-<span class="nc" id="L13">@Builder</span>
-<span class="nc" id="L14">@AllArgsConstructor</span>
-<span class="fc" id="L15">@NoArgsConstructor</span>
+<span class="nc" id="L15">@ToString</span>
+<span class="nc" id="L16">@Builder</span>
+<span class="nc" id="L17">@AllArgsConstructor</span>
+<span class="fc" id="L18">@NoArgsConstructor</span>
 public class JointPositions {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = &quot;id&quot;, nullable = false)
-<span class="nc" id="L20">    private Long id;</span>
+<span class="nc" id="L23">    private Long id;</span>
 
     @ManyToOne
     @JoinColumn(name=&quot;adaptor_session_id&quot;, nullable=false, updatable = false)
     @ToString.Exclude
-<span class="nc" id="L25">    private AdaptorSession adaptorSession;</span>
+<span class="nc" id="L28">    private AdaptorSession adaptorSession;</span>
 
     @Column(name = &quot;created_at&quot;, nullable = false, updatable = false)
-<span class="nc" id="L28">    private LocalDateTime createdAt;</span>
+<span class="nc" id="L31">    private LocalDateTime createdAt;</span>
 
     @Column(name = &quot;axis_1&quot;)
-<span class="nc" id="L31">    private Double axis1;</span>
+<span class="nc" id="L34">    private Double axis1;</span>
     @Column(name = &quot;axis_2&quot;)
-<span class="nc" id="L33">    private Double axis2;</span>
+<span class="nc" id="L36">    private Double axis2;</span>
     @Column(name = &quot;axis_3&quot;)
-<span class="nc" id="L35">    private Double axis3;</span>
+<span class="nc" id="L38">    private Double axis3;</span>
     @Column(name = &quot;axis_4&quot;)
-<span class="nc" id="L37">    private Double axis4;</span>
+<span class="nc" id="L40">    private Double axis4;</span>
     @Column(name = &quot;axis_5&quot;)
-<span class="nc" id="L39">    private Double axis5;</span>
+<span class="nc" id="L42">    private Double axis5;</span>
     @Column(name = &quot;axis_6&quot;)
-<span class="nc" id="L41">    private Double axis6;</span>
+<span class="nc" id="L44">    private Double axis6;</span>
 
     @Column(name = &quot;message&quot;)
-<span class="nc" id="L44">    private String message;</span>
+<span class="nc" id="L47">    private String message;</span>
 
     @PrePersist
     protected void onCreate() {
-<span class="nc" id="L48">        createdAt = LocalDateTime.now();</span>
-<span class="nc" id="L49">    }</span>
+<span class="nc" id="L51">        createdAt = LocalDateTime.now();</span>
+<span class="nc" id="L52">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

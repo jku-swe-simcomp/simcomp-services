@@ -11,17 +11,36 @@ import org.webjars.NotFoundException;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Repository for {@link Session}
+ */
 public interface SessionRepository extends JpaRepository&lt;Session, Long&gt; {
+
+    /**
+     * Returns a session by its session key.
+     * @param sessionKey the session key
+     * @return the session, empty otherwise
+     */
     Optional&lt;Session&gt; findBySessionKey(UUID sessionKey);
 
+    /**
+     * Updates the state of the session.
+     * @param sessionKey the session key
+     * @param state the new state
+     */
     @Transactional
     @Modifying
     @Query(&quot;UPDATE Session s SET s.state = :state WHERE s.sessionKey = :sessionKey&quot;)
     void updateSessionStateBySessionKey(UUID sessionKey, SessionState state);
 
-
+    /**
+     * Returns a session or throws an exception if not found.
+     * @param sessionKey the session key
+     * @return the session
+     * @throws NotFoundException if not found
+     */
     default Session findBySessionKeyOrElseThrow(UUID sessionKey) throws NotFoundException{
-<span class="nc" id="L24">        return findBySessionKey(sessionKey).orElseThrow(() -&gt;new NotFoundException(&quot;Session with key %s not found.&quot;.formatted(sessionKey)));</span>
+<span class="nc" id="L43">        return findBySessionKey(sessionKey).orElseThrow(() -&gt;new NotFoundException(&quot;Session with key %s not found.&quot;.formatted(sessionKey)));</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

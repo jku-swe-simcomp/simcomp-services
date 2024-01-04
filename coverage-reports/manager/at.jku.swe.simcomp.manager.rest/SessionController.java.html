@@ -25,16 +25,20 @@ import org.webjars.NotFoundException;
 
 import java.util.UUID;
 
+/**
+ * REST Controller for managing sessions.
+ * Refer to the OpenAPI documentation for more information.
+ */
 @RestController
 @RequestMapping(&quot;/session&quot;)
-<span class="fc" id="L30">@Slf4j</span>
+<span class="fc" id="L34">@Slf4j</span>
 @Tag(name = &quot;Session Controller&quot;, description = &quot;Endpoints to manage sessions.&quot;)
 public class SessionController {
     private final SessionService sessionService;
 
-<span class="fc" id="L35">    public SessionController(SessionService sessionService) {</span>
-<span class="fc" id="L36">        this.sessionService = sessionService;</span>
-<span class="fc" id="L37">    }</span>
+<span class="fc" id="L39">    public SessionController(SessionService sessionService) {</span>
+<span class="fc" id="L40">        this.sessionService = sessionService;</span>
+<span class="fc" id="L41">    }</span>
 
     @Operation(summary = &quot;Initialize a new session&quot;,
             description = &quot;Initializes a new session. Not all requested simulation types might be available. &quot; +
@@ -70,12 +74,12 @@ public class SessionController {
                     }))
     @PostMapping(value = &quot;&quot;, produces = &quot;application/json&quot;)
     public ResponseEntity&lt;SessionResponseDTO&gt; createSession(@RequestBody SessionRequest request) throws SessionInitializationFailedException {
-<span class="nc" id="L73">        log.info(&quot;Initialize Session Request: {}&quot;, request);</span>
-<span class="nc" id="L74">        Session session = (Session) request.accept(sessionService);</span>
-<span class="nc" id="L75">        log.info(&quot;Initialized session: {}&quot;, session);</span>
-<span class="nc" id="L76">        SessionResponseDTO response = new SessionResponseDTO(session.getSessionKey().toString(),</span>
-<span class="nc" id="L77">                session.getAdaptorSessions().stream().map(AdaptorSession::getAdaptorName).toList());</span>
-<span class="nc" id="L78">        return ResponseEntity.ok(response);</span>
+<span class="nc" id="L77">        log.info(&quot;Initialize Session Request: {}&quot;, request);</span>
+<span class="nc" id="L78">        Session session = (Session) request.accept(sessionService);</span>
+<span class="nc" id="L79">        log.info(&quot;Initialized session: {}&quot;, session);</span>
+<span class="nc" id="L80">        SessionResponseDTO response = new SessionResponseDTO(session.getSessionKey().toString(),</span>
+<span class="nc" id="L81">                session.getAdaptorSessions().stream().map(AdaptorSession::getAdaptorName).toList());</span>
+<span class="nc" id="L82">        return ResponseEntity.ok(response);</span>
     }
 
     @Operation(summary = &quot;Add simulation to existing session.&quot;,
@@ -113,11 +117,11 @@ public class SessionController {
     @PostMapping(&quot;/{sessionKey}/{simulationType}&quot;)
     public ResponseEntity&lt;Void&gt; addAdaptorSessionToAggregateSession(@Parameter(description = &quot;The id of the session&quot;) @PathVariable UUID sessionKey,
                                                                     @Parameter(description = &quot;The simulation type to add&quot;) @PathVariable String simulationType) throws BadRequestException, SessionInitializationFailedException, NotFoundException {
-<span class="nc" id="L116">        log.info(&quot;Request to add {} to session {}.&quot;, simulationType, sessionKey);</span>
-<span class="nc" id="L117">        sessionService.addAdaptorSessionToAggregatedSession(sessionKey, simulationType);</span>
-<span class="nc" id="L118">        log.info(&quot;Added {}.&quot;, simulationType);</span>
+<span class="nc" id="L120">        log.info(&quot;Request to add {} to session {}.&quot;, simulationType, sessionKey);</span>
+<span class="nc" id="L121">        sessionService.addAdaptorSessionToAggregatedSession(sessionKey, simulationType);</span>
+<span class="nc" id="L122">        log.info(&quot;Added {}.&quot;, simulationType);</span>
 
-<span class="nc" id="L120">        return ResponseEntity.ok().build();</span>
+<span class="nc" id="L124">        return ResponseEntity.ok().build();</span>
     }
 
     @Operation(summary = &quot;Reopen a closed simulation of an existing session.&quot;,
@@ -159,11 +163,11 @@ public class SessionController {
                                                                            @PathVariable UUID sessionKey,
                                                                        @Parameter(description = &quot;The type of the simulation to reopen&quot;)
                                                                        @PathVariable String simulationType) throws BadRequestException, SessionInitializationFailedException, NotFoundException {
-<span class="nc" id="L162">        log.info(&quot;Request to reopen {} from session {}.&quot;, simulationType, sessionKey);</span>
-<span class="nc" id="L163">        sessionService.reopenAdaptorSessionOfAggregateSession(sessionKey, simulationType);</span>
-<span class="nc" id="L164">        log.info(&quot;Reopened {}.&quot;, simulationType);</span>
+<span class="nc" id="L166">        log.info(&quot;Request to reopen {} from session {}.&quot;, simulationType, sessionKey);</span>
+<span class="nc" id="L167">        sessionService.reopenAdaptorSessionOfAggregateSession(sessionKey, simulationType);</span>
+<span class="nc" id="L168">        log.info(&quot;Reopened {}.&quot;, simulationType);</span>
 
-<span class="nc" id="L166">        return ResponseEntity.ok().build();</span>
+<span class="nc" id="L170">        return ResponseEntity.ok().build();</span>
 
     }
 
@@ -202,11 +206,11 @@ public class SessionController {
                                                                           @PathVariable UUID sessionKey,
                                                                       @Parameter(description = &quot;The type of the simulation to close&quot;)
                                                                       @PathVariable String simulationType) throws BadRequestException, NotFoundException {
-<span class="nc" id="L205">        log.info(&quot;Request to close {} from session {}.&quot;, simulationType, sessionKey);</span>
-<span class="nc" id="L206">        sessionService.closeAdaptorSessionOfAggregateSession(sessionKey, simulationType);</span>
-<span class="nc" id="L207">        log.info(&quot;Removed {}.&quot;, simulationType);</span>
+<span class="nc" id="L209">        log.info(&quot;Request to close {} from session {}.&quot;, simulationType, sessionKey);</span>
+<span class="nc" id="L210">        sessionService.closeAdaptorSessionOfAggregateSession(sessionKey, simulationType);</span>
+<span class="nc" id="L211">        log.info(&quot;Removed {}.&quot;, simulationType);</span>
 
-<span class="nc" id="L209">        return ResponseEntity.ok().build();</span>
+<span class="nc" id="L213">        return ResponseEntity.ok().build();</span>
     }
 
     @Operation(summary = &quot;Get information about the state of the sessions and the associated simulations.&quot;)
@@ -238,10 +242,10 @@ public class SessionController {
     @GetMapping(value = &quot;/{sessionKey}&quot;, produces = &quot;application/json&quot;)
     public ResponseEntity&lt;SessionStateDTO&gt; getSessionState(@Parameter(description = &quot;The id of the session&quot;)
                                                                @PathVariable UUID sessionKey) throws NotFoundException {
-<span class="nc" id="L241">        log.info(&quot;Get Session State Request: {}&quot;, sessionKey);</span>
-<span class="nc" id="L242">        SessionStateDTO state = sessionService.getSessionState(sessionKey);</span>
-<span class="nc" id="L243">        log.info(&quot;Session state: {}&quot;,state);</span>
-<span class="nc" id="L244">        return ResponseEntity.ok(state);</span>
+<span class="nc" id="L245">        log.info(&quot;Get Session State Request: {}&quot;, sessionKey);</span>
+<span class="nc" id="L246">        SessionStateDTO state = sessionService.getSessionState(sessionKey);</span>
+<span class="nc" id="L247">        log.info(&quot;Session state: {}&quot;,state);</span>
+<span class="nc" id="L248">        return ResponseEntity.ok(state);</span>
     }
 
     @Operation(summary = &quot;Close a session.&quot;)
@@ -276,19 +280,19 @@ public class SessionController {
     @PatchMapping(&quot;/{sessionKey}/close&quot;)
     public ResponseEntity&lt;Void&gt; closeSession(@Parameter(description = &quot;The id of the session&quot;)
                                                  @PathVariable UUID sessionKey) throws NotFoundException, BadRequestException {
-<span class="nc" id="L279">        log.info(&quot;Close Session Request: {}&quot;, sessionKey);</span>
-<span class="nc" id="L280">        sessionService.closeSession(sessionKey);</span>
-<span class="nc" id="L281">        return ResponseEntity.ok().build();</span>
+<span class="nc" id="L283">        log.info(&quot;Close Session Request: {}&quot;, sessionKey);</span>
+<span class="nc" id="L284">        sessionService.closeSession(sessionKey);</span>
+<span class="nc" id="L285">        return ResponseEntity.ok().build();</span>
     }
 
     // exception handlers
     @ExceptionHandler
     public ResponseEntity&lt;HttpErrorDTO&gt; handleSessionInitializationFailed(SessionInitializationFailedException e){
-<span class="nc" id="L287">        HttpErrorDTO dto = HttpErrorDTO.builder()</span>
-<span class="nc" id="L288">                .status(500)</span>
-<span class="nc" id="L289">                .message(&quot;Could not initialize session with message: %s&quot;.formatted(e.getMessage()))</span>
-<span class="nc" id="L290">                .build();</span>
-<span class="nc" id="L291">        return ResponseEntity.internalServerError().body(dto);</span>
+<span class="nc" id="L291">        HttpErrorDTO dto = HttpErrorDTO.builder()</span>
+<span class="nc" id="L292">                .status(500)</span>
+<span class="nc" id="L293">                .message(&quot;Could not initialize session with message: %s&quot;.formatted(e.getMessage()))</span>
+<span class="nc" id="L294">                .build();</span>
+<span class="nc" id="L295">        return ResponseEntity.internalServerError().body(dto);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

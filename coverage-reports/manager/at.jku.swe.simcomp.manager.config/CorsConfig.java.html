@@ -6,21 +6,25 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+/**
+ * The cors configuration.
+ * @deprecated probably not needed at all as current configuration aligns with the default configuration of Spring Boot.
+ */
 @Configuration
-<span class="fc" id="L10">public class CorsConfig {</span>
+<span class="fc" id="L14">public class CorsConfig {</span>
     @Bean
     public CorsFilter corsFilter() {
-<span class="fc" id="L13">        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();</span>
-<span class="fc" id="L14">        CorsConfiguration config = new CorsConfiguration();</span>
+<span class="fc" id="L17">        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();</span>
+<span class="fc" id="L18">        CorsConfiguration config = new CorsConfiguration();</span>
 
         // Allow all origins, methods, and headers
-<span class="fc" id="L17">        config.addAllowedOrigin(&quot;*&quot;);</span>
-<span class="fc" id="L18">        config.addAllowedMethod(&quot;*&quot;);</span>
-<span class="fc" id="L19">        config.addAllowedHeader(&quot;*&quot;);</span>
+<span class="fc" id="L21">        config.addAllowedOrigin(&quot;*&quot;);</span>
+<span class="fc" id="L22">        config.addAllowedMethod(&quot;*&quot;);</span>
+<span class="fc" id="L23">        config.addAllowedHeader(&quot;*&quot;);</span>
 
-<span class="fc" id="L21">        source.registerCorsConfiguration(&quot;/**&quot;, config);</span>
+<span class="fc" id="L25">        source.registerCorsConfiguration(&quot;/**&quot;, config);</span>
 
-<span class="fc" id="L23">        return new CorsFilter(source);</span>
+<span class="fc" id="L27">        return new CorsFilter(source);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

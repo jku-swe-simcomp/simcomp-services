@@ -12,37 +12,55 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
+/**
+ * This client is responsible for communicating with the axis-converter service.
+ */
 @Service
 public class AxisConverterClient {
     private final RestTemplate restTemplate;
     private final String axisConverterEndpoint;
 
+    /**
+     * Constructor
+     * @param restTemplate RestTemplate
+     * @param axisConverterEndpoint the endpoint of the axis-converter
+     */
     public AxisConverterClient(RestTemplate restTemplate,
-<span class="fc" id="L21">                               @Value(&quot;${application.axisconverter.endpoint}&quot;) String axisConverterEndpoint) {</span>
-<span class="fc" id="L22">        this.restTemplate = restTemplate;</span>
-<span class="fc" id="L23">        this.axisConverterEndpoint = axisConverterEndpoint;</span>
-<span class="fc" id="L24">    }</span>
+<span class="fc" id="L29">                               @Value(&quot;${application.axisconverter.endpoint}&quot;) String axisConverterEndpoint) {</span>
+<span class="fc" id="L30">        this.restTemplate = restTemplate;</span>
+<span class="fc" id="L31">        this.axisConverterEndpoint = axisConverterEndpoint;</span>
+<span class="fc" id="L32">    }</span>
 
+    /**
+     * This method calls the axis-converter service to calculate the direct kinematics.
+     * @param jointPositions the joint positions to be transformed
+     * @return the pose obtained through direct kinematics
+     */
     public PoseDTO directKinematics(List&lt;JointPositionDTO&gt; jointPositions){
-<span class="fc" id="L27">        HttpEntity&lt;List&lt;JointPositionDTO&gt;&gt; requestEntity = new HttpEntity&lt;&gt;(jointPositions);</span>
-<span class="fc" id="L28">        ResponseEntity&lt;PoseDTO&gt; responseEntity = restTemplate.exchange(</span>
+<span class="fc" id="L40">        HttpEntity&lt;List&lt;JointPositionDTO&gt;&gt; requestEntity = new HttpEntity&lt;&gt;(jointPositions);</span>
+<span class="fc" id="L41">        ResponseEntity&lt;PoseDTO&gt; responseEntity = restTemplate.exchange(</span>
                 axisConverterEndpoint + &quot;/api/converter/axisToPose&quot;,
                 HttpMethod.POST,
                 requestEntity,
                 PoseDTO.class
         );
-<span class="fc" id="L34">        return responseEntity.getBody();</span>
+<span class="fc" id="L47">        return responseEntity.getBody();</span>
     }
 
+    /**
+     * This method calls the axis-converter service to calculate the inverse kinematics.
+     * @param poseDTO the pose to be transformed
+     * @return the joint positions obtained through inverse kinematics
+     */
     public List&lt;JointPositionDTO&gt; inverseKinematics(PoseDTO poseDTO){
-<span class="nc" id="L38">        HttpEntity&lt;PoseDTO&gt; requestEntity = new HttpEntity&lt;&gt;(poseDTO);</span>
-<span class="nc" id="L39">        ResponseEntity&lt;List&lt;JointPositionDTO&gt;&gt; responseEntity = restTemplate.exchange(</span>
+<span class="nc" id="L56">        HttpEntity&lt;PoseDTO&gt; requestEntity = new HttpEntity&lt;&gt;(poseDTO);</span>
+<span class="nc" id="L57">        ResponseEntity&lt;List&lt;JointPositionDTO&gt;&gt; responseEntity = restTemplate.exchange(</span>
                 axisConverterEndpoint + &quot;/api/converter/poseToAxis&quot;,
                 HttpMethod.POST,
                 requestEntity,
-<span class="nc" id="L43">                new ParameterizedTypeReference&lt;&gt;(){}</span>
+<span class="nc" id="L61">                new ParameterizedTypeReference&lt;&gt;(){}</span>
         );
-<span class="nc" id="L45">        return responseEntity.getBody();</span>
+<span class="nc" id="L63">        return responseEntity.getBody();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

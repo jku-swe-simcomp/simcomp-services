@@ -23,15 +23,19 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * REST Controller for managing attributes.
+ * Refer to the OpenAPI documentation for more information.
+ */
 @RestController
 @RequestMapping(&quot;/session/{sessionId}/attribute/{attributeKey}&quot;)
-<span class="fc" id="L28">@Slf4j</span>
+<span class="fc" id="L32">@Slf4j</span>
 @Tag(name = &quot;Attribute Controller&quot;, description = &quot;Endpoints for managing attributes&quot;)
 public class AttributeController {
    private final AttributeService attributeService;
-<span class="fc" id="L32">   public AttributeController(AttributeService attributeService){</span>
-<span class="fc" id="L33">       this.attributeService = attributeService;</span>
-<span class="fc" id="L34">    }</span>
+<span class="fc" id="L36">   public AttributeController(AttributeService attributeService){</span>
+<span class="fc" id="L37">       this.attributeService = attributeService;</span>
+<span class="fc" id="L38">    }</span>
 
     @GetMapping
     @Operation(summary = &quot;Get Attributes&quot;, description = &quot;Retrieve attribute values from all simulation instances associated with this session. &quot; +
@@ -63,8 +67,8 @@ public class AttributeController {
             @Parameter(description = &quot;ID of the session. Sessions can be initialized with the Session Controller&quot;, in = ParameterIn.PATH, required = true) @PathVariable UUID sessionId,
             @Parameter(description = &quot;The key of the requested attribute.&quot;,
                     in = ParameterIn.PATH, required = true) @PathVariable AttributeKey attributeKey){
-<span class="nc" id="L66">        log.info(&quot;Request to fetch attribute {} for session {}&quot;, attributeKey, sessionId);</span>
-<span class="nc" id="L67">        return ResponseEntity.ok(attributeService.getAttributeValues(sessionId, attributeKey));</span>
+<span class="nc" id="L70">        log.info(&quot;Request to fetch attribute {} for session {}&quot;, attributeKey, sessionId);</span>
+<span class="nc" id="L71">        return ResponseEntity.ok(attributeService.getAttributeValues(sessionId, attributeKey));</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
