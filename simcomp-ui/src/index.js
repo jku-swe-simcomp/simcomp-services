@@ -1,17 +1,47 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
 import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import { createBrowserRouter, RouterProvider, redirect } from "react-router-dom";
+import Error from './pages/Error/Error';
+import Home from './pages/Home/Home';
+import Session from './pages/Session/Session';
+import Wrapper from './Wrapper';
+import { Container } from '@mui/material';
 
+async function authorizedRouteLoader({ request }) {
+  if (true) {
+    return null;
+  } else {
+    return redirect('/login');
+  }
+}
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Home />,
+    errorElement: <Error />,
+    /* loader: authorizedRouteLoader */
+  },
+  {
+    path: "/session/:sessionKey",
+    element: <Session />,
+    errorElement: <Error />,
+  },
+]);
+
+console.log('Connecting to: ' + process.env.REACT_APP_API_URL);
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    <Wrapper>
+      <Container maxWidth='xl'>
+        <RouterProvider router={router} />
+      </Container>
+    </Wrapper>
   </React.StrictMode>
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
