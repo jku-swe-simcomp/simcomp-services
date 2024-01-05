@@ -5,9 +5,9 @@ import at.jku.swe.simcomp.commons.adaptor.endpoint.simulation.SimulationInstance
 import at.jku.swe.simcomp.commons.adaptor.execution.command.CommandExecutor;
 import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
 
-public class SetJointAngleCommandExecutor implements CommandExecutor<ExecutionCommand.SetJointPositionCommand, ExecutionResultDTO> {
+public class GetJointAngleCommandExecutor  implements CommandExecutor<ExecutionCommand.PoseCommand, ExecutionResultDTO> {
     @Override
-    public ExecutionResultDTO execute(ExecutionCommand.SetJointPositionCommand command, SimulationInstanceConfig config) throws Exception {
+    public ExecutionResultDTO execute(ExecutionCommand.PoseCommand command, SimulationInstanceConfig config) throws Exception {
         return null;
     }
 }

@@ -2,57 +2,47 @@ package at.jku.swe.simcomp.azureadapter.service.NiryoOneController;
 
 import at.jku.swe.simcomp.azureadapter.service.HelperClasses.DigitalTwinsServiceVersion;
 import at.jku.swe.simcomp.azureadapter.service.NiryoOneModel.NiryoOneModel;
+import com.azure.core.http.rest.PagedIterable;
 import com.azure.core.models.JsonPatchDocument;
 import com.azure.digitaltwins.core.DigitalTwinsClient;
 import com.azure.digitaltwins.core.DigitalTwinsClientBuilder;
+import com.azure.digitaltwins.core.models.DigitalTwinsModelData;
 import com.azure.identity.ClientSecretCredentialBuilder;
 import com.azure.identity.DefaultAzureCredentialBuilder;
 import com.microsoft.azure.sdk.iot.service.digitaltwin.serialization.BasicDigitalTwin;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
-public class NiryoOneController {
+public class AzureExecutionService {
 
     private static DigitalTwinsClient client;
-    private String digitalTwinId;
+    private static String digitalTwinId;
 
 
-    public NiryoOneController(DigitalTwinsClient client, String digitalTwinId) {
+    public AzureExecutionService(DigitalTwinsClient client, String digitalTwinId) {
         this.client = client;
         this.digitalTwinId = digitalTwinId;
     }
 
-    public NiryoOneController() {
-    }
 
     public static DigitalTwinsClient buildConnection() {
+        /*
+         * NiryoOne Azure App.
+         */
         return new DigitalTwinsClientBuilder()
                 .credential(
                         new ClientSecretCredentialBuilder()
                                 .tenantId("f11d36c0-5880-41f7-91e5-ac5e42209e77")
-                                .clientId("ad79209a-1716-4df0-a8fa-e5028895c4f1")
-                                .clientSecret("4Rn8Q~X5Hslc8I0rbgywK.um5q8oXpvCNp2WLaJR")
+                                .clientId("a39ddd8f-18bf-41b2-9ab9-fea69e235b86")
+                                .clientSecret("unI8Q~MP2uwUGg38dOu4ASnrmcCYNC19fCAKPc9r")
                                 .build()
                 )
-                .endpoint("NiryoOneEndPoint"
-                        /*TODO: Evaluate the correctness*/)
+                .endpoint("https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize")
+                //https://login.microsoftonline.com/consumers/oauth2/v2.0/token
+                //https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize
                 .buildClient();
-    }
-
-    public void buildConnection2() {
-        DefaultAzureCredentialBuilder credentialBuilder = new DefaultAzureCredentialBuilder();
-        String digitalTwinsEndpoint = "Endpoint=sb://iothub-ns-robothubst-25388492-678c22e1f2.servicebus.windows.net/;SharedAccessKeyName=iothubowner;SharedAccessKey=RcguWKFyDw4rPqFJBwSQq77heNWyXT6PLAIoTLuyH28=;EntityPath=robothubstudent";
-        DigitalTwinsClientBuilder clientBuilder = new DigitalTwinsClientBuilder()
-                .credential(credentialBuilder.build())
-                .endpoint(digitalTwinsEndpoint)
-                .serviceVersion((com.azure.digitaltwins.core.DigitalTwinsServiceVersion) DigitalTwinsServiceVersion.getLatest());
-        DigitalTwinsClient syncClient = clientBuilder.buildClient();
-        try {
-            BasicDigitalTwin digitalTwin = syncClient.getDigitalTwin("HostName=RobotHubStudent.azure-devices.net;DeviceId=TestRobot;SharedAccessKey=DLmglEWvJzNTjBdIHk9WW8xfHkhoeYvDPAIoTDYQHns="/*TODO: Evaluate the correctness*/, BasicDigitalTwin.class);
-            System.out.println("Digital Twin retrieved: " + digitalTwin);
-        } catch (Exception e) {
-            System.out.println("An error occurred: " + e.getMessage());
-        }
     }
 
 
@@ -61,7 +51,6 @@ public class NiryoOneController {
             String propertyPath = getPropertyPathForJoint(jointName);
             if (propertyPath.isEmpty()) {
                 System.out.println("Invalid joint name!");
-                return;
             }
 
             JsonPatchDocument patchDocument = new JsonPatchDocument();
@@ -93,16 +82,16 @@ public class NiryoOneController {
         }
     }
 
-    public void getAllJointAngles() {
+    public static List<Double> getAllJointAngles() {
         try {
             NiryoOneModel niryoOneModel = client.getDigitalTwin(digitalTwinId, NiryoOneModel.class);
-
-            System.out.println("Joint 1 Angle: " + niryoOneModel.getJoint1Angle());
-            System.out.println("Joint 2 Angle: " + niryoOneModel.getJoint2Angle());
-            System.out.println("Joint 3 Angle: " + niryoOneModel.getJoint3Angle());
-            System.out.println("Joint 4 Angle: " + niryoOneModel.getJoint4Angle());
-            System.out.println("Joint 5 Angle: " + niryoOneModel.getJoint5Angle());
-            System.out.println("Joint 6 Angle: " + niryoOneModel.getJoint6Angle());
+            List<Double> niryoOneAngles = null;
+            niryoOneAngles.add(niryoOneModel.getJoint1Angle());
+            niryoOneAngles.add(niryoOneModel.getJoint2Angle());
+            niryoOneAngles.add(niryoOneModel.getJoint3Angle());
+            niryoOneAngles.add(niryoOneModel.getJoint4Angle());
+            niryoOneAngles.add(niryoOneModel.getJoint5Angle());
+            return niryoOneAngles;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -111,6 +100,7 @@ public class NiryoOneController {
 
     public double getJointAngle(String jointName) {
         try {
+            BasicDigitalTwin test = client.getDigitalTwin(digitalTwinId, BasicDigitalTwin.class);
             NiryoOneModel niryoOneModel = client.getDigitalTwin(digitalTwinId, NiryoOneModel.class);
 
             switch (jointName.toLowerCase()) {
@@ -155,11 +145,25 @@ public class NiryoOneController {
     }
 
     public static void main(String[] args) {
-        String digitalTwinId = "3be35b1f-b085-409d-907c-c62f096eb180";
+        String digitalTwinId = "dtmi:com:example:NiryoOne;1";
 
         DigitalTwinsClient digitalTwinsClient = buildConnection();
 
-        NiryoOneController niryoOneController = new NiryoOneController(digitalTwinsClient, digitalTwinId);
+        PagedIterable<DigitalTwinsModelData> data = digitalTwinsClient.listModels();
+        data.stream();
+
+         /*for (DigitalTwinsModelData data : digitalTwinsClient.listModels()) {
+             System.out.println(data.toString());
+         }
+
+        BasicDigitalTwin basicTwinResult = digitalTwinsClient.getDigitalTwin(
+                digitalTwinId,
+                BasicDigitalTwin.class);
+        System.out.println(basicTwinResult.toString());
+
+        DigitalTwinsModelData model = digitalTwinsClient.getModel(digitalTwinId);
+
+        AzureExecutionService niryoOneController = new AzureExecutionService(digitalTwinsClient, digitalTwinId);
 
         double joint1Angle = niryoOneController.getJointAngle("joint1_angle");
         System.out.println("Joint 1: " + joint1Angle);
@@ -171,15 +175,14 @@ public class NiryoOneController {
         niryoOneController.setJointAngle("joint2_angle", 30.0);
 
         joint1Angle = niryoOneController.getJointAngle("joint1");
-        System.out.println("Winkel für Joint 1: " + joint1Angle);
+        System.out.println("Angle für Joint 1: " + joint1Angle);
 
         joint2Angle = niryoOneController.getJointAngle("joint2");
-        System.out.println("Winkel für Joint 2: " + joint2Angle);
+        System.out.println("Angle für Joint 2: " + joint2Angle);
 
         niryoOneController.setJointAngles(90.0, 60.0, 45.0, 30.0, 75.0, 120.0);
 
-        niryoOneController.getAllJointAngles();
+        getAllJointAngles();*/
     }
-
 
 }

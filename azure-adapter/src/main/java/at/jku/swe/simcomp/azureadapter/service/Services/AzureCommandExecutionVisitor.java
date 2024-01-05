@@ -1,37 +1,35 @@
 package at.jku.swe.simcomp.azureadapter.service.Services;
 
-import at.jku.swe.simcomp.azureadapter.service.NiryoOneController.NiryoOneController;
+import at.jku.swe.simcomp.azureadapter.service.NiryoOneController.CommandExecutor.GetJointAngleCommandExecutor;
+import at.jku.swe.simcomp.azureadapter.service.NiryoOneController.CommandExecutor.SetJointAngleCommandExecutor;
 import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
-import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
 import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
 import at.jku.swe.simcomp.commons.adaptor.execution.command.visitor.CommandExecutionVisitor;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class AzureCommandExecutionVisitor extends CommandExecutionVisitor {
-    /*
-     * TODO: Initialize all the needed services
-     */
-    private final NiryoOneController niryoOneController;
-    public static final List<Double> currentJointPositions = new ArrayList<>(List.of(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+
     private final AzureSessionService azureSessionService;
 
-    public AzureCommandExecutionVisitor(NiryoOneController niryoOneController, AzureSessionService demoSessionService){
-        this.niryoOneController = niryoOneController;
-        this.azureSessionService = demoSessionService;
+    private final SetJointAngleCommandExecutor setJointAngleCommandExecutor;
+
+    private final GetJointAngleCommandExecutor getJointAngleCommandExecutor;
+
+    public AzureCommandExecutionVisitor(AzureSessionService azureSessionService, SetJointAngleCommandExecutor setJointAngleCommandExecutor, GetJointAngleCommandExecutor getJointAngleCommandExecutor) {
+        this.azureSessionService = azureSessionService;
+        this.setJointAngleCommandExecutor = setJointAngleCommandExecutor;
+        this.getJointAngleCommandExecutor = getJointAngleCommandExecutor;
     }
 
     @Override
-    public ExecutionResultDTO visit(ExecutionCommand.AdjustJointAngleCommand command, String sessionKey) throws SessionNotValidException {
-        return null;
+    public ExecutionResultDTO visit(ExecutionCommand.SetJointPositionCommand command, String sessionKey) throws Exception {
+        return setJointAngleCommandExecutor.execute(command, azureSessionService.renewSession(sessionKey));
     }
 
     @Override
-    public ExecutionResultDTO visit(ExecutionCommand.SetJointPositionCommand command, String sessionKey) throws SessionNotValidException {
-        return null;
+    public ExecutionResultDTO visit(ExecutionCommand.PoseCommand command, String sessionKey) throws Exception {
+        return getJointAngleCommandExecutor.execute(command, azureSessionService.renewSession(sessionKey));
     }
+
 }
