@@ -1,10 +1,15 @@
 package at.jku.swe.simcomp.azureadapter.service.NiryoOneController;
 
+import com.azure.core.http.rest.PagedIterable;
 import com.azure.core.models.JsonPatchDocument;
 import com.azure.core.util.logging.ClientLogger;
+import com.azure.digitaltwins.core.BasicDigitalTwin;
 import com.azure.digitaltwins.core.DigitalTwinsClient;
 import com.azure.digitaltwins.core.DigitalTwinsClientBuilder;
+import com.azure.digitaltwins.core.models.DigitalTwinsModelData;
 import com.azure.identity.ClientSecretCredentialBuilder;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.minidev.json.JSONObject;
 import org.springframework.stereotype.Component;
 
@@ -12,12 +17,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class AzureExecutionService {
 
-    private static DigitalTwinsClient client = buildConnection();
-    private static String digitalTwinId = "dtmi:com:example:NiryoOne;1";
+    private final static DigitalTwinsClient client = buildConnection();
+
+    private final static String modelid = "dtmi:com:example:NiryoOne;1";
 
     static final String tentantId = "f11d36c0-5880-41f7-91e5-ac5e42209e77";
     static final String clientId = "a39ddd8f-18bf-41b2-9ab9-fea69e235b86";
@@ -26,9 +33,6 @@ public class AzureExecutionService {
 
 
     public static DigitalTwinsClient buildConnection() {
-        /*
-         * NiryoOne Azure App.
-         */
         return new DigitalTwinsClientBuilder()
                 .credential(
                         new ClientSecretCredentialBuilder()
@@ -42,116 +46,68 @@ public class AzureExecutionService {
     }
 
 
-    public static void setJointAngle(String digitalTwinId, String jointName, double angle) {
-        try {
-            if (client == null) {
-                client = buildConnection();
+    public static List<Double> getAllJointAngles(String digitaltwinid) {
+        List<Double> jointAngles = new ArrayList<>();
+
+        PagedIterable<String> pageableResponse = client.query("SELECT * FROM digitaltwins", String.class);
+
+        for (String response : pageableResponse) {
+            if (response.contains(digitaltwinid)) {
+                double joint1 = getDoubleValueForKey(response, "joint1_angle");
+                double joint2 = getDoubleValueForKey(response, "joint2_angle");
+                double joint3 = getDoubleValueForKey(response, "joint3_angle");
+                double joint4 = getDoubleValueForKey(response, "joint4_angle");
+                double joint5 = getDoubleValueForKey(response, "joint5_angle");
+                double joint6 = getDoubleValueForKey(response, "joint6_angle");
+
+                jointAngles.add(joint1);
+                jointAngles.add(joint2);
+                jointAngles.add(joint3);
+                jointAngles.add(joint4);
+                jointAngles.add(joint5);
+                jointAngles.add(joint6);
             }
-
-            String propertyPath = "joint" + jointName + "_angle";
-            JsonPatchDocument patchDocument = new JsonPatchDocument();
-            patchDocument.appendReplace(propertyPath, angle);
-
-            client.updateDigitalTwin(digitalTwinId, patchDocument);
-
-            System.out.printf("The angle of the joint '%s' was successfully set to %.2f degrees.%n", jointName, angle);
-
-        } catch (Exception ex) {
-            ClientLogger logger = new ClientLogger(AzureExecutionService.class);
-            logger.error("Error when setting the joint angle: " + ex.getMessage());
         }
-    }
 
-    private String getPropertyPathForJoint(String jointName) {
-        return "joint" + jointName + "_angle";
-    }
-
-    public static List<Double> getAllJointAngles() {
-        try {
-            if (client == null) {
-                client = buildConnection();
-            }
-
-            String model = client.getModel(digitalTwinId).getDtdlModel();
-            JSONObject jsonObject = new JSONObject(Integer.parseInt(model));
-
-            List<Double> jointAngles = new ArrayList<>();
-            String[] jointNames = {"joint1_angle", "joint2_angle", "joint3_angle", "joint4_angle", "joint5_angle", "joint6_angle"};
-
-            for (String jointName : jointNames) {
-                if (jsonObject.containsKey(jointName)) {
-                    double angle = Double.parseDouble(jsonObject.getAsString(jointName));
-                    jointAngles.add(angle);
-                }
-            }
-
-            return jointAngles;
-
-        } catch (Exception ex) {
-            ClientLogger logger = new ClientLogger(AzureExecutionService.class);
-            logger.error("Error when retrieving the joint angles: " + ex.getMessage());
-            return Collections.emptyList();
-        }
+        return jointAngles;
     }
 
 
 
-    public double getJointAngle(String jointName) {
-        double angle = 0.0;
-        try {
-            if (client == null) {
-                client = buildConnection();
+    public double getJointAngle(String digitaltwinid, String jointName) {
+        double value = 0.0;
+
+        PagedIterable<String> pageableResponse = client.query("SELECT * FROM digitaltwins", String.class);
+
+        for (String response : pageableResponse) {
+            if (response.contains(digitaltwinid)) {
+                value = getDoubleValueForKey(response, jointName);
             }
-
-            String model = client.getModel(digitalTwinId).getDtdlModel();
-            JSONObject jsonObject = new JSONObject(Integer.parseInt(model));
-
-            switch (jointName) {
-            case "joint1_angle":
-                angle = (double) jsonObject.get("joint1_angle");
-            case "joint2_angle":
-                angle = (double) jsonObject.get("joint2_angle");
-            case "joint3_angle":
-                angle = (double) jsonObject.get("joint3_angle");
-            case "joint4_angle":
-                angle = (double) jsonObject.get("joint4_angle");
-            case "joint5_angle":
-                angle = (double) jsonObject.get("joint5_angle");
-            case "joint6_angle":
-                angle = (double) jsonObject.get("joint6_angle");
-            default:
-                angle = 0.0;
-            }
-
-        } catch (Exception ex) {
-            ClientLogger logger = new ClientLogger(AzureExecutionService.class);
-            logger.error("Error when retrieving the joint angles: " + ex.getMessage());
         }
-        return angle;
+
+
+        return value;
+    }
+
+    public static double getDoubleValueForKey(String jsonString, String key) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(jsonString);
+            return jsonNode.get(key).asDouble();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Double.NaN;
+        }
     }
 
 
     public void setJointAngles(List<Double> jointAngles) {
-        try {
-            if (client == null) {
-                client = buildConnection();
-            }
-
-            for (int i = 0; i < 6 && i < jointAngles.size(); i++) {
-                double angle = jointAngles.get(i);
-
-                String propertyPath = "joint" + (i + 1) + "_angle";
-                JsonPatchDocument patchDocument = new JsonPatchDocument();
-                patchDocument.appendReplace(propertyPath, angle);
-
-                client.updateDigitalTwin(digitalTwinId, patchDocument);
-            }
-
-        } catch (Exception ex) {
-            ClientLogger logger = new ClientLogger(AzureExecutionService.class);
-            logger.error("Errors when setting the joint angles: " + ex.getMessage());
-        }
     }
+
+    public static void setJointAngle(String jointName, double angle) {
+
+    }
+
 
     public static void main(String[] args) throws IOException {
 
