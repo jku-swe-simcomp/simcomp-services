@@ -16,8 +16,6 @@ public class AzureExecutionService {
 
     private final static DigitalTwinsClient client = buildConnection();
 
-    private final static String modelid = "dtmi:com:example:NiryoOne;1";
-
     static final String tentantId = "f11d36c0-5880-41f7-91e5-ac5e42209e77";
     static final String clientId = "a39ddd8f-18bf-41b2-9ab9-fea69e235b86";
     static final String clientSecret = "unI8Q~MP2uwUGg38dOu4ASnrmcCYNC19fCAKPc9r";
@@ -64,6 +62,28 @@ public class AzureExecutionService {
         return jointAngles;
     }
 
+    public static List<String> getKeys() {
+        List<String> keys = new ArrayList<>();
+
+        PagedIterable<String> pageableResponse = client.query("SELECT * FROM digitaltwins", String.class);
+
+        for (String response : pageableResponse) {
+            keys.add(getStringValueForKey(response, "/dtId"));
+        }
+
+        return keys;
+    }
+
+    public static String getStringValueForKey(String jsonString, String key) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(jsonString);
+            return jsonNode.get(key).asText();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
 
     public double getJointAngle(String digitaltwinid, String jointName) {
