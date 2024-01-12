@@ -35,6 +35,9 @@ public class AzureAdaptorEndpointService implements AdaptorEndpointService {
         azureSessionService.renewSession(sessionId);
 
         return switch(attributeKey){
+            /*
+             * TODO: Add changes.
+             */
             case JOINT_POSITIONS ->  new AttributeValue.JointPositions(AzureExecutionService.getAllJointAngles("Test"));
             default -> throw new UnsupportedOperationException("Attribute %s not supported by this service".formatted(attributeKey));
         };
