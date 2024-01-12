@@ -32,7 +32,7 @@ public class AzureService {
     }
 
     public static void main(String[] args) {
-        createDigitalTwin("test");
+        deleteDigitalTwin("test");
 
     }
 

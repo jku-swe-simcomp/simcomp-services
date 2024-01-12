@@ -1,5 +1,8 @@
 package at.jku.swe.simcomp.azureadapter.service.NiryoOneController;
 
+import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.RoboOperationFailedException;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.simulation.SimulationInstanceConfig;
 import com.azure.core.http.rest.PagedIterable;
 import com.azure.core.models.JsonPatchDocument;
 import com.azure.digitaltwins.core.DigitalTwinsClient;
@@ -8,10 +11,15 @@ import com.azure.identity.ClientSecretCredentialBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 import java.util.*;
 
-@Component
+@Component @Slf4j
 public class AzureExecutionService {
 
     private final static DigitalTwinsClient client = buildConnection();
@@ -86,7 +94,7 @@ public class AzureExecutionService {
     }
 
 
-    public double getJointAngle(String digitaltwinid, String jointName) {
+    public static double getJointAngle(String digitaltwinid, String jointName) {
         double value = 0.0;
 
         PagedIterable<String> pageableResponse = client.query("SELECT * FROM digitaltwins", String.class);
@@ -153,6 +161,7 @@ public class AzureExecutionService {
 
 
     public static void main(String[] args) {
+        setJointAngle("NiryoRobot", "/joint1_angle", 0.39);
     }
 
 }

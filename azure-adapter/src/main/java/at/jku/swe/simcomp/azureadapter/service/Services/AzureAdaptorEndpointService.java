@@ -39,7 +39,7 @@ public class AzureAdaptorEndpointService implements AdaptorEndpointService {
         azureSessionService.renewSession(sessionId);
 
         return switch(attributeKey){
-            case JOINT_POSITIONS ->  new AttributeValue.JointPositions(AzureExecutionService.getAllJointAngles(String.valueOf(AzureExecutionService.getKeys().stream().findFirst())));
+            case JOINT_POSITIONS ->  new AttributeValue.JointPositions(AzureExecutionService.getAllJointAngles("NiryoRobot"));
             default -> throw new UnsupportedOperationException("Attribute %s not supported by this service".formatted(attributeKey));
         };
     }
