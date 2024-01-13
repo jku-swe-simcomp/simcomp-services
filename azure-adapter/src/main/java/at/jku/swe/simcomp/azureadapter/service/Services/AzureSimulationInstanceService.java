@@ -66,4 +66,8 @@ public class AzureSimulationInstanceService implements SimulationInstanceService
         simulationInstanceRemovalListeners.forEach(listener -> listener.onSimulationRemoved(config));
         log.info("Notified simulation instance removal listeners about removal of: {}", config);
     }
+
+    public static Set<SimulationInstanceConfig> getInstances() {
+        return instances;
+    }
 }
