@@ -60,6 +60,18 @@ public class SimulationInstanceController {
 <span class="nc" id="L60">        return ResponseEntity.ok(new AvailableServicesDTO(simulations));</span>
     }
 
+    @GetMapping(value=&quot;/type/{type}/custom-commands&quot;)
+    public ResponseEntity&lt;List&lt;String&gt;&gt; getSupportedCustomCommands(@PathVariable String type){
+<span class="nc" id="L65">        log.info(&quot;Request to return supported custom commands for simulation {} received.&quot;, type);</span>
+<span class="nc" id="L66">        return ResponseEntity.ok(service.getSupportedCustomCommandsOfSimulation(type));</span>
+    }
+
+    @GetMapping(value=&quot;/type/{type}/custom-commands/{commandType}/example&quot;)
+    public ResponseEntity&lt;String&gt; getSupportedCustomCommandExample(@PathVariable String type, @PathVariable String commandType){
+<span class="nc" id="L71">        log.info(&quot;Request to return custom command example for simulation {} for command type {} received.&quot;, type, commandType);</span>
+<span class="nc" id="L72">        return ResponseEntity.ok(service.getCustomCommandExampleJson(type, commandType));</span>
+    }
+
     @Operation(summary = &quot;Get Simulation Instances&quot;,
             description = &quot;Returns all registered simulation instances for all available simulation types with the corresponding simulation type, the host and port.&quot; +
                     &quot;If an instance is included in the response, it might still not be available if the instance is associated with an active session.&quot;)
@@ -79,8 +91,8 @@ public class SimulationInstanceController {
     })
     @GetMapping(value = &quot;/instance&quot;, produces = &quot;application/json&quot;)
     public ResponseEntity&lt;List&lt;SimulationInstanceConfig&gt;&gt; getSimulationInstances(){
-<span class="nc" id="L82">        log.info(&quot;Request to return available simulation instances received.&quot;);</span>
-<span class="nc" id="L83">        return ResponseEntity.ok(service.getSimulationInstances());</span>
+<span class="nc" id="L94">        log.info(&quot;Request to return available simulation instances received.&quot;);</span>
+<span class="nc" id="L95">        return ResponseEntity.ok(service.getSimulationInstances());</span>
     }
 
     @Operation(summary = &quot;Get Simulation Instances for a specific Simulation Type&quot;,
@@ -103,8 +115,8 @@ public class SimulationInstanceController {
     @GetMapping(&quot;/{type}/instance&quot;)
     public ResponseEntity&lt;List&lt;SimulationInstanceConfig&gt;&gt; getSimulationInstances(@Parameter(description = &quot;The type of the simulation, e.g. WEBOTS&quot;, required = true)
                                                                                      @PathVariable String type){
-<span class="nc" id="L106">        log.info(&quot;Request to return available simulation instances of simulation {} received.&quot;, type);</span>
-<span class="nc" id="L107">        return ResponseEntity.ok(service.getSimulationInstances(type));</span>
+<span class="nc" id="L118">        log.info(&quot;Request to return available simulation instances of simulation {} received.&quot;, type);</span>
+<span class="nc" id="L119">        return ResponseEntity.ok(service.getSimulationInstances(type));</span>
     }
     @Operation(summary = &quot;Register simulation instance&quot;,
             description = &quot;Registers a simulation instance for the indicated type. For a given type, no two instances can have the same id&quot; +
@@ -125,9 +137,9 @@ public class SimulationInstanceController {
                     schema = @Schema(implementation = SimulationInstanceConfig.class),
                     examples = @ExampleObject(value = &quot;{\&quot;simulationType\&quot;:\&quot;WEBOTS\&quot;, \&quot;instanceId\&quot;:\&quot;MY_PERSONAL_WEBOTS_INSTANCE\&quot;,\&quot;instanceHost\&quot;:\&quot;localhost\&quot;, \&quot;instancePort\&quot;:10010}&quot;)))
                                                                          @RequestBody SimulationInstanceConfig config) throws Exception {
-<span class="nc" id="L128">        log.info(&quot;Request to register simulation instance {} for simulation {} received.&quot;, config.getInstanceId(), config.getSimulationType());</span>
-<span class="nc" id="L129">        service.registerSimulationInstanceForAdaptor(config);</span>
-<span class="nc" id="L130">        return ResponseEntity.ok().build();</span>
+<span class="nc" id="L140">        log.info(&quot;Request to register simulation instance {} for simulation {} received.&quot;, config.getInstanceId(), config.getSimulationType());</span>
+<span class="nc" id="L141">        service.registerSimulationInstanceForAdaptor(config);</span>
+<span class="nc" id="L142">        return ResponseEntity.ok().build();</span>
     }
 
 
@@ -148,9 +160,9 @@ public class SimulationInstanceController {
                                                              @PathVariable String type,
                                                          @Parameter(description = &quot;The id of the simulation instance to be deleted.&quot;)
                                                          @PathVariable String instanceId){
-<span class="nc" id="L151">        log.info(&quot;Request to delete simulation instance {} of simulation {} received.&quot;, instanceId, type);</span>
-<span class="nc" id="L152">        service.deleteSimulationInstance(type, instanceId);</span>
-<span class="nc" id="L153">        return ResponseEntity.ok().build();</span>
+<span class="nc" id="L163">        log.info(&quot;Request to delete simulation instance {} of simulation {} received.&quot;, instanceId, type);</span>
+<span class="nc" id="L164">        service.deleteSimulationInstance(type, instanceId);</span>
+<span class="nc" id="L165">        return ResponseEntity.ok().build();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

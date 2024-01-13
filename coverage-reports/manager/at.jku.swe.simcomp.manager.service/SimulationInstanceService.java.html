@@ -105,8 +105,32 @@ public class SimulationInstanceService {
         }
 <span class="fc" id="L106">    }</span>
 
-    private List&lt;SimulationInstanceConfig&gt; getSimulationInstances(ServiceRegistrationConfigDTO config){
-<span class="fc" id="L109">        return adaptorClient.getSimulationInstances(config);</span>
+    public List&lt;String&gt; getSupportedCustomCommandsOfSimulation(String simulationName) {
+<span class="nc" id="L109">        Optional&lt;ServiceRegistrationConfigDTO&gt; adaptorConfig = serviceRegistryClient.getRegisteredAdaptors().stream()</span>
+<span class="nc" id="L110">                .filter(ac -&gt; ac.getName().equals(simulationName))</span>
+<span class="nc" id="L111">                .findFirst();</span>
+
+<span class="nc bnc" id="L113" title="All 2 branches missed.">        if(adaptorConfig.isPresent()){</span>
+<span class="nc" id="L114">            return adaptorClient.getSupportedCustomCommandsOfSimulation(adaptorConfig.get());</span>
+        }else{
+<span class="nc" id="L116">            throw new NotFoundException(&quot;Simulation with name &quot; + simulationName + &quot; not found.&quot;);</span>
+        }
     }
+    public String getCustomCommandExampleJson(String simulationName, String commandType) {
+<span class="nc" id="L120">        Optional&lt;ServiceRegistrationConfigDTO&gt; adaptorConfig = serviceRegistryClient.getRegisteredAdaptors().stream()</span>
+<span class="nc" id="L121">                .filter(ac -&gt; ac.getName().equals(simulationName))</span>
+<span class="nc" id="L122">                .findFirst();</span>
+
+<span class="nc bnc" id="L124" title="All 2 branches missed.">        if(adaptorConfig.isPresent()){</span>
+<span class="nc" id="L125">            return adaptorClient.getSupportedCustomCommandExampleJson(adaptorConfig.get(), commandType);</span>
+        }else{
+<span class="nc" id="L127">            throw new NotFoundException(&quot;Simulation with name &quot; + simulationName + &quot; not found.&quot;);</span>
+        }
+    }
+
+    private List&lt;SimulationInstanceConfig&gt; getSimulationInstances(ServiceRegistrationConfigDTO config){
+<span class="fc" id="L132">        return adaptorClient.getSimulationInstances(config);</span>
+    }
+
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

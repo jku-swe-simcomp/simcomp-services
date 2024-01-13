@@ -81,15 +81,16 @@ public class ExecutionController {
                             @ExampleObject(name = &quot;Calibrate&quot;, value = &quot;{ \&quot;type\&quot;: \&quot;CALIBRATE\&quot;}&quot;),
                             @ExampleObject(name = &quot;Open Hand&quot;, value = &quot;{ \&quot;type\&quot;: \&quot;OPEN_HAND\&quot;}&quot;),
                             @ExampleObject(name = &quot;Set Speed&quot;, value = &quot;{ \&quot;type\&quot;: \&quot;SET_SPEED\&quot;, \&quot;speed\&quot;:2.3}&quot;),
+                            @ExampleObject(name = &quot;Custom&quot;, value = &quot; { \&quot;type\&quot;: \&quot;CUSTOM\&quot;, \&quot;jsonCommand\&quot;:\&quot;visit /simulation/type/{type}/custom-commands to get the available custom commands for a simulation type. visit /simulation/type/{type}/custom-commands/{commandType}/example to get an example for a custom command.\&quot;}&quot;),
                     }))
     @PostMapping(value = &quot;/{sessionId}/execution&quot;, consumes = &quot;application/json&quot;, produces = &quot;text/html&quot;)
     public ResponseEntity&lt;String&gt; execute(@Parameter(description = &quot;The id of the session.&quot;, required = true, schema = @Schema(implementation = UUID.class, example = &quot;123e4567-e89b-12d3-a456-426614174001&quot;))
                                               @PathVariable(&quot;sessionId&quot;) UUID sessionId,
                                   @RequestBody ExecutionCommand command) throws BadRequestException {
-<span class="nc" id="L89">        log.info(&quot;Request to execute command for session {}: {}&quot;, sessionId, command);</span>
-<span class="nc" id="L90">        UUID executionId = executionService.executeCommand(sessionId, command);</span>
-<span class="nc" id="L91">        log.info(&quot;Returning execution id {}&quot;, executionId);</span>
-<span class="nc" id="L92">        return ResponseEntity.status(202).body(executionId.toString());</span>
+<span class="nc" id="L90">        log.info(&quot;Request to execute command for session {}: {}&quot;, sessionId, command);</span>
+<span class="nc" id="L91">        UUID executionId = executionService.executeCommand(sessionId, command);</span>
+<span class="nc" id="L92">        log.info(&quot;Returning execution id {}&quot;, executionId);</span>
+<span class="nc" id="L93">        return ResponseEntity.status(202).body(executionId.toString());</span>
     }
 
     @Operation(summary = &quot;Get all Executions for Session&quot;,
@@ -118,10 +119,10 @@ public class ExecutionController {
     @GetMapping(value = &quot;/{sessionId}/execution&quot;)
     public ResponseEntity&lt;List&lt;ExecutionDTO&gt;&gt; getAllExecutions(@Parameter(description = &quot;The id of the session.&quot;, required = true, schema = @Schema(implementation = UUID.class, example = &quot;123e4567-e89b-12d3-a456-426614174001&quot;))
                                           @PathVariable(&quot;sessionId&quot;) UUID sessionId){
-<span class="nc" id="L121">        log.info(&quot;Request to get executions for session {}.&quot;, sessionId);</span>
-<span class="nc" id="L122">        List&lt;ExecutionDTO&gt; executions = executionService.getAllExecutionsForSession(sessionId);</span>
-<span class="nc" id="L123">        log.info(&quot;Returning executions {}.&quot;, executions);</span>
-<span class="nc" id="L124">        return ResponseEntity.status(200).body(executions);</span>
+<span class="nc" id="L122">        log.info(&quot;Request to get executions for session {}.&quot;, sessionId);</span>
+<span class="nc" id="L123">        List&lt;ExecutionDTO&gt; executions = executionService.getAllExecutionsForSession(sessionId);</span>
+<span class="nc" id="L124">        log.info(&quot;Returning executions {}.&quot;, executions);</span>
+<span class="nc" id="L125">        return ResponseEntity.status(200).body(executions);</span>
     }
 
     @Operation(summary = &quot;Get information about execution and responses.&quot;,
@@ -157,9 +158,9 @@ public class ExecutionController {
     @GetMapping(value = &quot;/execution/{executionId}&quot;, produces = &quot;application/json&quot;)
     public ResponseEntity&lt;ExecutionDTO&gt; getExecutionDetails(@Parameter(description = &quot;The id of the execution&quot;, schema = @Schema(implementation = UUID.class))
                                                                 @PathVariable UUID executionId){
-<span class="nc" id="L160">        log.info(&quot;Request to fetch execution {}.&quot;, executionId);</span>
-<span class="nc" id="L161">        ExecutionDTO dto = executionService.getExecution(executionId);</span>
-<span class="nc" id="L162">        return ResponseEntity.ok(dto);</span>
+<span class="nc" id="L161">        log.info(&quot;Request to fetch execution {}.&quot;, executionId);</span>
+<span class="nc" id="L162">        ExecutionDTO dto = executionService.getExecution(executionId);</span>
+<span class="nc" id="L163">        return ResponseEntity.ok(dto);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

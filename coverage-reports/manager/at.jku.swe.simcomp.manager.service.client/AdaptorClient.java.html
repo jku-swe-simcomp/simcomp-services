@@ -222,5 +222,31 @@ public class AdaptorClient {
 <span class="fc" id="L222">        String url = getDomain(serviceRegistrationConfigDTO)+ getDeleteSimulationInstancePathForInstanceId(instanceId);</span>
 <span class="fc" id="L223">        restTemplate.delete(url);</span>
 <span class="fc" id="L224">    }</span>
+
+    /**
+     * Returns the supported custom commands of a given adaptor.
+     * @param serviceRegistrationConfigDTO the adaptor config identifying the adaptor
+     * @return the supported custom commands
+     */
+    public List&lt;String&gt; getSupportedCustomCommandsOfSimulation(ServiceRegistrationConfigDTO serviceRegistrationConfigDTO) {
+<span class="nc" id="L232">        String url = getDomain(serviceRegistrationConfigDTO) + GET_CUSTOM_COMMANDS;</span>
+<span class="nc" id="L233">        ResponseEntity&lt;List&lt;String&gt;&gt; responseEntity = restTemplate.exchange(</span>
+                url,
+                HttpMethod.GET,
+                null,
+<span class="nc" id="L237">                new ParameterizedTypeReference&lt;&gt;() {}</span>
+        );
+<span class="nc" id="L239">        return responseEntity.getBody();</span>
+    }
+
+    /**
+     * Returns an example for a custom command according to its type
+     * @param serviceRegistrationConfigDTO the adaptor config identifying the adaptor
+     * @return the example
+     */
+    public String getSupportedCustomCommandExampleJson(ServiceRegistrationConfigDTO serviceRegistrationConfigDTO, String commandType) {
+<span class="nc" id="L248">        String url = getDomain(serviceRegistrationConfigDTO) + getCustomCommandExamplePathForType(commandType);</span>
+<span class="nc" id="L249">        return restTemplate.getForEntity(url, String.class).getBody();</span>
+    }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,14 +1,15 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-Adaptor Manager,at.jku.swe.simcomp.manager.rest,SimulationInstanceController,62,10,0,0,14,4,5,2,5,2
+Adaptor Manager,at.jku.swe.simcomp.manager.rest,SimulationInstanceController,84,10,0,0,18,4,7,2,7,2
 Adaptor Manager,at.jku.swe.simcomp.manager.rest,ExecutionController,51,10,0,0,11,4,3,2,3,2
 Adaptor Manager,at.jku.swe.simcomp.manager.rest,AttributeController,12,10,0,0,2,4,1,2,1,2
 Adaptor Manager,at.jku.swe.simcomp.manager.rest,ErrorHandler,39,3,0,0,15,1,3,1,3,1
 Adaptor Manager,at.jku.swe.simcomp.manager.rest,SessionController,127,10,0,0,30,4,7,2,7,2
 Adaptor Manager,at.jku.swe.simcomp.manager,AdaptorManagerApplication,5,3,0,0,2,1,1,1,1,1
-Adaptor Manager,at.jku.swe.simcomp.manager.service.client,AdaptorClient,107,511,16,28,6,84,16,16,0,10
+Adaptor Manager,at.jku.swe.simcomp.manager.service.client,AdaptorClient,144,511,16,28,11,84,18,16,2,10
 Adaptor Manager,at.jku.swe.simcomp.manager.service.client,AxisConverterClient,24,30,0,0,3,7,1,2,1,2
 Adaptor Manager,at.jku.swe.simcomp.manager.service.client,AxisConverterClient.new ParameterizedTypeReference() {...},6,0,0,0,1,0,1,0,1,0
 Adaptor Manager,at.jku.swe.simcomp.manager.service.client,ServiceRegistryClient,12,46,1,1,2,11,2,3,1,3
+Adaptor Manager,at.jku.swe.simcomp.manager.service.client,AdaptorClient.new ParameterizedTypeReference() {...},6,0,0,0,1,0,1,0,1,0
 Adaptor Manager,at.jku.swe.simcomp.manager.service.client,AdaptorClient.new ParameterizedTypeReference() {...},0,6,0,0,0,1,0,1,0,1
 Adaptor Manager,at.jku.swe.simcomp.manager.config,CorsConfig,0,29,0,0,0,8,0,2,0,2
 Adaptor Manager,at.jku.swe.simcomp.manager.config,RestTemplateConfig,0,28,0,0,0,9,0,4,0,4
@@ -21,7 +22,7 @@ Adaptor Manager,at.jku.swe.simcomp.manager.service,SessionService,135,589,11,25,
 Adaptor Manager,at.jku.swe.simcomp.manager.service,AttributeService,27,246,5,10,6,49,5,13,0,10
 Adaptor Manager,at.jku.swe.simcomp.manager.service,KinematicsService,74,6,4,0,13,3,5,1,3,1
 Adaptor Manager,at.jku.swe.simcomp.manager.service,ExecutionService,52,228,4,10,9,53,6,13,2,10
-Adaptor Manager,at.jku.swe.simcomp.manager.service,SimulationInstanceService,0,137,0,6,0,32,0,14,0,11
+Adaptor Manager,at.jku.swe.simcomp.manager.service,SimulationInstanceService,61,137,4,6,12,32,6,14,4,11
 Adaptor Manager,at.jku.swe.simcomp.manager.service,AsyncCommandDistributionService,41,193,5,9,5,50,5,8,0,6
 Adaptor Manager,at.jku.swe.simcomp.manager.rest.exception,CommandExecutionFailedException,0,10,0,0,0,4,0,2,0,2
 Adaptor Manager,at.jku.swe.simcomp.manager.domain.model,Execution,39,63,0,0,4,12,8,11,8,11
