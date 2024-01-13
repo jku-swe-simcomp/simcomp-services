@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static at.jku.swe.simcomp.demoadaptor.service.DemoSimulationInstanceService.currentJointPositions;
+
 @Service
 public class DemoAdaptorEndpointService implements AdaptorEndpointService {
     private final DemoSessionService demoSessionService;
@@ -33,10 +35,10 @@ public class DemoAdaptorEndpointService implements AdaptorEndpointService {
 
     @Override
     public AttributeValue getAttributeValue(AttributeKey attributeKey, String sessionId) throws SessionNotValidException {
-        demoSessionService.renewSession(sessionId);
+        var config = demoSessionService.renewSession(sessionId);
         // Note: can add more cases for different attributes
         return switch(attributeKey){
-            case JOINT_POSITIONS -> new AttributeValue.JointPositions(DemoCommandExecutionVisitor.currentJointPositions);
+            case JOINT_POSITIONS -> new AttributeValue.JointPositions(currentJointPositions.get(config));
             default -> throw new UnsupportedOperationException("Attribute %s not supported by this service".formatted(attributeKey));
         };
     }

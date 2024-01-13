@@ -2,6 +2,9 @@ package at.jku.swe.simcomp.commons.adaptor.dto;
 
 import lombok.*;
 
+/**
+ * Represents the orientation of the end-effector.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

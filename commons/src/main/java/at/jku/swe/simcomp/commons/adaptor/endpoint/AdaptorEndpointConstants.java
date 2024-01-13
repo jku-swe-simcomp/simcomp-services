@@ -3,6 +3,10 @@ package at.jku.swe.simcomp.commons.adaptor.endpoint;
 import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeKey;
 import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 
+/**
+ * This class contains the constants for the adaptor endpoint.
+ * Contains the paths for the endpoints, and methods to build the paths based on different parameters.
+ */
 public class AdaptorEndpointConstants {
     public static final String HEALTH_CHECK_PATH="/health";
     public static final String INIT_SESSION_PATH="/session/init";

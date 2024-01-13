@@ -14,6 +14,9 @@ import org.springframework.http.ResponseEntity;
 import java.io.IOException;
 import java.text.ParseException;
 
+/**
+ * This interface defines the methods for the adaptor endpoint.
+ */
 public interface AdaptorEndpoint {
     ResponseEntity<String> initSession(String instanceId) throws SessionInitializationFailedException;
     ResponseEntity<String> closeSession(String sessionId) throws SessionNotValidException;

@@ -9,6 +9,10 @@ import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidExce
 import java.io.IOException;
 import org.json.simple.parser.ParseException;
 
+/**
+ * This interface defines the methods for the adaptor endpoint service.
+ * Has to be implemented by the simulation adaptor.
+ */
 public interface AdaptorEndpointService {
     AttributeValue getAttributeValue(AttributeKey attribute, String sessionId) throws SessionNotValidException, RoboOperationFailedException, IOException, ParseException;
     String initSession() throws SessionInitializationFailedException;

@@ -2,6 +2,11 @@ package at.jku.swe.simcomp.commons.adaptor.execution.command.visitor;
 
 import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
 
+/**
+ * This interface represents a visitor for the {@link ExecutionCommand} hierarchy.
+ * @param <T> Return type of the visit methods
+ * @param <P> Parameter type of the visit methods
+ */
 public interface ExecutionCommandVisitor<T,P> {
     default T visit(ExecutionCommand.AdjustJointAngleCommand command, P param) throws Exception{
         return defaultBehaviour(command, param);

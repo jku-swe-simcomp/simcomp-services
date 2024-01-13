@@ -10,6 +10,9 @@ import lombok.NonNull;
 
 import java.util.List;
 
+/**
+ * This interface represents a command to be executed.
+ */
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         property = "type")
@@ -32,10 +35,30 @@ import java.util.List;
 })
 @Schema(description = "A command to be executed.")
 public interface ExecutionCommand {
+    /**
+     * Accepts a visitor to perform some operation on the command.
+     * @param visitor the visitor
+     * @param param additional parameter for the visitor
+     * @return the result of the visit
+     * @param <T> the result type
+     * @param <P> the type of the additional parameter
+     * @throws Exception if the visit fails
+     */
     <T,P> T accept(ExecutionCommandVisitor<T,P> visitor, P param) throws Exception;
+
+    /**
+     * Returns the corresponding action type {@link ActionType} of the command.
+     * @return the corresponding action type
+     */
     @JsonIgnore
     ActionType getCorrespondingActionType();
-    public static record PoseCommand(@NonNull PositionDTO position, @NonNull OrientationDTO orientation) implements ExecutionCommand {
+
+    /**
+     * This record represents a pose command.
+     * @param position the position
+     * @param orientation the orientation
+     */
+    record PoseCommand(@NonNull PositionDTO position, @NonNull OrientationDTO orientation) implements ExecutionCommand {
         private static final ActionType correspondingActionType = ActionType.POSE;
 
         @Override
@@ -49,7 +72,11 @@ public interface ExecutionCommand {
         }
     }
 
-    public static record SetPositionCommand(@NonNull PositionDTO position) implements ExecutionCommand {
+    /**
+     * This record represents a set position command.
+     * @param position the position
+     */
+    record SetPositionCommand(@NonNull PositionDTO position) implements ExecutionCommand {
         private static final ActionType correspondingActionType = ActionType.SET_POSITION;
 
         @Override
@@ -62,7 +89,12 @@ public interface ExecutionCommand {
             return correspondingActionType;
         }
     }
-    public static record SetOrientationCommand(@NonNull OrientationDTO orientation) implements ExecutionCommand {
+
+    /**
+     * This record represents a set orientation command.
+     * @param orientation the orientation
+     */
+    record SetOrientationCommand(@NonNull OrientationDTO orientation) implements ExecutionCommand {
         private static final ActionType correspondingActionType = ActionType.SET_ORIENTATION;
 
         @Override
@@ -75,7 +107,11 @@ public interface ExecutionCommand {
             return correspondingActionType;
         }
     }
-    public static record AdjustJointAngleCommand(@NonNull JointAngleAdjustmentDTO jointAngleAdjustment) implements ExecutionCommand {
+    /**
+     * This record represents a adjust joint angle command.
+     * @param jointAngleAdjustment the joint angle adjustment
+     */
+    record AdjustJointAngleCommand(@NonNull JointAngleAdjustmentDTO jointAngleAdjustment) implements ExecutionCommand {
         private static final ActionType correspondingActionType = ActionType.ADJUST_JOINT_ANGLE;
 
         @Override
@@ -88,7 +124,12 @@ public interface ExecutionCommand {
             return correspondingActionType;
         }
     }
-    public static record SetJointPositionCommand(@NonNull JointPositionDTO jointPosition) implements ExecutionCommand {
+
+    /**
+     * This record represents a set joint position command.
+     * @param jointPosition the joint position
+     */
+    record SetJointPositionCommand(@NonNull JointPositionDTO jointPosition) implements ExecutionCommand {
         private static final ActionType correspondingActionType = ActionType.SET_JOINT_POSITION;
 
         @Override
@@ -101,7 +142,12 @@ public interface ExecutionCommand {
             return correspondingActionType;
         }
     }
-    public static record SetSpeedCommand(@NonNull Double speed) implements ExecutionCommand {
+
+    /**
+     * This record represents a set speed command.
+     * @param speed the speed
+     */
+    record SetSpeedCommand(@NonNull Double speed) implements ExecutionCommand {
         private static final ActionType correspondingActionType = ActionType.SET_SPEED;
 
         @Override
@@ -115,7 +161,10 @@ public interface ExecutionCommand {
         }
     }
 
-    public static record PauseCommand() implements ExecutionCommand {
+    /**
+     * This record represents a pause command.
+     */
+    record PauseCommand() implements ExecutionCommand {
         private static final ActionType correspondingActionType = ActionType.PAUSE;
 
         @Override
@@ -128,7 +177,11 @@ public interface ExecutionCommand {
             return correspondingActionType;
         }
     }
-    public static record ResumeCommand() implements ExecutionCommand {
+
+    /**
+     * This record represents a resume command.
+     */
+    record ResumeCommand() implements ExecutionCommand {
         private static final ActionType correspondingActionType = ActionType.RESUME;
 
         @Override
@@ -142,7 +195,11 @@ public interface ExecutionCommand {
         }
 
     }
-    public static record ResetToHomeCommand() implements ExecutionCommand {
+
+    /**
+     * This record represents a reset to home command.
+     */
+    record ResetToHomeCommand() implements ExecutionCommand {
         private static final ActionType correspondingActionType = ActionType.RESET_TO_HOME;
 
         @Override
@@ -155,7 +212,11 @@ public interface ExecutionCommand {
             return correspondingActionType;
         }
     }
-    public static record StopCommand() implements ExecutionCommand {
+
+    /**
+     * This record represents a stop command.
+     */
+    record StopCommand() implements ExecutionCommand {
         private static final ActionType correspondingActionType = ActionType.STOP;
 
         @Override
@@ -168,7 +229,11 @@ public interface ExecutionCommand {
             return correspondingActionType;
         }
     }
-    public static record CalibrateCommand() implements ExecutionCommand {
+
+    /**
+     * This record represents a calibrate command.
+     */
+    record CalibrateCommand() implements ExecutionCommand {
         private static final ActionType correspondingActionType = ActionType.CALIBRATE;
 
         @Override
@@ -181,7 +246,11 @@ public interface ExecutionCommand {
             return correspondingActionType;
         }
     }
-    public static record ToggleGripperModeCommand() implements ExecutionCommand {
+
+    /**
+     * This record represents a toggle gripper mode command.
+     */
+    record ToggleGripperModeCommand() implements ExecutionCommand {
         private static final ActionType correspondingActionType = ActionType.TOGGLE_GRIPPER_MODE;
 
         @Override
@@ -194,7 +263,11 @@ public interface ExecutionCommand {
             return correspondingActionType;
         }
     }
-    public static record GrabCommand() implements ExecutionCommand {
+
+    /**
+     * This record represents a grab command.
+     */
+    record GrabCommand() implements ExecutionCommand {
         private static final ActionType correspondingActionType = ActionType.GRAB;
 
         @Override
@@ -207,7 +280,11 @@ public interface ExecutionCommand {
             return correspondingActionType;
         }
     }
-    public static record OpenHandCommand() implements ExecutionCommand {
+
+    /**
+     * This record represents an open hand command.
+     */
+    record OpenHandCommand() implements ExecutionCommand {
         private static final ActionType correspondingActionType = ActionType.OPEN_HAND;
 
         @Override
@@ -221,7 +298,11 @@ public interface ExecutionCommand {
         }
     }
 
-    public static record CompositeCommand(List<? extends ExecutionCommand> commands) implements ExecutionCommand {
+    /**
+     * This record represents a composite command.
+     * @param commands the commands to execute
+     */
+    record CompositeCommand(List<? extends ExecutionCommand> commands) implements ExecutionCommand {
         private static final ActionType correspondingActionType = ActionType.COMPOSITE;
 
         @Override

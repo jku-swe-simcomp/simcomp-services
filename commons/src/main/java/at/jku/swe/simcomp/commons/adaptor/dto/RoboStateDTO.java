@@ -4,6 +4,9 @@ import lombok.*;
 
 import java.util.List;
 
+/**
+ * Represents the state of the robot.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

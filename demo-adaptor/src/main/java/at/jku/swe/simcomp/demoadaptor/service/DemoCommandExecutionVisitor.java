@@ -11,9 +11,10 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+import static at.jku.swe.simcomp.demoadaptor.service.DemoSimulationInstanceService.currentJointPositions;
+
 @Service
 public class DemoCommandExecutionVisitor extends CommandExecutionVisitor {
-    public static final List<Double> currentJointPositions = new ArrayList<>(List.of(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
     private final DemoSessionService demoSessionService;
     private final JointPositionCommandExecutor jointPositionCommandExecutor;
     private final AdjustJointAngleCommandExecutor adjustJointAngleCommandExecutor;
@@ -27,15 +28,11 @@ public class DemoCommandExecutionVisitor extends CommandExecutionVisitor {
 
     @Override
     public ExecutionResultDTO visit(ExecutionCommand.AdjustJointAngleCommand command, String sessionKey) throws SessionNotValidException {
-        int jointIndex = command.jointAngleAdjustment().getJoint().getIndex() - 1;
-        currentJointPositions.set(jointIndex, currentJointPositions.get(jointIndex) + command.jointAngleAdjustment().getByRadians());
         return adjustJointAngleCommandExecutor.execute(command, demoSessionService.renewSession(sessionKey));
     }
 
     @Override
     public ExecutionResultDTO visit(ExecutionCommand.SetJointPositionCommand command, String sessionKey) throws SessionNotValidException {
-        int jointIndex = command.jointPosition().getJoint().getIndex() - 1;
-        currentJointPositions.set(jointIndex, command.jointPosition().getRadians());
         return jointPositionCommandExecutor.execute(command, demoSessionService.renewSession(sessionKey));
     }
 }

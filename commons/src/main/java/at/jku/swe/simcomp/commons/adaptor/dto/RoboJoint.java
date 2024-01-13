@@ -2,6 +2,9 @@ package at.jku.swe.simcomp.commons.adaptor.dto;
 
 import lombok.Getter;
 
+/**
+ * Represents a joint of the robot.
+ */
 @Getter
 public enum RoboJoint {
     AXIS_1(1),

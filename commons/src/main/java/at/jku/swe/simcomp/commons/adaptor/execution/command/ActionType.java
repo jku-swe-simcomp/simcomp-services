@@ -2,6 +2,9 @@ package at.jku.swe.simcomp.commons.adaptor.execution.command;
 
 import lombok.Getter;
 
+/**
+ * This enum represents the different action types.
+ */
 @Getter
 public enum ActionType {
     POSE("POSE"),

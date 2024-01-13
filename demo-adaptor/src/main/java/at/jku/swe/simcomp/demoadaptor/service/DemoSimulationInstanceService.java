@@ -15,6 +15,7 @@ import java.util.*;
 public class DemoSimulationInstanceService implements SimulationInstanceService {
     private static final Set<DemoSimulationRemovalListener> simulationInstanceRemovalListeners = Collections.synchronizedSet(new HashSet<>());
     public static final Set<SimulationInstanceConfig> instances = Collections.synchronizedSet(new HashSet<>());
+    public static final Map<SimulationInstanceConfig, List<Double>> currentJointPositions = new HashMap<>();
 
     private final String adaptorName;
     public DemoSimulationInstanceService(@Value("${adaptor.endpoint.name}") String adaptorName) {
@@ -34,6 +35,7 @@ public class DemoSimulationInstanceService implements SimulationInstanceService 
             throw new BadRequestException("Simulation instance with same id already exists");
         }
         instances.add(config);
+        currentJointPositions.put(config, new ArrayList<>(List.of(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)));
         log.info("Added simulation: {}", config);
     }
 
@@ -42,6 +44,7 @@ public class DemoSimulationInstanceService implements SimulationInstanceService 
         Optional<SimulationInstanceConfig> config = instances.stream().filter(simulation -> simulation.getInstanceId().equals(instanceId)).findFirst();
         if(config.isPresent()){
             instances.remove(config.get());
+            currentJointPositions.remove(config.get());
             notifySimulationRemovalListeners(config.get());
             log.info("Removed simulation: {}", config.get());
         }else {
