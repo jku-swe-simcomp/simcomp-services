@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PreDestroy;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
@@ -29,13 +30,10 @@ public class AzureSimulationInstanceService implements SimulationInstanceService
         if(!config.getSimulationType().equals(this.adaptorName)){
             throw new BadRequestException("Simulation name does not match the name of this adaptor");
         }
-        if(instances.stream().anyMatch(instance -> instance.getInstanceHost().equals(config.getInstanceHost()) &&
-                instance.getInstancePort().equals(config.getInstancePort()))){
-            throw new BadRequestException("Simulation instance with same host and port already exists");
-        }
         if(instances.stream().anyMatch(instance -> instance.getInstanceId().equals(config.getInstanceId()))){
             throw new BadRequestException("Simulation instance with same id already exists");
         }
+        AzureService.createDigitalTwin(config.getInstanceId());
         instances.add(config);
         log.info("Added simulation: {}", config);
     }
@@ -44,6 +42,7 @@ public class AzureSimulationInstanceService implements SimulationInstanceService
     public void removeSimulationInstance(String instanceId) {
         Optional<SimulationInstanceConfig> config = instances.stream().filter(simulation -> simulation.getInstanceId().equals(instanceId)).findFirst();
         if(config.isPresent()){
+            AzureService.deleteDigitalTwin(config.get().getInstanceId());
             instances.remove(config.get());
             notifySimulationRemovalListeners(config.get());
             log.info("Removed simulation: {}", config.get());
@@ -69,5 +68,12 @@ public class AzureSimulationInstanceService implements SimulationInstanceService
 
     public static Set<SimulationInstanceConfig> getInstances() {
         return instances;
+    }
+
+    @PreDestroy
+    public void cleanUpInstances() {
+        for (var instance : instances) {
+            AzureService.deleteDigitalTwin(instance.getInstanceId());
+        }
     }
 }

@@ -6,11 +6,7 @@ import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeValue;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.AdaptorEndpointService;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
-import com.azure.core.http.rest.PagedIterable;
-import com.azure.digitaltwins.core.DigitalTwinsClient;
 import org.springframework.stereotype.Service;
-
-import static at.jku.swe.simcomp.azureadapter.service.NiryoOneController.AzureExecutionService.buildConnection;
 
 @Service
 public class AzureAdaptorEndpointService implements AdaptorEndpointService {
@@ -36,10 +32,10 @@ public class AzureAdaptorEndpointService implements AdaptorEndpointService {
 
     @Override
     public AttributeValue getAttributeValue(AttributeKey attributeKey, String sessionId) throws SessionNotValidException {
-        azureSessionService.renewSession(sessionId);
+        var config = azureSessionService.renewSession(sessionId);
 
         return switch(attributeKey){
-            case JOINT_POSITIONS ->  new AttributeValue.JointPositions(AzureExecutionService.getAllJointAngles("NiryoRobot"));
+            case JOINT_POSITIONS ->  new AttributeValue.JointPositions(AzureExecutionService.getAllJointAngles(config.getInstanceId()));
             default -> throw new UnsupportedOperationException("Attribute %s not supported by this service".formatted(attributeKey));
         };
     }
