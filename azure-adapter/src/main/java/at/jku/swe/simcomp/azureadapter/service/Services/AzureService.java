@@ -31,9 +31,4 @@ public class AzureService {
         client.deleteDigitalTwin(twinId);
     }
 
-    public static void main(String[] args) {
-        deleteDigitalTwin("test");
-
-    }
-
 }

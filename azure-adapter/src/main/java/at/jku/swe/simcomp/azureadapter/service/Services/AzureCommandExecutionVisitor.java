@@ -13,29 +13,20 @@ public class AzureCommandExecutionVisitor extends CommandExecutionVisitor {
 
     private final SetJointAngleCommandExecutor setJointAngleCommandExecutor;
 
-    private final PoseCommandExecutor getJointAngleCommandExecutor;
-
     private final AdjustJointAngleExecutor adjustJointAngleExecutor;
 
 
     public AzureCommandExecutionVisitor(AzureSessionService azureSessionService,
                                         SetJointAngleCommandExecutor setJointAngleCommandExecutor,
-                                        PoseCommandExecutor getJointAngleCommandExecutor,
                                         AdjustJointAngleExecutor adjustJointAngleExecutor) {
         this.azureSessionService = azureSessionService;
         this.setJointAngleCommandExecutor = setJointAngleCommandExecutor;
-        this.getJointAngleCommandExecutor = getJointAngleCommandExecutor;
         this.adjustJointAngleExecutor = adjustJointAngleExecutor;
     }
 
     @Override
     public ExecutionResultDTO visit(ExecutionCommand.SetJointPositionCommand command, String sessionKey) throws Exception {
         return setJointAngleCommandExecutor.execute(command, azureSessionService.renewSession(sessionKey));
-    }
-
-    @Override
-    public ExecutionResultDTO visit(ExecutionCommand.PoseCommand command, String sessionKey) throws Exception {
-        return getJointAngleCommandExecutor.execute(command, azureSessionService.renewSession(sessionKey));
     }
 
     @Override
