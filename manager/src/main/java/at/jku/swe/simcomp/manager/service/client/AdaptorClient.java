@@ -222,4 +222,30 @@ public class AdaptorClient {
         String url = getDomain(serviceRegistrationConfigDTO)+ getDeleteSimulationInstancePathForInstanceId(instanceId);
         restTemplate.delete(url);
     }
+
+    /**
+     * Returns the supported custom commands of a given adaptor.
+     * @param serviceRegistrationConfigDTO the adaptor config identifying the adaptor
+     * @return the supported custom commands
+     */
+    public List<String> getSupportedCustomCommandsOfSimulation(ServiceRegistrationConfigDTO serviceRegistrationConfigDTO) {
+        String url = getDomain(serviceRegistrationConfigDTO) + GET_CUSTOM_COMMANDS;
+        ResponseEntity<List<String>> responseEntity = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<>() {}
+        );
+        return responseEntity.getBody();
+    }
+
+    /**
+     * Returns an example for a custom command according to its type
+     * @param serviceRegistrationConfigDTO the adaptor config identifying the adaptor
+     * @return the example
+     */
+    public String getSupportedCustomCommandExampleJson(ServiceRegistrationConfigDTO serviceRegistrationConfigDTO, String commandType) {
+        String url = getDomain(serviceRegistrationConfigDTO) + getCustomCommandExamplePathForType(commandType);
+        return restTemplate.getForEntity(url, String.class).getBody();
+    }
 }

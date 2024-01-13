@@ -21,7 +21,8 @@ public enum ActionType {
     STOP("STOP"),
     CALIBRATE("CALIBRATE"),
     TOGGLE_GRIPPER_MODE("TOGGLE_GRIPPER_MODE"),
-    COMPOSITE("COMPOSITE");
+    COMPOSITE("COMPOSITE"),
+    CUSTOM("CUSTOM");
 
     private final String actionName;
     ActionType(String name){

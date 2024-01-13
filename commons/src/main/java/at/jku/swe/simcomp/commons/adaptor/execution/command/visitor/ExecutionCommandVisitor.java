@@ -68,9 +68,14 @@ public interface ExecutionCommandVisitor<T,P> {
         return defaultBehaviour(command, param);
     }
 
+    default T visit(ExecutionCommand.CustomCommand command, P param) throws Exception{
+        return defaultBehaviour(command, param);
+    }
+
     default T defaultBehaviour(ExecutionCommand command, P param) throws Exception{
         throw getUnsupportedOperationException(command);
     }
+
 
     private static UnsupportedOperationException getUnsupportedOperationException(ExecutionCommand command) {
         return new UnsupportedOperationException("The action type %s is not supported by this service.".formatted(command.getCorrespondingActionType()));

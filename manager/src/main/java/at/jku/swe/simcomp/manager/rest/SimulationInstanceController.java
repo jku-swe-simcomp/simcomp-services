@@ -60,6 +60,18 @@ public class SimulationInstanceController {
         return ResponseEntity.ok(new AvailableServicesDTO(simulations));
     }
 
+    @GetMapping(value="/type/{type}/custom-commands")
+    public ResponseEntity<List<String>> getSupportedCustomCommands(@PathVariable String type){
+        log.info("Request to return supported custom commands for simulation {} received.", type);
+        return ResponseEntity.ok(service.getSupportedCustomCommandsOfSimulation(type));
+    }
+
+    @GetMapping(value="/type/{type}/custom-commands/{commandType}/example")
+    public ResponseEntity<String> getSupportedCustomCommandExample(@PathVariable String type, @PathVariable String commandType){
+        log.info("Request to return custom command example for simulation {} for command type {} received.", type, commandType);
+        return ResponseEntity.ok(service.getCustomCommandExampleJson(type, commandType));
+    }
+
     @Operation(summary = "Get Simulation Instances",
             description = "Returns all registered simulation instances for all available simulation types with the corresponding simulation type, the host and port." +
                     "If an instance is included in the response, it might still not be available if the instance is associated with an active session.")

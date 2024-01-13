@@ -13,13 +13,14 @@ import at.jku.swe.simcomp.commons.adaptor.registration.ServiceRegistryClient;
 import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 import at.jku.swe.simcomp.commons.adaptor.registration.exception.ServiceRegistrationFailedException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.swagger.v3.core.util.Json;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.util.List;
+
 import org.json.simple.parser.ParseException;
 
 /**
@@ -119,6 +120,28 @@ public class AdaptorEndpointController implements AdaptorEndpoint{
     @GetMapping("/{sessionId}/attribute/{attribute}")
     public final ResponseEntity<AttributeValue> getAttribute(@PathVariable AttributeKey attribute, @PathVariable String sessionId) throws SessionNotValidException, RoboOperationFailedException, IOException, ParseException {
         AttributeValue value = adaptorEndpointService.getAttributeValue(attribute, sessionId);
+        return ResponseEntity.ok(value);
+    }
+
+    /**
+     * Abstract endpoint to get an attribute.
+     * @return the attribute
+     */
+    @Override
+    @GetMapping("/custom-commands")
+    public final ResponseEntity<List<String>> getCustomCommandTypes() {
+        List<String> value = adaptorEndpointService.getSupportedCustomCommandTypes();
+        return ResponseEntity.ok(value);
+    }
+
+    /**
+     * Abstract endpoint to get an attribute.
+     * @return the attribute
+     */
+    @Override
+    @GetMapping("/custom-commands/{type}/example")
+    public final ResponseEntity<String> getCustomCommandTypeExampleJson(@PathVariable String type) {
+        String value = adaptorEndpointService.getCustomCommandTypeExampleJson(type);
         return ResponseEntity.ok(value);
     }
 

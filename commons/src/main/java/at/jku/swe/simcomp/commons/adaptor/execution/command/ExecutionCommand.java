@@ -31,6 +31,7 @@ import java.util.List;
         @JsonSubTypes.Type(value = ExecutionCommand.ResetToHomeCommand.class, name = "RESET_TO_HOME"),
         @JsonSubTypes.Type(value = ExecutionCommand.ToggleGripperModeCommand.class, name = "TOGGLE_GRIPPER_MODE"),
         @JsonSubTypes.Type(value = ExecutionCommand.SetSpeedCommand.class, name = "SET_SPEED"),
+        @JsonSubTypes.Type(value = ExecutionCommand.CustomCommand.class, name = "CUSTOM"),
         @JsonSubTypes.Type(value = ExecutionCommand.CompositeCommand.class, name = "COMPOSITE"),
 })
 @Schema(description = "A command to be executed.")
@@ -304,6 +305,24 @@ public interface ExecutionCommand {
      */
     record CompositeCommand(List<? extends ExecutionCommand> commands) implements ExecutionCommand {
         private static final ActionType correspondingActionType = ActionType.COMPOSITE;
+
+        @Override
+        public <T,P> T accept(ExecutionCommandVisitor<T, P> visitor, P param) throws Exception {
+            return visitor.visit(this, param);
+        }
+
+        @Override
+        public ActionType getCorrespondingActionType() {
+            return correspondingActionType;
+        }
+    }
+
+    /**
+     * This record represents a custom command.
+     * @param jsonCommand the custom command as json string
+     */
+    record CustomCommand(String jsonCommand) implements ExecutionCommand {
+        private static final ActionType correspondingActionType = ActionType.CUSTOM;
 
         @Override
         public <T,P> T accept(ExecutionCommandVisitor<T, P> visitor, P param) throws Exception {

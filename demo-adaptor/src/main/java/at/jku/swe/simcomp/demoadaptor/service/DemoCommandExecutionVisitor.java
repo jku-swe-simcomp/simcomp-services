@@ -6,6 +6,8 @@ import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
 import at.jku.swe.simcomp.commons.adaptor.execution.command.visitor.CommandExecutionVisitor;
 import at.jku.swe.simcomp.demoadaptor.service.command_executors.AdjustJointAngleCommandExecutor;
 import at.jku.swe.simcomp.demoadaptor.service.command_executors.JointPositionCommandExecutor;
+import at.jku.swe.simcomp.demoadaptor.service.dto.CustomCommand;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -34,5 +36,15 @@ public class DemoCommandExecutionVisitor extends CommandExecutionVisitor {
     @Override
     public ExecutionResultDTO visit(ExecutionCommand.SetJointPositionCommand command, String sessionKey) throws SessionNotValidException {
         return jointPositionCommandExecutor.execute(command, demoSessionService.renewSession(sessionKey));
+    }
+
+    @Override
+    public ExecutionResultDTO visit(ExecutionCommand.CustomCommand command, String param) throws Exception {
+        demoSessionService.renewSession(param);
+        CustomCommand customCommand = new ObjectMapper().readValue(command.jsonCommand(), CustomCommand.class);
+        if(customCommand instanceof CustomCommand.ChangeAltitude){
+            return new ExecutionResultDTO("Executed custom command CHANGE_ALTITUDE");
+        }
+        throw new UnsupportedOperationException("Custom command %s not supported by this service".formatted(command));
     }
 }

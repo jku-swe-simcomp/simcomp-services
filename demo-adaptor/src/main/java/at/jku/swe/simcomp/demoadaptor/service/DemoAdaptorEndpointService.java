@@ -5,6 +5,8 @@ import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeValue;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.AdaptorEndpointService;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
+import at.jku.swe.simcomp.demoadaptor.service.dto.CustomCommand;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,5 +43,22 @@ public class DemoAdaptorEndpointService implements AdaptorEndpointService {
             case JOINT_POSITIONS -> new AttributeValue.JointPositions(currentJointPositions.get(config));
             default -> throw new UnsupportedOperationException("Attribute %s not supported by this service".formatted(attributeKey));
         };
+    }
+
+    @Override
+    public List<String> getSupportedCustomCommandTypes() {
+        return List.of("CHANGE_ALTITUDE");
+    }
+
+    @Override
+    public String getCustomCommandTypeExampleJson(String type) {
+        try {
+            return switch(type) {
+                case "CHANGE_ALTITUDE" -> new ObjectMapper().writeValueAsString(new CustomCommand.ChangeAltitude(0.0));
+                default -> "";
+            };
+        }catch (Exception e) {
+            return "";
+        }
     }
 }

@@ -7,6 +7,8 @@ import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializati
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
 
 import java.io.IOException;
+import java.util.List;
+
 import org.json.simple.parser.ParseException;
 
 /**
@@ -18,4 +20,8 @@ public interface AdaptorEndpointService {
     String initSession() throws SessionInitializationFailedException;
     String initSession(String instanceId) throws SessionInitializationFailedException;
     void closeSession(String sessionId) throws SessionNotValidException;
+    default List<String> getSupportedCustomCommandTypes(){return List.of();}
+    default String getCustomCommandTypeExampleJson(String type){
+        return "";
+    }
 }

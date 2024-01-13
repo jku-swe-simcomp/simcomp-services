@@ -105,7 +105,31 @@ public class SimulationInstanceService {
         }
     }
 
+    public List<String> getSupportedCustomCommandsOfSimulation(String simulationName) {
+        Optional<ServiceRegistrationConfigDTO> adaptorConfig = serviceRegistryClient.getRegisteredAdaptors().stream()
+                .filter(ac -> ac.getName().equals(simulationName))
+                .findFirst();
+
+        if(adaptorConfig.isPresent()){
+            return adaptorClient.getSupportedCustomCommandsOfSimulation(adaptorConfig.get());
+        }else{
+            throw new NotFoundException("Simulation with name " + simulationName + " not found.");
+        }
+    }
+    public String getCustomCommandExampleJson(String simulationName, String commandType) {
+        Optional<ServiceRegistrationConfigDTO> adaptorConfig = serviceRegistryClient.getRegisteredAdaptors().stream()
+                .filter(ac -> ac.getName().equals(simulationName))
+                .findFirst();
+
+        if(adaptorConfig.isPresent()){
+            return adaptorClient.getSupportedCustomCommandExampleJson(adaptorConfig.get(), commandType);
+        }else{
+            throw new NotFoundException("Simulation with name " + simulationName + " not found.");
+        }
+    }
+
     private List<SimulationInstanceConfig> getSimulationInstances(ServiceRegistrationConfigDTO config){
         return adaptorClient.getSimulationInstances(config);
     }
+
 }
