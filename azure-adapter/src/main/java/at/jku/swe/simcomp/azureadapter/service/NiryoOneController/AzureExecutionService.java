@@ -8,6 +8,7 @@ import com.azure.identity.ClientSecretCredentialBuilder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -15,12 +16,24 @@ import java.util.*;
 @Component @Slf4j
 public class AzureExecutionService {
 
-    private final static DigitalTwinsClient client = buildConnection();
+    private static DigitalTwinsClient client;// = buildConnection();
 
-    static final String tentantId = "f11d36c0-5880-41f7-91e5-ac5e42209e77";
-    static final String clientId = "a39ddd8f-18bf-41b2-9ab9-fea69e235b86";
-    static final String clientSecret = "unI8Q~MP2uwUGg38dOu4ASnrmcCYNC19fCAKPc9r";
-    static final String endpoint = "https://Student.api.wcus.digitaltwins.azure.net";
+    static String tentantId;// = "f11d36c0-5880-41f7-91e5-ac5e42209e77";
+    static String clientId;// = "a39ddd8f-18bf-41b2-9ab9-fea69e235b86";
+    static String clientSecret;// = "unI8Q~MP2uwUGg38dOu4ASnrmcCYNC19fCAKPc9r";
+    static String endpoint;// = "https://Student.api.wcus.digitaltwins.azure.net";
+
+    public AzureExecutionService(@Value("${azure.tentantid}") String tentantId,
+                                 @Value("${azure.clientid}$") String clientid,
+                                 @Value("${azure.clientSecret}$") String clientSecret,
+                                 @Value("${azure.endpoint}$") String endpoint) {
+        AzureExecutionService.tentantId = tentantId;
+        AzureExecutionService.clientId = clientid;
+        AzureExecutionService.clientSecret = clientSecret;
+        AzureExecutionService.endpoint = endpoint;
+        client = buildConnection();
+    }
+
 
 
     public static DigitalTwinsClient buildConnection() {
