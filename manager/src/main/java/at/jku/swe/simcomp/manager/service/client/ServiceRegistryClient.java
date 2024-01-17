@@ -11,17 +11,31 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * This client is responsible for communicating with the service registry.
+ */
 @Service
 @Slf4j
 public class ServiceRegistryClient {
     private final RestTemplate restTemplate;
     private final Boolean isInverseKinematicsEnabled;
+
+    /**
+     * Constructor
+     * @param restTemplate RestTemplate
+     * @param isInverseKinematicsEnabled the flag to enable inverse kinematic, defaults to false.
+     */
     public ServiceRegistryClient(RestTemplate restTemplate,
                                  @Value("${application.kinematics.inverse.enabled}") Boolean isInverseKinematicsEnabled) {
         this.restTemplate = restTemplate;
         this.isInverseKinematicsEnabled = Objects.requireNonNullElse(isInverseKinematicsEnabled, false);
     }
 
+    /**
+     * This method calls the service registry to fetch all available adaptors.
+     * If inverse kinematics is enabled, the pose action is added to the supported actions.
+     * @return the list of available adaptors
+     */
     public List<ServiceRegistrationConfigDTO> getRegisteredAdaptors() {
         log.debug("Fetching available adaptors...");
         // Note: default-object for endpoint does not make sense, but is required for the unit-tests

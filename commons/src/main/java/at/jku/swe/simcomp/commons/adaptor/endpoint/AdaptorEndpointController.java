@@ -13,13 +13,14 @@ import at.jku.swe.simcomp.commons.adaptor.registration.ServiceRegistryClient;
 import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 import at.jku.swe.simcomp.commons.adaptor.registration.exception.ServiceRegistrationFailedException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.swagger.v3.core.util.Json;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.util.List;
+
 import org.json.simple.parser.ParseException;
 
 /**
@@ -60,6 +61,12 @@ public class AdaptorEndpointController implements AdaptorEndpoint{
         registerThisAdaptorEndpointAtServiceRegistry();
     }
 
+    /**
+     * Endpoint to initialize a session.
+     * @param instanceId the id of the simulation instance requested by the user (optional)
+     * @return a response entity with the id of the session
+     * @throws SessionInitializationFailedException if the session could not be initialized
+     */
     @Override
     @PostMapping("/session/init")
     public ResponseEntity<String> initSession(@RequestParam(required = false) String instanceId) throws SessionInitializationFailedException {
@@ -71,6 +78,12 @@ public class AdaptorEndpointController implements AdaptorEndpoint{
         return ResponseEntity.ok(sessionId);
     }
 
+    /**
+     * Endpoint to close a session.
+     * @param sessionId the id of the session to close
+     * @return a response entity
+     * @throws SessionNotValidException if the session is not valid
+     */
     @Override
     @DeleteMapping("/session/{sessionId}/close")
     public ResponseEntity<String> closeSession(@PathVariable String sessionId) throws SessionNotValidException {
@@ -111,6 +124,28 @@ public class AdaptorEndpointController implements AdaptorEndpoint{
     }
 
     /**
+     * Abstract endpoint to get an attribute.
+     * @return the attribute
+     */
+    @Override
+    @GetMapping("/custom-commands")
+    public final ResponseEntity<List<String>> getCustomCommandTypes() {
+        List<String> value = adaptorEndpointService.getSupportedCustomCommandTypes();
+        return ResponseEntity.ok(value);
+    }
+
+    /**
+     * Abstract endpoint to get an attribute.
+     * @return the attribute
+     */
+    @Override
+    @GetMapping("/custom-commands/{type}/example")
+    public final ResponseEntity<String> getCustomCommandTypeExampleJson(@PathVariable String type) {
+        String value = adaptorEndpointService.getCustomCommandTypeExampleJson(type);
+        return ResponseEntity.ok(value);
+    }
+
+    /**
      * Endpoint for health check.
      * @return the attribute
      */
@@ -121,7 +156,7 @@ public class AdaptorEndpointController implements AdaptorEndpoint{
     }
 
     /**
-     * Endpoint for manually triggering registration.
+     * Endpoint for manually triggering registration at the service registry.
      * @return the attribute
      */
     @PostMapping("/registry/register")
@@ -131,7 +166,7 @@ public class AdaptorEndpointController implements AdaptorEndpoint{
     }
 
     /**
-     * Endpoint for manually triggering registration.
+     * Endpoint for manually triggering unregistration from the service registry.
      * @return the attribute
      */
     @PostMapping("/registry/unregister")
@@ -157,7 +192,9 @@ public class AdaptorEndpointController implements AdaptorEndpoint{
     }
 
     /**
-     * Utility method registering this adaptor.
+     * Utility method registering this adaptor asynchronously.
+     * If the environment variable REGISTRATION_DELAY_MS is set, the thread will sleep for the specified amount of time.
+     * This is useful if the service registry is not available yet.
      */
     private void registerThisAdaptorEndpointAtServiceRegistry() {
             new Thread(() -> {
@@ -181,7 +218,7 @@ public class AdaptorEndpointController implements AdaptorEndpoint{
     }
 
     /**
-     * Utility method that returns an exception of type originalExClass with the message of the wrapperException.
+     * Utility method that returns an exception of type originalExClass with the specified message.
      * @param originalExClass the class of the exception to be created
      * @param message the message of the exception to be created
      * @return the exception

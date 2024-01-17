@@ -6,16 +6,28 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+/**
+ * Scheduler for performing health checks on adaptors.
+ */
 @Component
 @Slf4j
 public class HealthCheckScheduler {
     private final AdaptorRepository adaptorRepository;
     private final AdaptorClient adaptorClient;
+
+    /**
+     * Constructor
+     * @param adaptorRepository the injected adaptor repository
+     * @param adaptorClient the injected adaptor client
+     */
     public HealthCheckScheduler(AdaptorRepository adaptorRepository, AdaptorClient adaptorClient) {
        this.adaptorRepository = adaptorRepository;
        this.adaptorClient = adaptorClient;
     }
 
+    /**
+     * Performs a health check on all adaptors and sets their status accordingly.
+     */
     @Scheduled(fixedRate = 60000)
     public void performHealthCheckAndSetStatus(){
         log.info("Performing health check on all adaptors");

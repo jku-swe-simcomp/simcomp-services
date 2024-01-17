@@ -22,16 +22,10 @@ public class ServiceRegistrationConfig {
      * @param port the port of the adaptor
      * @return the config bean
      */
-    /*
-     * TODO: Think about handling the registration - perhabs the twins
-     */
     @Bean
     public ServiceRegistrationConfigDTO getServiceRegistrationConfig(@Value("${adaptor.endpoint.name}") String name,
                                                                      @Value("${adaptor.endpoint.host}") String host,
                                                                      @Value("${server.port}") Integer port){
-        /*
-         * TODO: All the needed actions which are supported may be listed in here.
-         */
         return ServiceRegistrationConfigDTO.builder()
                 .name(name)
                 .host(host)

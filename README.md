@@ -88,6 +88,12 @@ To add a report for a new Spring Boot project, include the jacoco-plugin (see [h
 Additionally, E2E tests are completed on every change to the docker-compose configuration (see section Deployment). 
 Last completion time and details can also be found on github-pages.
 
+### Java Docs
+Java docs are also published on [github-pages](https://jku-swe-simcomp.github.io/simcomp-services/). 
+To add a report for a new Spring Boot project, 
+include the javadoc-plugin (see [here](./manager/pom.xml) for an example), include the generated report in the [Github actions workflow](./.github/workflows/main.yml) and add a link to the [index.html](./.github/index.html).
+
+
 ### Deployment
 This repository is equipped with a Github Actions Continuous Integration pipeline,
 which builds/tests all projects on every push to the main branch, pushes Docker images for all services to the Docker hub.

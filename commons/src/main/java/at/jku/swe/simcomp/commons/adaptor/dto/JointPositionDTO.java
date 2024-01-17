@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents the position of a joint
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

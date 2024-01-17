@@ -4,6 +4,9 @@ import lombok.*;
 
 import java.util.List;
 
+/**
+ * Represents the pose of the end-effector.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

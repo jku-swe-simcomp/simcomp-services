@@ -10,11 +10,20 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Service for registering and unregistering adaptors.
+ */
 @Service
 @Slf4j
 public class RegistrationService {
     private final AdaptorRepository adaptorRepository;
     private final AdaptorMapper adaptorMapper;
+
+    /**
+     * Constructor
+     * @param adaptorRepository the injected adaptor repository
+     * @param adaptorMapper the injected adaptor mapper
+     */
     public RegistrationService(AdaptorRepository adaptorRepository, AdaptorMapper adaptorMapper){
         this.adaptorRepository = adaptorRepository;
         this.adaptorMapper = adaptorMapper;

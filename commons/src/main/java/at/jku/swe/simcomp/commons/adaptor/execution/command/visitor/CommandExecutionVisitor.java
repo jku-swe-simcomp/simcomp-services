@@ -4,7 +4,18 @@ import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.CompositeCommandExe
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.InvalidCommandParametersException;
 import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
 
+/**
+ * This class represents a visitor for the {@link ExecutionCommand} hierarchy.
+ * Contains a default implementation for the composite command.
+ */
 public abstract class CommandExecutionVisitor implements ExecutionCommandVisitor<ExecutionResultDTO, String> {
+    /**
+     * This method is called when a composite command is visited.
+     * @param composite The composite command
+     * @param sessionKey The session key of the current session
+     * @return The result of the execution
+     * @throws Exception If the execution fails
+     */
     @Override
     public final ExecutionResultDTO visit(ExecutionCommand.CompositeCommand composite, String sessionKey) throws Exception {
         var commands = composite.commands();
@@ -21,10 +32,18 @@ public abstract class CommandExecutionVisitor implements ExecutionCommandVisitor
         return setMessageAndReturn(resultDTO, report.toString());
     }
 
+    /**
+     * This method is called when a sub-command is visited from a composite command.
+     * @param command The sub-command
+     * @param sessionKey The session key of the current session
+     * @param report The report of the execution up to this point
+     * @return The result of the execution
+     * @throws CompositeCommandExecutionFailedException If the execution fails
+     */
     private ExecutionResultDTO tryAcceptSubCommand(ExecutionCommand command, String sessionKey, StringBuilder report) throws CompositeCommandExecutionFailedException {
         try {
             return command.accept(this, sessionKey);
-        } catch(CompositeCommandExecutionFailedException e){// a nested composite-command threw the exception, just prepending the report
+        } catch(CompositeCommandExecutionFailedException e){// a nested composite-command threw the exception, just prepending the report and rethrowing the exception
             e.prependReport(report.toString());
             throw e;
         } catch (Exception e) {// a scalar execution-command threw the exception, throwing dedicated exception

@@ -6,6 +6,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+/**
+ * This class represents a response from an adaptor for an execution.
+ */
 @Getter
 @Setter
 @Entity

@@ -3,6 +3,9 @@ package at.jku.swe.simcomp.commons.adaptor.endpoint.simulation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+/**
+ * This class represents the configuration of a simulation instance.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

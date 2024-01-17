@@ -5,9 +5,13 @@ import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeValue;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.AdaptorEndpointService;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
+import at.jku.swe.simcomp.demoadaptor.service.dto.CustomCommand;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static at.jku.swe.simcomp.demoadaptor.service.DemoSimulationInstanceService.currentJointPositions;
 
 @Service
 public class DemoAdaptorEndpointService implements AdaptorEndpointService {
@@ -33,11 +37,28 @@ public class DemoAdaptorEndpointService implements AdaptorEndpointService {
 
     @Override
     public AttributeValue getAttributeValue(AttributeKey attributeKey, String sessionId) throws SessionNotValidException {
-        demoSessionService.renewSession(sessionId);
+        var config = demoSessionService.renewSession(sessionId);
         // Note: can add more cases for different attributes
         return switch(attributeKey){
-            case JOINT_POSITIONS -> new AttributeValue.JointPositions(DemoCommandExecutionVisitor.currentJointPositions);
+            case JOINT_POSITIONS -> new AttributeValue.JointPositions(currentJointPositions.get(config));
             default -> throw new UnsupportedOperationException("Attribute %s not supported by this service".formatted(attributeKey));
         };
+    }
+
+    @Override
+    public List<String> getSupportedCustomCommandTypes() {
+        return List.of("CHANGE_ALTITUDE");
+    }
+
+    @Override
+    public String getCustomCommandTypeExampleJson(String type) {
+        try {
+            return switch(type) {
+                case "CHANGE_ALTITUDE" -> new ObjectMapper().writeValueAsString(new CustomCommand.ChangeAltitude(0.0));
+                default -> "";
+            };
+        }catch (Exception e) {
+            return "";
+        }
     }
 }
