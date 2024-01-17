@@ -48,6 +48,12 @@ jobs:
       env:
         ADAPTOR_HOST: not_required_but_cannot_be_null
 
+    - name: Build webots-drone-adaptor
+      working-directory: simcomp-services/webots-drone-adaptor
+      run: mvn -B package
+      env:
+        ADAPTOR_HOST: not_required_but_cannot_be_null
+
     - name: Build azure-adapter
       working-directory: simcomp-services/azure-adapter
       run: mvn -B package
@@ -151,6 +157,14 @@ jobs:
         context: ./simcomp-services/webots-adaptor
         push: true
         tags: ${{ secrets.DOCKER_NAMESPACE }}/webots-adaptor:${{ env.DATE }}
+        labels: ${{ steps.meta.outputs.labels }}
+
+    - name: Build and push webots-drone-adaptor Docker image
+      uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+      with:
+        context: ./simcomp-services/webots-drone-adaptor
+        push: true
+        tags: ${{ secrets.DOCKER_NAMESPACE }}/webots-drone-adaptor:${{ env.DATE }}
         labels: ${{ steps.meta.outputs.labels }}
 
     - name: Build and push manager Docker image
