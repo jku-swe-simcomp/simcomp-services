@@ -111,15 +111,18 @@ def tcp_socket():
             if operation == 'set_altitude':
                 value = json_data.get("value")
                 robot.set_altitude(value)
+                response = '{"result": "success"}\n'
             elif operation == 'adjust_altitude':
                 value = json_data.get("value")
                 robot.adjust_altitude(value)
-            response = '{"result": "success"}\n'
+                response = '{"result": "success"}\n'
+            else :
+                response = '{"result": "unsupported operation"}'
 
         except json.JSONDecodeError as e:
             print('json could not be pared')
             print(e.msg)
-            response = '{"result":"The JSON file could not be parsed"}\n'
+            response = '{"result":"invalid json"}\n'
 
         print('Returning response: ' + response)
         con.sendall(response.encode('utf-8'))
