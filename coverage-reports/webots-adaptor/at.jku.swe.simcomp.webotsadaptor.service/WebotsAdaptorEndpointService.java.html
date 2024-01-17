@@ -2,6 +2,7 @@
 
 import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeKey;
 import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeValue;
+import at.jku.swe.simcomp.commons.adaptor.dto.JointPositionDTO;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.AdaptorEndpointService;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.RoboOperationFailedException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
@@ -25,9 +26,9 @@ public class WebotsAdaptorEndpointService implements AdaptorEndpointService {
      * Constructor to create a new endpoint for a session service class.
      * @param sessionService the service to keep manage the session
      */
-<span class="fc" id="L28">    public WebotsAdaptorEndpointService(SessionService sessionService) {</span>
-<span class="fc" id="L29">        this.SESSION_SERVICE = sessionService;</span>
-<span class="fc" id="L30">    }</span>
+<span class="fc" id="L29">    public WebotsAdaptorEndpointService(SessionService sessionService) {</span>
+<span class="fc" id="L30">        this.SESSION_SERVICE = sessionService;</span>
+<span class="fc" id="L31">    }</span>
 
     /**
      * Method to initialize an arbitrary new session.
@@ -36,7 +37,7 @@ public class WebotsAdaptorEndpointService implements AdaptorEndpointService {
      */
     @Override
     public String initSession() throws SessionInitializationFailedException {
-<span class="fc" id="L39">        return SESSION_SERVICE.initializeSession();</span>
+<span class="fc" id="L40">        return SESSION_SERVICE.initializeSession();</span>
     }
 
     /**
@@ -47,7 +48,7 @@ public class WebotsAdaptorEndpointService implements AdaptorEndpointService {
      */
     @Override
     public String initSession(String instanceId) throws SessionInitializationFailedException {
-<span class="fc" id="L50">        return SESSION_SERVICE.initializeSession(instanceId);</span>
+<span class="fc" id="L51">        return SESSION_SERVICE.initializeSession(instanceId);</span>
     }
 
     /**
@@ -57,8 +58,8 @@ public class WebotsAdaptorEndpointService implements AdaptorEndpointService {
      */
     @Override
     public void closeSession(String sessionId) throws SessionNotValidException {
-<span class="fc" id="L60">        SESSION_SERVICE.closeSession(sessionId);</span>
-<span class="fc" id="L61">    }</span>
+<span class="fc" id="L61">        SESSION_SERVICE.closeSession(sessionId);</span>
+<span class="fc" id="L62">    }</span>
 
     /**
      * Method to get an attribute for a session. Currently, only the axes values
@@ -73,11 +74,11 @@ public class WebotsAdaptorEndpointService implements AdaptorEndpointService {
      */
     @Override
     public AttributeValue getAttributeValue(AttributeKey attributeKey, String sessionId) throws SessionNotValidException, RoboOperationFailedException, IOException, ParseException {
-<span class="fc" id="L76">        SimulationInstanceConfig config = SESSION_SERVICE.getConfigForSession(sessionId);</span>
+<span class="fc" id="L77">        SimulationInstanceConfig config = SESSION_SERVICE.getConfigForSession(sessionId);</span>
         // Note: can add more cases for different attributes
-<span class="fc bfc" id="L78" title="All 2 branches covered.">        return switch(attributeKey){</span>
-<span class="fc" id="L79">            case JOINT_POSITIONS -&gt;  new AttributeValue.JointPositions(WebotsExecutionService.getPositions(config));</span>
-<span class="fc" id="L80">            default -&gt; throw new UnsupportedOperationException(&quot;Attribute %s not supported by this service&quot;.formatted(attributeKey));</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">        return switch(attributeKey){</span>
+<span class="fc" id="L80">            case JOINT_POSITIONS -&gt;  new AttributeValue.JointPositions(WebotsExecutionService.getPositions(config));</span>
+<span class="fc" id="L81">            default -&gt; throw new UnsupportedOperationException(&quot;Attribute %s not supported by this service&quot;.formatted(attributeKey));</span>
         };
     }
 }
