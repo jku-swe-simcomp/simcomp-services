@@ -22,8 +22,7 @@ export default function Home() {
             <TabList variant='scrollable' onChange={handleChange}>
               <Tab label="Overview" value="1" />
               <Tab label="Instances" value="2" />
-              <Tab label="Attributes" value="3" />
-              <Tab label="Anomaly Detection" value="4" />
+              <Tab label="Anomaly Detection & Attributes" value="3" />
             </TabList>
           </Box>
           <TabPanel value="1">

@@ -11,6 +11,7 @@ import Home from './pages/Home/Home';
 import Session from './pages/Session/Session';
 import Wrapper from './Wrapper';
 import { Container } from '@mui/material';
+import { deleteAllInstances } from './helpers/helpers';
 
 async function authorizedRouteLoader({ request }) {
   if (true) {
@@ -35,6 +36,7 @@ const router = createBrowserRouter([
 ]);
 
 console.log('Connecting to: ' + process.env.REACT_APP_API_URL);
+await deleteAllInstances();
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
