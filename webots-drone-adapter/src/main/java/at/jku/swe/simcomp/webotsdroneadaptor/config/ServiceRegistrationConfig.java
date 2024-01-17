@@ -1,4 +1,4 @@
-package at.jku.swe.simcomp.webotsadaptor.config;
+package at.jku.swe.simcomp.webotsdroneadaptor.config;
 
 import at.jku.swe.simcomp.commons.adaptor.execution.command.ActionType;
 import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.swing.*;
 import java.util.Set;
 
 /**
@@ -32,12 +31,7 @@ public class ServiceRegistrationConfig {
                 .host(host)
                 .port(port)
                 .supportedActions(Set.of(
-                        ActionType.POSE,
-                        ActionType.ADJUST_JOINT_ANGLE,
-                        ActionType.RESET_TO_HOME,
-                        ActionType.GRAB,
-                        ActionType.OPEN_HAND,
-                        ActionType.SET_JOINT_POSITION))
+                        ActionType.CUSTOM))
                 .build();
     }
 }

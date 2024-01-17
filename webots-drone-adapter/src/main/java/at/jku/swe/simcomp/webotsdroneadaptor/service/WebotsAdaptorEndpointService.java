@@ -1,8 +1,7 @@
-package at.jku.swe.simcomp.webotsadaptor.service;
+package at.jku.swe.simcomp.webotsdroneadaptor.service;
 
 import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeKey;
 import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeValue;
-import at.jku.swe.simcomp.commons.adaptor.dto.JointPositionDTO;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.AdaptorEndpointService;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.RoboOperationFailedException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
