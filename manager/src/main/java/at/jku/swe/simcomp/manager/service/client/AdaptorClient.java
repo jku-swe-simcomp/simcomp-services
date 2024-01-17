@@ -26,17 +26,31 @@ import java.util.List;
 import java.util.Optional;
 import static at.jku.swe.simcomp.commons.adaptor.endpoint.AdaptorEndpointConstants.*;
 
+/**
+ * This service is responsible for communicating with the adaptors.
+ */
 @Service
 @Slf4j
 public class AdaptorClient {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
+
+    /**
+     * Constructor
+     * @param restTemplate the rest template
+     * @param objectMapper the object mapper
+     */
     public AdaptorClient(@Qualifier("noExceptionThrowingRestTemplate") RestTemplate restTemplate,
                          ObjectMapper objectMapper) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * Tries to initialize a session with the given adaptor.
+     * @param adaptorConfig the adaptor config
+     * @return the session key if successful, empty otherwise
+     */
     public Optional<String> getSession(@NonNull ServiceRegistrationConfigDTO adaptorConfig) {
         String url = getDomain(adaptorConfig) + INIT_SESSION_PATH;
         try {
@@ -55,6 +69,12 @@ public class AdaptorClient {
         }
     }
 
+    /**
+     * Tries to initialize a session with the given adaptor for a given simulation instance.
+     * @param adaptorConfig the adaptor config
+     * @param instanceId the simulation instance id
+     * @return the session key if successful, empty otherwise
+     */
     public Optional<String> getSession(@NonNull ServiceRegistrationConfigDTO adaptorConfig,
                                        @NonNull String instanceId) {
         String url = getDomain(adaptorConfig) + getInitSessionPathWithInstanceId(instanceId);
@@ -74,6 +94,11 @@ public class AdaptorClient {
         }
     }
 
+    /**
+     * Closes a session with the given adaptor.
+     * @param adaptorConfig the adaptor config identifying the adaptor
+     * @param sessionKey the key of the session to be closed
+     */
     public void closeSession(@NonNull ServiceRegistrationConfigDTO adaptorConfig,
                              @NonNull String sessionKey){
         String url = getDomain(adaptorConfig) + getCloseSessionPathForSessionId(sessionKey);
@@ -84,6 +109,14 @@ public class AdaptorClient {
         }
     }
 
+    /**
+     * Executes a command for a given adaptor session.
+     * @param adaptorConfig the adaptor config identifying the adaptor
+     * @param command the command to be executed
+     * @param adaptorSessionKey the session key of the adaptor session
+     * @return the execution result
+     * @throws CommandExecutionFailedException if the command execution failed
+     */
     public ExecutionResultDTO executeCommand(@NonNull ServiceRegistrationConfigDTO adaptorConfig,
                                              @NonNull ExecutionCommand command,
                                              @NonNull String adaptorSessionKey) throws CommandExecutionFailedException {
@@ -112,6 +145,13 @@ public class AdaptorClient {
         }
     }
 
+    /**
+     * Fetches the attribute-value from an adaptor for a given session
+     * @param config the adaptor config identifying the adaptor
+     * @param attributeKey the attribute key
+     * @param sessionId the session id
+     * @return the attribute value if successful, empty otherwise
+     */
     public Optional<AttributeValue> getAttributeValue(@NonNull String sessionId,
                                                       @NonNull AttributeKey attributeKey,
                                                       @NonNull ServiceRegistrationConfigDTO config) throws SessionNotValidException {
@@ -140,6 +180,12 @@ public class AdaptorClient {
         return Optional.empty();
     }
 
+    /**
+     * Registers a simulation instance for a given adaptor.
+     * @param serviceRegistrationConfigDTO the adaptor config
+     * @param config the simulation instance config
+     * @throws Exception if registration fails
+     */
     public void registerSimulationInstanceForAdaptor(@NonNull ServiceRegistrationConfigDTO serviceRegistrationConfigDTO,
                                                      @NonNull SimulationInstanceConfig config) throws Exception {
         String url = getDomain(serviceRegistrationConfigDTO) + SIMULATION_INSTANCE_PATH;
@@ -150,6 +196,11 @@ public class AdaptorClient {
         }
     }
 
+    /**
+     * Returns all simulation instances for a given adaptor.
+     * @param config the adaptor config identifying the adaptor
+     * @return the simulation instances
+     */
     public List<SimulationInstanceConfig> getSimulationInstances(ServiceRegistrationConfigDTO config) {
         String url = getDomain(config) + SIMULATION_INSTANCE_PATH;
         ResponseEntity<List<SimulationInstanceConfig>> responseEntity = restTemplate.exchange(
@@ -161,9 +212,40 @@ public class AdaptorClient {
         return responseEntity.getBody();
     }
 
+    /**
+     * Deletes a simulation instance for a given adaptor.
+     * @param serviceRegistrationConfigDTO the adaptor config identifying the adaptor
+     * @param instanceId the simulation instance id identifying the simulation instance to be deleted
+     */
     public void deleteSimulationInstance(@NonNull ServiceRegistrationConfigDTO serviceRegistrationConfigDTO,
                                          @NonNull String instanceId){
         String url = getDomain(serviceRegistrationConfigDTO)+ getDeleteSimulationInstancePathForInstanceId(instanceId);
         restTemplate.delete(url);
+    }
+
+    /**
+     * Returns the supported custom commands of a given adaptor.
+     * @param serviceRegistrationConfigDTO the adaptor config identifying the adaptor
+     * @return the supported custom commands
+     */
+    public List<String> getSupportedCustomCommandsOfSimulation(ServiceRegistrationConfigDTO serviceRegistrationConfigDTO) {
+        String url = getDomain(serviceRegistrationConfigDTO) + GET_CUSTOM_COMMANDS;
+        ResponseEntity<List<String>> responseEntity = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<>() {}
+        );
+        return responseEntity.getBody();
+    }
+
+    /**
+     * Returns an example for a custom command according to its type
+     * @param serviceRegistrationConfigDTO the adaptor config identifying the adaptor
+     * @return the example
+     */
+    public String getSupportedCustomCommandExampleJson(ServiceRegistrationConfigDTO serviceRegistrationConfigDTO, String commandType) {
+        String url = getDomain(serviceRegistrationConfigDTO) + getCustomCommandExamplePathForType(commandType);
+        return restTemplate.getForEntity(url, String.class).getBody();
     }
 }

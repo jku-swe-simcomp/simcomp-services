@@ -8,6 +8,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+/**
+ * This class represents the error response of an execution.
+ * It contains the current state of the robot.
+ * Is returned when by the endpoints when a {@link at.jku.swe.simcomp.commons.adaptor.endpoint.exception.RoboOperationFailedException} is thrown.
+ */
 @Getter
 @Setter
 @ToString

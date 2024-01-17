@@ -5,6 +5,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+/**
+ * This class represents the joint-positions of a simulation for a adaptor session.
+ */
 @Getter
 @Setter
 @Entity

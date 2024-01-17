@@ -7,6 +7,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+/**
+ * Exception handling for the adaptor endpoint.
+ */
 @org.springframework.web.bind.annotation.ControllerAdvice
 public class AdaptorEndpointExceptionHandler {
     @ExceptionHandler

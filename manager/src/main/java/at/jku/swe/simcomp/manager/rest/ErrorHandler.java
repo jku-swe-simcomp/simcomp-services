@@ -7,6 +7,10 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.webjars.NotFoundException;
 
+/**
+ * Global error handler for REST endpoints.
+ * This class is used to handle exceptions that occur in the REST endpoints.
+ */
 @ControllerAdvice
 public class ErrorHandler {
     @ExceptionHandler

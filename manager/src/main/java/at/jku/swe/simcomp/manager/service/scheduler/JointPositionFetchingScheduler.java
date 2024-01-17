@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * This scheduler fetches the joint positions for all open adaptor sessions.
+ */
 @Component
 @Slf4j
 public class JointPositionFetchingScheduler {
@@ -27,6 +30,12 @@ public class JointPositionFetchingScheduler {
     private final AdaptorClient adaptorClient;
     private final ServiceRegistryClient serviceRegistryClient;
 
+    /**
+     * Constructor
+     * @param adaptorSessionRepository repository for adaptor sessions
+     * @param adaptorClient client for adaptor communication
+     * @param serviceRegistryClient client for service registry communication
+     */
     public JointPositionFetchingScheduler(AdaptorSessionRepository adaptorSessionRepository,
                                           AdaptorClient adaptorClient,
                                           ServiceRegistryClient serviceRegistryClient){
@@ -35,6 +44,10 @@ public class JointPositionFetchingScheduler {
         this.serviceRegistryClient = serviceRegistryClient;
     }
 
+    /**
+     * Fetches the joint positions from all open adaptor sessions.
+     * Persists the positions in the database, see {@link JointPositions}
+     */
     @Scheduled(fixedRate = 30000)
     public void fetchJointPositionsForOpenAdaptorSessions(){
         log.info("Fetching joint positions for open adaptor sessions..");
@@ -52,7 +65,7 @@ public class JointPositionFetchingScheduler {
         sessionConfigMap.forEach(this::fetchJointPosition);
         log.debug("Finished fetching joint positions for open adaptor sessions");
     }
-
+    // private region methods
     private ServiceRegistrationConfigDTO findMatchingConfig(AdaptorSession session, List<ServiceRegistrationConfigDTO> adaptorConfigs) {
         String adaptorName = session.getAdaptorName();
 

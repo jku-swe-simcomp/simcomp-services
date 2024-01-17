@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * This service is responsible for executing commands {@link ExecutionCommand} for a given session.
+ */
 @Service
 @Slf4j
 public class ExecutionService {
@@ -34,6 +37,17 @@ public class ExecutionService {
     private final ExecutionCommandKinematicsVisitor kinematicsVisitor;
     private final boolean isInverseKinematicsEnabled;
 
+    /**
+     * Constructor
+     * @param sessionRepository the session repository
+     * @param objectMapper the object mapper
+     * @param executionRepository the execution repository
+     * @param commandDistributionService the command distribution service
+     * @param serviceRegistryClient the service registry client
+     * @param adaptorSessionRepository the adaptor session repository
+     * @param kinematicsVisitor the kinematics visitor
+     * @param isInverseKinematicsEnabled the flag to enable inverse kinematic, defaults to false.
+     */
     public ExecutionService(SessionRepository sessionRepository,
                             ObjectMapper objectMapper,
                             ExecutionRepository executionRepository,
@@ -52,10 +66,23 @@ public class ExecutionService {
         this.isInverseKinematicsEnabled = Objects.requireNonNullElse(isInverseKinematicsEnabled, false);
     }
 
+    /**
+     * Fetches all executions for a given session.
+     * @param sessionKey the session key
+     * @return the executions
+     */
     public List<ExecutionDTO> getAllExecutionsForSession(UUID sessionKey) {
         return executionRepository.findBySessionSessionKey(sessionKey).stream().map(this::fromModel).toList();
     }
 
+    /**
+     * Executes a command for a given session by distributing the commands to the adaptors.
+     * If inverse kinematics is enabled, the command is transformed using the kinematics service (axis-converter).
+     * @param sessionId the session id
+     * @param command the command
+     * @return the execution id
+     * @throws BadRequestException if the session is closed
+     */
     public UUID executeCommand(@NonNull final UUID sessionId, @NonNull ExecutionCommand command) throws BadRequestException {
         Session session = sessionRepository.findBySessionKeyOrElseThrow(sessionId);
         if(session.getState().equals(SessionState.CLOSED)){
@@ -76,6 +103,11 @@ public class ExecutionService {
         return execution.getExecutionId();
     }
 
+    /**
+     * Fetches an execution for a given execution id.
+     * @param executionId the execution id
+     * @return the execution
+     */
     public ExecutionDTO getExecution(UUID executionId) {
         Execution execution = executionRepository.findByExecutionUUIDOrElseThrow(executionId);
         return fromModel(execution);

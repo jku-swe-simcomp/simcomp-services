@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * This class represents a session aggregating various adaptor-sessions {@link AdaptorSession} and executions {@link Execution}.
+ */
 @Getter
 @Setter
 @Builder

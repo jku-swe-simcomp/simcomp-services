@@ -1,5 +1,6 @@
 package at.jku.swe.simcomp.azureadapter.service.Services;
 
+import at.jku.swe.simcomp.azureadapter.service.NiryoOneController.AzureExecutionService;
 import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeKey;
 import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeValue;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.AdaptorEndpointService;
@@ -31,13 +32,10 @@ public class AzureAdaptorEndpointService implements AdaptorEndpointService {
 
     @Override
     public AttributeValue getAttributeValue(AttributeKey attributeKey, String sessionId) throws SessionNotValidException {
-        azureSessionService.renewSession(sessionId);
-        // Note: can add more cases for different attributes
-        /*
-         * TODO: Changes like needed
-         */
+        var config = azureSessionService.renewSession(sessionId);
+
         return switch(attributeKey){
-            case JOINT_POSITIONS -> new AttributeValue.JointPositions(AzureCommandExecutionVisitor.currentJointPositions);
+            case JOINT_POSITIONS ->  new AttributeValue.JointPositions(AzureExecutionService.getAllJointAngles(config.getInstanceId()));
             default -> throw new UnsupportedOperationException("Attribute %s not supported by this service".formatted(attributeKey));
         };
     }

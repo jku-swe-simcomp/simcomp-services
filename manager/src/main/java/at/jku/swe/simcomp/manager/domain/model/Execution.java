@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * This class represents a command execution for a session.
+ */
 @Getter
 @Setter
 @Entity

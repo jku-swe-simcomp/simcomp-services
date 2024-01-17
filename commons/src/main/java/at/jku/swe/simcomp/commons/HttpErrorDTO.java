@@ -10,6 +10,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * These DTOs are used to represent an error response from the server.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

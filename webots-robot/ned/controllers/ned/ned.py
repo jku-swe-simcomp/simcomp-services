@@ -1,6 +1,7 @@
 import json
 import socket
 from controller import Robot
+import math
 
 """
 Controller for the Webots Robot
@@ -82,7 +83,11 @@ def wait_for_connection():
 
 def get_value(motor):
     motor.getPositionSensor().enable(100)
-    return motor.getPositionSensor().getValue()
+    value = motor.getPositionSensor().getValue()
+    if math.isnan(value):
+        return 0
+    else:
+        return value
 
 
 def set_axis(set_axis_input):

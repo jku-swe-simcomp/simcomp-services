@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents the angle adjustment of a joint.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

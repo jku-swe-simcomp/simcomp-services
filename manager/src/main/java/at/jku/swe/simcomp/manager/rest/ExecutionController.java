@@ -22,6 +22,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * REST Controller for managing executions.
+ * Refer to the OpenAPI documentation for more information.
+ */
 @RestController
 @RequestMapping("/session")
 @Slf4j
@@ -77,6 +81,7 @@ public class ExecutionController {
                             @ExampleObject(name = "Calibrate", value = "{ \"type\": \"CALIBRATE\"}"),
                             @ExampleObject(name = "Open Hand", value = "{ \"type\": \"OPEN_HAND\"}"),
                             @ExampleObject(name = "Set Speed", value = "{ \"type\": \"SET_SPEED\", \"speed\":2.3}"),
+                            @ExampleObject(name = "Custom", value = " { \"type\": \"CUSTOM\", \"jsonCommand\":\"visit /simulation/type/{type}/custom-commands to get the available custom commands for a simulation type. visit /simulation/type/{type}/custom-commands/{commandType}/example to get an example for a custom command.\"}"),
                     }))
     @PostMapping(value = "/{sessionId}/execution", consumes = "application/json", produces = "text/html")
     public ResponseEntity<String> execute(@Parameter(description = "The id of the session.", required = true, schema = @Schema(implementation = UUID.class, example = "123e4567-e89b-12d3-a456-426614174001"))
