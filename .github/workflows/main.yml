@@ -94,12 +94,14 @@ jobs:
     - name: Consolidate java-docs
       run: |
         mkdir -p ./simcomp-services/pages/java-docs/webots-adaptor
+        mkdir -p ./simcomp-services/pages/java-docs/azure-adapter
         mkdir -p ./simcomp-services/pages/java-docs/axis-converter
         mkdir -p ./simcomp-services/pages/java-docs/manager
         mkdir -p ./simcomp-services/pages/java-docs/registry
         mkdir -p ./simcomp-services/pages/java-docs/commons
 
         cp -R ./simcomp-services/webots-adaptor/target/site/apidocs/* ./simcomp-services/pages/java-docs/webots-adaptor
+        cp -R ./simcomp-services/azure-adapter/target/site/apidocs/* ./simcomp-services/pages/java-docs/azure-adapter
         cp -R ./simcomp-services/axis-converter/target/site/apidocs/* ./simcomp-services/pages/java-docs/axis-converter
         cp -R ./simcomp-services/manager/target/site/apidocs/* ./simcomp-services/pages/java-docs/manager
         cp -R ./simcomp-services/service-registry/target/site/apidocs/* ./simcomp-services/pages/java-docs/registry
