@@ -1,0 +1,8 @@
+at.jku.swe.simcomp.azureadapter
+at.jku.swe.simcomp.azureadapter.config
+at.jku.swe.simcomp.azureadapter.service.HelperClasses
+at.jku.swe.simcomp.azureadapter.service.NiryoOneController
+at.jku.swe.simcomp.azureadapter.service.NiryoOneController.CommandExecutor
+at.jku.swe.simcomp.azureadapter.service.NiryoOneModel
+at.jku.swe.simcomp.azureadapter.service.Services
+at.jku.swe.simcomp.azureadapter.simulation
