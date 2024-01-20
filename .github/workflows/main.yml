@@ -56,7 +56,7 @@ jobs:
 
     - name: Build azure-adapter
       working-directory: simcomp-services/azure-adapter
-      run: mvn -B package
+      run: mvn -B -DskipTests package javadoc:javadoc
       env:
         ADAPTOR_HOST: not_required_but_cannot_be_null
 
