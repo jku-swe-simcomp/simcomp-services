@@ -3,6 +3,7 @@ package at.jku.swe.simcomp.manager.rest;
 import at.jku.swe.simcomp.commons.HttpErrorDTO;
 import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeValue;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.simulation.SimulationInstanceConfig;
+import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
 import at.jku.swe.simcomp.commons.manager.dto.AvailableServicesDTO;
 import at.jku.swe.simcomp.manager.service.SimulationInstanceService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -60,16 +61,51 @@ public class SimulationInstanceController {
         return ResponseEntity.ok(new AvailableServicesDTO(simulations));
     }
 
+    @Operation(summary = "Get the identifiers of the custom-commands supported by a given simulation type (e.g. WEBOTS).",
+            description = "Returns a list of custom commands supported by the simulation type." +
+                    "To get an example of the command, use the endpoint /type/{type}/custom-commands/{commandType}/example, were commandType is one of the supported commands.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Supported custom commands fetched",
+                    content = @io.swagger.v3.oas.annotations.media.Content(
+                            array = @ArraySchema(schema = @Schema(implementation = String.class)),
+                            examples = @ExampleObject(value = "[\"TURN_AROUND\", \"MOVE_FORWARD\", \"MOVE_BACKWARD\", \"TURN_LEFT\", \"TURN_RIGHT\"]")
+                    )),
+            @ApiResponse(responseCode = "500",
+                    description = "Internal server error",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = HttpErrorDTO.class),
+                            examples =@ExampleObject(value = "{\"type\":\"ERROR\",\"status\":500, \"message\":\"Internal server error.\"}")
+                    ))
+    })
     @GetMapping(value="/type/{type}/custom-commands")
-    public ResponseEntity<List<String>> getSupportedCustomCommands(@PathVariable String type){
+    public ResponseEntity<List<String>> getSupportedCustomCommands(@Parameter(description = "The simulation type (e.g. WEBOTS)", required = true)
+                                                                       @PathVariable String type){
         log.info("Request to return supported custom commands for simulation {} received.", type);
         return ResponseEntity.ok(service.getSupportedCustomCommandsOfSimulation(type));
     }
 
+    @Operation(summary = "Get example for a supported custom command.",
+            description = "Returns an example representing the expected input for a given custom command of a simulation type." +
+                    "To get the supported custom commands of a simulation type, use the endpoint /type/{type}/custom-commands.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Example fetched",
+                    content = @io.swagger.v3.oas.annotations.media.Content(
+                            schema = @Schema(implementation = ExecutionCommand.CustomCommand.class),
+                            examples = @ExampleObject(value = "{\"type\":\"CUSTOM\", \"jsonCommand\": \"{\"customCommandType\":\"TURN_AROUND\", \"direction\":\"LEFT\"}\"}")
+                    )),
+            @ApiResponse(responseCode = "500",
+                    description = "Internal server error",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = HttpErrorDTO.class),
+                            examples =@ExampleObject(value = "{\"type\":\"ERROR\",\"status\":500, \"message\":\"Internal server error.\"}")
+                    ))
+    })
     @GetMapping(value="/type/{type}/custom-commands/{commandType}/example")
-    public ResponseEntity<String> getSupportedCustomCommandExample(@PathVariable String type, @PathVariable String commandType){
+    public ResponseEntity<ExecutionCommand.CustomCommand> getSupportedCustomCommandExample(@PathVariable String type, @PathVariable String commandType){
         log.info("Request to return custom command example for simulation {} for command type {} received.", type, commandType);
-        return ResponseEntity.ok(service.getCustomCommandExampleJson(type, commandType));
+        return ResponseEntity.ok(new ExecutionCommand.CustomCommand(service.getCustomCommandExampleJson(type, commandType)));
     }
 
     @Operation(summary = "Get Simulation Instances",
