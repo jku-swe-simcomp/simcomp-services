@@ -3,6 +3,7 @@
 import at.jku.swe.simcomp.commons.HttpErrorDTO;
 import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeValue;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.simulation.SimulationInstanceConfig;
+import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
 import at.jku.swe.simcomp.commons.manager.dto.AvailableServicesDTO;
 import at.jku.swe.simcomp.manager.service.SimulationInstanceService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,14 +27,14 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(&quot;/simulation&quot;)
-<span class="fc" id="L29">@Slf4j</span>
+<span class="fc" id="L30">@Slf4j</span>
 @Tag(name = &quot;Simulation Controller&quot;, description = &quot;Endpoints for managing simulation types and corresponding simulation instances.&quot;)
 public class SimulationInstanceController {
     private final SimulationInstanceService service;
 
-<span class="fc" id="L34">    public SimulationInstanceController(SimulationInstanceService service){</span>
-<span class="fc" id="L35">        this.service = service;</span>
-<span class="fc" id="L36">    }</span>
+<span class="fc" id="L35">    public SimulationInstanceController(SimulationInstanceService service){</span>
+<span class="fc" id="L36">        this.service = service;</span>
+<span class="fc" id="L37">    }</span>
 
     @Operation(summary = &quot;Get Simulation Types&quot;,
             description = &quot;Returns all simulation types that are currently available and the commands/actions that are supported by them.&quot; +
@@ -54,22 +55,57 @@ public class SimulationInstanceController {
     })
     @GetMapping(value = &quot;/type&quot;, produces = &quot;application/json&quot;)
     public ResponseEntity&lt;AvailableServicesDTO&gt; getAvailableSimulations(){
-<span class="nc" id="L57">        log.info(&quot;Request to return available simulations received.&quot;);</span>
-<span class="nc" id="L58">        var simulations = service.getAvailableSimulations();</span>
-<span class="nc" id="L59">        log.info(&quot;Available simulations: {}&quot;, simulations);</span>
-<span class="nc" id="L60">        return ResponseEntity.ok(new AvailableServicesDTO(simulations));</span>
+<span class="nc" id="L58">        log.info(&quot;Request to return available simulations received.&quot;);</span>
+<span class="nc" id="L59">        var simulations = service.getAvailableSimulations();</span>
+<span class="nc" id="L60">        log.info(&quot;Available simulations: {}&quot;, simulations);</span>
+<span class="nc" id="L61">        return ResponseEntity.ok(new AvailableServicesDTO(simulations));</span>
     }
 
+    @Operation(summary = &quot;Get the identifiers of the custom-commands supported by a given simulation type (e.g. WEBOTS).&quot;,
+            description = &quot;Returns a list of custom commands supported by the simulation type.&quot; +
+                    &quot;To get an example of the command, use the endpoint /type/{type}/custom-commands/{commandType}/example, were commandType is one of the supported commands.&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;200&quot;,
+                    description = &quot;Supported custom commands fetched&quot;,
+                    content = @io.swagger.v3.oas.annotations.media.Content(
+                            array = @ArraySchema(schema = @Schema(implementation = String.class)),
+                            examples = @ExampleObject(value = &quot;[\&quot;TURN_AROUND\&quot;, \&quot;MOVE_FORWARD\&quot;, \&quot;MOVE_BACKWARD\&quot;, \&quot;TURN_LEFT\&quot;, \&quot;TURN_RIGHT\&quot;]&quot;)
+                    )),
+            @ApiResponse(responseCode = &quot;500&quot;,
+                    description = &quot;Internal server error&quot;,
+                    content = @Content(mediaType = &quot;application/json&quot;,
+                            schema = @Schema(implementation = HttpErrorDTO.class),
+                            examples =@ExampleObject(value = &quot;{\&quot;type\&quot;:\&quot;ERROR\&quot;,\&quot;status\&quot;:500, \&quot;message\&quot;:\&quot;Internal server error.\&quot;}&quot;)
+                    ))
+    })
     @GetMapping(value=&quot;/type/{type}/custom-commands&quot;)
-    public ResponseEntity&lt;List&lt;String&gt;&gt; getSupportedCustomCommands(@PathVariable String type){
-<span class="nc" id="L65">        log.info(&quot;Request to return supported custom commands for simulation {} received.&quot;, type);</span>
-<span class="nc" id="L66">        return ResponseEntity.ok(service.getSupportedCustomCommandsOfSimulation(type));</span>
+    public ResponseEntity&lt;List&lt;String&gt;&gt; getSupportedCustomCommands(@Parameter(description = &quot;The simulation type (e.g. WEBOTS)&quot;, required = true)
+                                                                       @PathVariable String type){
+<span class="nc" id="L84">        log.info(&quot;Request to return supported custom commands for simulation {} received.&quot;, type);</span>
+<span class="nc" id="L85">        return ResponseEntity.ok(service.getSupportedCustomCommandsOfSimulation(type));</span>
     }
 
+    @Operation(summary = &quot;Get example for a supported custom command.&quot;,
+            description = &quot;Returns an example representing the expected input for a given custom command of a simulation type.&quot; +
+                    &quot;To get the supported custom commands of a simulation type, use the endpoint /type/{type}/custom-commands.&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;200&quot;,
+                    description = &quot;Example fetched&quot;,
+                    content = @io.swagger.v3.oas.annotations.media.Content(
+                            schema = @Schema(implementation = ExecutionCommand.CustomCommand.class),
+                            examples = @ExampleObject(value = &quot;{\&quot;type\&quot;:\&quot;CUSTOM\&quot;, \&quot;jsonCommand\&quot;: \&quot;{\&quot;customCommandType\&quot;:\&quot;TURN_AROUND\&quot;, \&quot;direction\&quot;:\&quot;LEFT\&quot;}\&quot;}&quot;)
+                    )),
+            @ApiResponse(responseCode = &quot;500&quot;,
+                    description = &quot;Internal server error&quot;,
+                    content = @Content(mediaType = &quot;application/json&quot;,
+                            schema = @Schema(implementation = HttpErrorDTO.class),
+                            examples =@ExampleObject(value = &quot;{\&quot;type\&quot;:\&quot;ERROR\&quot;,\&quot;status\&quot;:500, \&quot;message\&quot;:\&quot;Internal server error.\&quot;}&quot;)
+                    ))
+    })
     @GetMapping(value=&quot;/type/{type}/custom-commands/{commandType}/example&quot;)
-    public ResponseEntity&lt;String&gt; getSupportedCustomCommandExample(@PathVariable String type, @PathVariable String commandType){
-<span class="nc" id="L71">        log.info(&quot;Request to return custom command example for simulation {} for command type {} received.&quot;, type, commandType);</span>
-<span class="nc" id="L72">        return ResponseEntity.ok(service.getCustomCommandExampleJson(type, commandType));</span>
+    public ResponseEntity&lt;ExecutionCommand.CustomCommand&gt; getSupportedCustomCommandExample(@PathVariable String type, @PathVariable String commandType){
+<span class="nc" id="L107">        log.info(&quot;Request to return custom command example for simulation {} for command type {} received.&quot;, type, commandType);</span>
+<span class="nc" id="L108">        return ResponseEntity.ok(new ExecutionCommand.CustomCommand(service.getCustomCommandExampleJson(type, commandType)));</span>
     }
 
     @Operation(summary = &quot;Get Simulation Instances&quot;,
@@ -91,8 +127,8 @@ public class SimulationInstanceController {
     })
     @GetMapping(value = &quot;/instance&quot;, produces = &quot;application/json&quot;)
     public ResponseEntity&lt;List&lt;SimulationInstanceConfig&gt;&gt; getSimulationInstances(){
-<span class="nc" id="L94">        log.info(&quot;Request to return available simulation instances received.&quot;);</span>
-<span class="nc" id="L95">        return ResponseEntity.ok(service.getSimulationInstances());</span>
+<span class="nc" id="L130">        log.info(&quot;Request to return available simulation instances received.&quot;);</span>
+<span class="nc" id="L131">        return ResponseEntity.ok(service.getSimulationInstances());</span>
     }
 
     @Operation(summary = &quot;Get Simulation Instances for a specific Simulation Type&quot;,
@@ -115,8 +151,8 @@ public class SimulationInstanceController {
     @GetMapping(&quot;/{type}/instance&quot;)
     public ResponseEntity&lt;List&lt;SimulationInstanceConfig&gt;&gt; getSimulationInstances(@Parameter(description = &quot;The type of the simulation, e.g. WEBOTS&quot;, required = true)
                                                                                      @PathVariable String type){
-<span class="nc" id="L118">        log.info(&quot;Request to return available simulation instances of simulation {} received.&quot;, type);</span>
-<span class="nc" id="L119">        return ResponseEntity.ok(service.getSimulationInstances(type));</span>
+<span class="nc" id="L154">        log.info(&quot;Request to return available simulation instances of simulation {} received.&quot;, type);</span>
+<span class="nc" id="L155">        return ResponseEntity.ok(service.getSimulationInstances(type));</span>
     }
     @Operation(summary = &quot;Register simulation instance&quot;,
             description = &quot;Registers a simulation instance for the indicated type. For a given type, no two instances can have the same id&quot; +
@@ -137,9 +173,9 @@ public class SimulationInstanceController {
                     schema = @Schema(implementation = SimulationInstanceConfig.class),
                     examples = @ExampleObject(value = &quot;{\&quot;simulationType\&quot;:\&quot;WEBOTS\&quot;, \&quot;instanceId\&quot;:\&quot;MY_PERSONAL_WEBOTS_INSTANCE\&quot;,\&quot;instanceHost\&quot;:\&quot;localhost\&quot;, \&quot;instancePort\&quot;:10010}&quot;)))
                                                                          @RequestBody SimulationInstanceConfig config) throws Exception {
-<span class="nc" id="L140">        log.info(&quot;Request to register simulation instance {} for simulation {} received.&quot;, config.getInstanceId(), config.getSimulationType());</span>
-<span class="nc" id="L141">        service.registerSimulationInstanceForAdaptor(config);</span>
-<span class="nc" id="L142">        return ResponseEntity.ok().build();</span>
+<span class="nc" id="L176">        log.info(&quot;Request to register simulation instance {} for simulation {} received.&quot;, config.getInstanceId(), config.getSimulationType());</span>
+<span class="nc" id="L177">        service.registerSimulationInstanceForAdaptor(config);</span>
+<span class="nc" id="L178">        return ResponseEntity.ok().build();</span>
     }
 
 
@@ -160,9 +196,9 @@ public class SimulationInstanceController {
                                                              @PathVariable String type,
                                                          @Parameter(description = &quot;The id of the simulation instance to be deleted.&quot;)
                                                          @PathVariable String instanceId){
-<span class="nc" id="L163">        log.info(&quot;Request to delete simulation instance {} of simulation {} received.&quot;, instanceId, type);</span>
-<span class="nc" id="L164">        service.deleteSimulationInstance(type, instanceId);</span>
-<span class="nc" id="L165">        return ResponseEntity.ok().build();</span>
+<span class="nc" id="L199">        log.info(&quot;Request to delete simulation instance {} of simulation {} received.&quot;, instanceId, type);</span>
+<span class="nc" id="L200">        service.deleteSimulationInstance(type, instanceId);</span>
+<span class="nc" id="L201">        return ResponseEntity.ok().build();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
