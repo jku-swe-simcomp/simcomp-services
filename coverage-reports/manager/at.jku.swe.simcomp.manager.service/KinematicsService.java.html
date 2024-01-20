@@ -35,13 +35,13 @@ public class KinematicsService {
      * @return the transformed command
      */
     public ExecutionCommand.CompositeCommand poseToComposite(ExecutionCommand.PoseCommand poseCommand){
-<span class="nc" id="L38">        List&lt;JointPositionDTO&gt; jointPositions = axisConverterClient.inverseKinematics(new PoseDTO(poseCommand.position(), poseCommand.orientation()));</span>
-<span class="nc bnc" id="L39" title="All 2 branches missed.">        if(jointPositions.size() != 6){</span>
+<span class="fc" id="L38">        List&lt;JointPositionDTO&gt; jointPositions = axisConverterClient.inverseKinematics(new PoseDTO(poseCommand.position(), poseCommand.orientation()));</span>
+<span class="pc bpc" id="L39" title="1 of 2 branches missed.">        if(jointPositions.size() != 6){</span>
 <span class="nc" id="L40">            throw new RuntimeException(&quot;Wrong number of joint positions for inverse kinematics returned by axis-converter.&quot;);</span>
         }
-<span class="nc" id="L42">        List&lt;ExecutionCommand.SetJointPositionCommand&gt; jointPositionCommands = jointPositions.stream()</span>
-<span class="nc" id="L43">                .map(ExecutionCommand.SetJointPositionCommand::new).toList();</span>
-<span class="nc" id="L44">        return new ExecutionCommand.CompositeCommand(jointPositionCommands);</span>
+<span class="fc" id="L42">        List&lt;ExecutionCommand.SetJointPositionCommand&gt; jointPositionCommands = jointPositions.stream()</span>
+<span class="fc" id="L43">                .map(ExecutionCommand.SetJointPositionCommand::new).toList();</span>
+<span class="fc" id="L44">        return new ExecutionCommand.CompositeCommand(jointPositionCommands);</span>
     }
 
     /**
