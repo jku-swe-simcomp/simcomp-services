@@ -50,7 +50,7 @@ jobs:
 
     - name: Build webots-drone-adaptor
       working-directory: simcomp-services/webots-drone-adaptor
-      run: mvn -B package
+      run: mvn -B package javadoc:javadoc
       env:
         ADAPTOR_HOST: not_required_but_cannot_be_null
 
@@ -85,11 +85,13 @@ jobs:
         mkdir -p ./simcomp-services/pages/coverage-reports/registry
         mkdir -p ./simcomp-services/pages/coverage-reports/webots-adaptor
         mkdir -p ./simcomp-services/pages/coverage-reports/axis-converter
+        mkdir -p ./simcomp-services/pages/coverage-reports/webots-drone-adaptor
 
         cp -R ./simcomp-services/manager/target/site/jacoco/* ./simcomp-services/pages/coverage-reports/manager
         cp -R ./simcomp-services/webots-adaptor/target/site/jacoco/* ./simcomp-services/pages/coverage-reports/webots-adaptor
         cp -R ./simcomp-services/service-registry/target/site/jacoco/* ./simcomp-services/pages/coverage-reports/registry
         cp -R ./simcomp-services/axis-converter/target/site/jacoco/* ./simcomp-services/pages/coverage-reports/axis-converter
+        cp -R ./simcomp-services/webots-drone-adaptor/target/site/jacoco/* ./simcomp-services/pages/coverage-reports/webots-drone-adaptor
 
     - name: Consolidate java-docs
       run: |
@@ -99,6 +101,7 @@ jobs:
         mkdir -p ./simcomp-services/pages/java-docs/manager
         mkdir -p ./simcomp-services/pages/java-docs/registry
         mkdir -p ./simcomp-services/pages/java-docs/commons
+        mkdir -p ./simcomp-services/pages/java-docs/webots-drone-adaptor
 
         cp -R ./simcomp-services/webots-adaptor/target/site/apidocs/* ./simcomp-services/pages/java-docs/webots-adaptor
         cp -R ./simcomp-services/azure-adapter/target/site/apidocs/* ./simcomp-services/pages/java-docs/azure-adapter
@@ -106,6 +109,7 @@ jobs:
         cp -R ./simcomp-services/manager/target/site/apidocs/* ./simcomp-services/pages/java-docs/manager
         cp -R ./simcomp-services/service-registry/target/site/apidocs/* ./simcomp-services/pages/java-docs/registry
         cp -R ./simcomp-services/commons/target/site/apidocs/* ./simcomp-services/pages/java-docs/commons
+        cp -R ./simcomp-services/webots-drone-adaptor/target/site/apidocs/* ./simcomp-services/pages/java-docs/webots-drone-adaptor
 
     - name: Deploy Coverage Reports to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
