@@ -18,8 +18,8 @@ import java.io.IOException;
  * command executor.
  */
 @Service
-public class WebotsCommandExecutionVisitor extends CommandExecutionVisitor {
-    private final SessionService sessionService;
+public class WebotsDroneCommandExecutionVisitor extends CommandExecutionVisitor {
+    private final DroneSessionService sessionService;
     private final CustomExecutor customExecutor;
 
     /**
@@ -27,7 +27,7 @@ public class WebotsCommandExecutionVisitor extends CommandExecutionVisitor {
      * @param sessionService session service instance to keep track of the session instances
      * @param customExecutor executor for custom commands
      */
-    public WebotsCommandExecutionVisitor(SessionService sessionService, CustomExecutor customExecutor){
+    public WebotsDroneCommandExecutionVisitor(DroneSessionService sessionService, CustomExecutor customExecutor){
         this.sessionService = sessionService;
         this.customExecutor = customExecutor;
     }

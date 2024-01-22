@@ -15,17 +15,17 @@ import java.io.IOException;
 /**
  * Class to build and communication endpoint for the session management.
  * Interaction with a SessionService instance to manage the sessions.
- * @see SessionService
+ * @see DroneSessionService
  */
 @Service
-public class WebotsAdaptorEndpointService implements AdaptorEndpointService {
-    private final SessionService SESSION_SERVICE;
+public class WebotsDroneAdaptorEndpointService implements AdaptorEndpointService {
+    private final DroneSessionService SESSION_SERVICE;
 
     /**
      * Constructor to create a new endpoint for a session service class.
      * @param sessionService the service to keep manage the session
      */
-    public WebotsAdaptorEndpointService(SessionService sessionService) {
+    public WebotsDroneAdaptorEndpointService(DroneSessionService sessionService) {
         this.SESSION_SERVICE = sessionService;
     }
 
@@ -76,7 +76,7 @@ public class WebotsAdaptorEndpointService implements AdaptorEndpointService {
         SimulationInstanceConfig config = SESSION_SERVICE.getConfigForSession(sessionId);
         // Note: can add more cases for different attributes
         return switch(attributeKey){
-            case JOINT_POSITIONS ->  new AttributeValue.JointPositions(WebotsExecutionService.getPositions(config));
+            case JOINT_POSITIONS ->  new AttributeValue.JointPositions(WebotsDroneExecutionService.getPositions(config));
             default -> throw new UnsupportedOperationException("Attribute %s not supported by this service".formatted(attributeKey));
         };
     }

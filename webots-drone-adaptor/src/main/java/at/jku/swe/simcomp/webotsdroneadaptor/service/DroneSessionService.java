@@ -3,7 +3,7 @@ package at.jku.swe.simcomp.webotsdroneadaptor.service;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.simulation.SimulationInstanceConfig;
-import at.jku.swe.simcomp.webotsdroneadaptor.domain.simulation.SimulationInstanceRemovalListener;
+import at.jku.swe.simcomp.webotsdroneadaptor.domain.simulation.DroneInstanceRemovalListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -15,12 +15,12 @@ import java.util.concurrent.Executors;
 
 /**
  * The class provides a service to manage sessions
- * @see WebotsSimulationInstanceService
- * @see SimulationInstanceRemovalListener
+ * @see WebotsDroneSimulationInstanceService
+ * @see at.jku.swe.simcomp.webotsdroneadaptor.domain.simulation.DroneInstanceRemovalListener
  */
 @Service
 @Slf4j
-public class SessionService implements SimulationInstanceRemovalListener {
+public class DroneSessionService implements DroneInstanceRemovalListener {
     private static final ConcurrentHashMap<String, SimulationInstanceConfig> CURRENT_SESSIONS = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, Thread> SESSION_TERMINATION_THREADS = new ConcurrentHashMap<>();
     private static final ExecutorService SESSION_TERMINATION_EXECUTOR = Executors.newFixedThreadPool(10);
@@ -32,7 +32,7 @@ public class SessionService implements SimulationInstanceRemovalListener {
      * @param webotsSimulationInstanceService Webots simulation service to which the new
      *                                        instance is added as simulation removal listener
      */
-    public SessionService(WebotsSimulationInstanceService webotsSimulationInstanceService){
+    public DroneSessionService(WebotsDroneSimulationInstanceService webotsSimulationInstanceService){
         webotsSimulationInstanceService.addSimulationRemovalListener(this);
     }
 
@@ -163,13 +163,13 @@ public class SessionService implements SimulationInstanceRemovalListener {
     }
 
     private Optional<SimulationInstanceConfig> getAvailableInstance() {
-        return WebotsSimulationInstanceService.getInstances().stream()
+        return WebotsDroneSimulationInstanceService.getInstances().stream()
                 .filter(instance -> !CURRENT_SESSIONS.containsValue(instance))
                 .findFirst();
     }
 
     private Optional<SimulationInstanceConfig> getInstance(String instanceId) {
-        return WebotsSimulationInstanceService.getInstances().stream()
+        return WebotsDroneSimulationInstanceService.getInstances().stream()
                 .filter(instance -> !CURRENT_SESSIONS.containsValue(instance) && instance.getInstanceId().equals(instanceId))
                 .findFirst();
     }
