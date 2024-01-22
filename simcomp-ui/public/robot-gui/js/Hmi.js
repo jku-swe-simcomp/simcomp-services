@@ -121,15 +121,18 @@ define((require, exports, module) => {
           mode: 'cors'
         });
         const json = await res.json();
+        console.log(json);
         const firstInstance = Object.values(json)[0];
-        Robot.dispatch('ROBOT_CHANGE_ANGLES', {
-          A0: firstInstance.jointPositions[0],
-          A1: firstInstance.jointPositions[1],
-          A2: firstInstance.jointPositions[2],
-          A3: firstInstance.jointPositions[3],
-          A4: firstInstance.jointPositions[4],
-          A5: firstInstance.jointPositions[5],
-        });
+        if (firstInstance != null) {
+          Robot.dispatch('ROBOT_CHANGE_ANGLES', {
+            A0: firstInstance.jointPositions[0],
+            A1: firstInstance.jointPositions[1],
+            A2: firstInstance.jointPositions[2],
+            A3: firstInstance.jointPositions[3],
+            A4: firstInstance.jointPositions[4],
+            A5: firstInstance.jointPositions[5],
+          });
+        }
       }
       updateAngles();
       setInterval(() => {
@@ -137,11 +140,11 @@ define((require, exports, module) => {
       }, 2000);
 
       const geo = [
-        [2.8, -1.7, 2.3],
-        [0, 0, 13.0],
-        [1, 0, 2],
-        [12.6, 0, 0],
-        [3.6, 0, 0],
+        [-4.8, -4.8, 2.1],
+        [-0.6, 0.5, 10.0],
+        [1.4, -0.6, 1.4],
+        [10, 0, 0],
+        [3, 0, 0],
         [0, 0, 0],
       ]
 

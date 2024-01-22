@@ -15,7 +15,6 @@ export default function AddInstance(props) {
         async function getAdaptors() {
             try {
                 const res = await axios.get(process.env.REACT_APP_API_URL + '/simulation/type');
-                console.log(res);
                 setAdaptors(res.data.availableSimulations);
             } catch (e) {
                 console.error(e);

@@ -30,6 +30,7 @@ class AxisConverterClientTest {
     @InjectMocks
     private AxisConverterClient axisConverterClient;
 
+
     @Test
     void jointPositionsToPose() {
         // Arrange

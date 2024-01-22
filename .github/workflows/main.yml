@@ -56,7 +56,7 @@ jobs:
 
     - name: Build azure-adapter
       working-directory: simcomp-services/azure-adapter
-      run: mvn -B package
+      run: mvn -B -DskipTests package javadoc:javadoc
       env:
         ADAPTOR_HOST: not_required_but_cannot_be_null
 
@@ -96,6 +96,7 @@ jobs:
     - name: Consolidate java-docs
       run: |
         mkdir -p ./simcomp-services/pages/java-docs/webots-adaptor
+        mkdir -p ./simcomp-services/pages/java-docs/azure-adapter
         mkdir -p ./simcomp-services/pages/java-docs/axis-converter
         mkdir -p ./simcomp-services/pages/java-docs/manager
         mkdir -p ./simcomp-services/pages/java-docs/registry
@@ -103,6 +104,7 @@ jobs:
         mkdir -p ./simcomp-services/pages/java-docs/webots-drone-adaptor
 
         cp -R ./simcomp-services/webots-adaptor/target/site/apidocs/* ./simcomp-services/pages/java-docs/webots-adaptor
+        cp -R ./simcomp-services/azure-adapter/target/site/apidocs/* ./simcomp-services/pages/java-docs/azure-adapter
         cp -R ./simcomp-services/axis-converter/target/site/apidocs/* ./simcomp-services/pages/java-docs/axis-converter
         cp -R ./simcomp-services/manager/target/site/apidocs/* ./simcomp-services/pages/java-docs/manager
         cp -R ./simcomp-services/service-registry/target/site/apidocs/* ./simcomp-services/pages/java-docs/registry
