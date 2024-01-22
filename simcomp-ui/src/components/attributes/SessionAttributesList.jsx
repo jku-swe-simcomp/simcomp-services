@@ -5,6 +5,11 @@ import axios from 'axios';
 import SimcompAlert from '../alerts/SimcompAlert';
 import AttributeSelector from './AttributeSelector';
 import JointPositionsTable from './attributeTables/JointPositionsTable';
+import JointStatesTable from './attributeTables/JointStatesTable';
+import PoseTable from './attributeTables/PoseTable';
+import PositionTable from './attributeTables/PositionTable';
+import OrientationTable from './attributeTables/OrientationTable';
+import SourceOfTruthSelector from './SourceOfTruthSelector';
 
 export default function SessionAttributesList() {
     const [attribute, setAttribute] = useState('JOINT_POSITIONS');
@@ -25,15 +30,31 @@ export default function SessionAttributesList() {
             }
             const results = await Promise.allSettled(promises);
             results.forEach((r, index) => {
-                sessions[index].attribute = r;
+                if (r.status === 'fulfilled') {
+                    let sessionsCopy = [...sessions];
+                    let sessionCopy = { ...sessionsCopy[index] };
+                    sessionCopy.attribute = r.value.data;
+                    sessionsCopy[index] = sessionCopy;
+                    setSessions(sessionsCopy);
+                } else {
+                    let sessionsCopy = [...sessions];
+                    let sessionCopy = { ...sessionsCopy[index] };
+                    sessionCopy.attribute = null;
+                    sessionsCopy[index] = sessionCopy;
+                    setSessions(sessionsCopy);
+                }
             });
             setLoading(false);
         }
-        updateAttributes();
+        const intervalID = setInterval(() => {
+            updateAttributes();
+        }, 10_000);
+        return () => {
+            clearInterval(intervalID);
+        }
     }, [attribute]);
 
-
-    console.log(sessions[0]?.attribute?.value.data);
+    console.log(sessions);
     return (
         <div>
             {alerts.map((a, index) => (
@@ -58,32 +79,33 @@ export default function SessionAttributesList() {
                                         <Card variant="outlined">
                                             <CardContent>
                                                 <Typography variant="h6" component="h2">{session.sessionKey}</Typography>
+                                                <SourceOfTruthSelector sessionKey={session.sessionKey} />
                                                 <Typography variant="body1" gutterBottom>Instances:</Typography>
                                                 {session.acquiredSimulations.map((sim, index) => (
                                                     <Box key={index}>
                                                         <h5>{sim}</h5>
                                                         {attribute === 'JOINT_POSITIONS' ?
-                                                            <JointPositionsTable data={session.attribute?.value.data[sim]} />
+                                                            <JointPositionsTable sourceOfTruth={session.sourceOfTruth} data={session.attribute} sim={sim} />
                                                             :
                                                             <></>
                                                         }
                                                         {attribute === 'JOINT_STATES' ?
-                                                            <></>
+                                                            <JointStatesTable sourceOfTruth={session.sourceOfTruth} data={session.attribute} sim={sim} />
                                                             :
                                                             <></>
                                                         }
                                                         {attribute === 'POSITION' ?
-                                                            <></>
+                                                            <PositionTable sourceOfTruth={session.sourceOfTruth} data={session.attribute} sim={sim} />
                                                             :
                                                             <></>
                                                         }
                                                         {attribute === 'POSE' ?
-                                                            <></>
+                                                            <PoseTable sourceOfTruth={session.sourceOfTruth} data={session.attribute} sim={sim} />
                                                             :
                                                             <></>
                                                         }
                                                         {attribute === 'ORIENTATION' ?
-                                                            <></>
+                                                            <OrientationTable sourceOfTruth={session.sourceOfTruth} data={session.attribute} sim={sim} />
                                                             :
                                                             <></>
                                                         }

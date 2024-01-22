@@ -1,0 +1,45 @@
+@startuml
+interface ExecutionCommand {
+    +getActionType(): ActionType
+    +accept(ExecutionCommandVisitor<T> visitor): T
+}
+
+enum ActionType {
+    POSE,
+    SET_POSITION,
+    SET_ORIENTATION,
+    GRAB,
+    OPEN_HAND,
+    ADJUST_JOINT_ANGLE,
+    SET_JOINT_POSITION,
+    SET_SPEED,
+    PAUSE,
+    RESUME,
+    RESET_TO_HOME,
+    STOP,
+    CALIBRATE,
+    TOGGLE_GRIPPER_MODE,
+    COMPOSITE,
+    CUSTOM
+}
+interface ExecutionCommandVisitor<T> {
+    +visit(AnyCommand): T
+    // one visit method for each command
+}
+
+class CompositeCommand {
+    -commands: List<ExecutionCommand>
+}
+
+class CustomCommand {
+    -jsonCommand: String
+}
+
+class AnyCommand {
+    // One command for each action
+}
+
+ExecutionCommand <|-- CompositeCommand
+ExecutionCommand <|-- AnyCommand
+ExecutionCommand <|-- CustomCommand
+@enduml

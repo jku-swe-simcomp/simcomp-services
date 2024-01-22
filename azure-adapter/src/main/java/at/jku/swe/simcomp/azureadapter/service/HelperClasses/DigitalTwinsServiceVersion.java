@@ -18,6 +18,11 @@ public enum DigitalTwinsServiceVersion implements ServiceVersion {
 
     private final String version;
 
+    /**
+     * Constructs a DigitalTwinsServiceVersion enum constant with the specified version.
+     *
+     * @param version The version string representing the service API version.
+     */
     DigitalTwinsServiceVersion(String version) {
         this.version = version;
     }

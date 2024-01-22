@@ -11,31 +11,66 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-@Component @Slf4j
+/**
+ * The AzureExecutionService class is responsible for interacting with the Azure Digital Twins service.
+ * It provides methods for building connections, retrieving joint angles, updating joint angles, and other related operations.
+ */
+@Component
+@Slf4j
 public class AzureExecutionService {
 
-    private static DigitalTwinsClient client;// = buildConnection();
+    /**
+     * The Azure Digital Twins client used for interacting with the service.
+     */
+    public static DigitalTwinsClient client;
 
-    static String tentantId;// = "f11d36c0-5880-41f7-91e5-ac5e42209e77";
-    static String clientId;// = "a39ddd8f-18bf-41b2-9ab9-fea69e235b86";
-    static String clientSecret;// = "unI8Q~MP2uwUGg38dOu4ASnrmcCYNC19fCAKPc9r";
-    static String endpoint;// = "https://Student.api.wcus.digitaltwins.azure.net";
+    /**
+     * Azure AD tenant ID.
+     */
+    static String tentantId;
 
+    /**
+     * Azure AD client ID.
+     */
+    static String clientId;
+
+    /**
+     * Azure AD client secret.
+     */
+    static String clientSecret;
+
+    /**
+     * Azure Digital Twins service endpoint.
+     */
+    static String endpoint;
+
+    /**
+     * Constructs an AzureExecutionService with the specified configuration values.
+     *
+     * @param tentantId    Azure AD tenant ID.
+     * @param clientId     Azure AD client ID.
+     * @param clientSecret Azure AD client secret.
+     * @param endpoint     Azure Digital Twins service endpoint.
+     */
     public AzureExecutionService(@Value("${azure.tentantid}") String tentantId,
-                                 @Value("${azure.clientid}$") String clientid,
+                                 @Value("${azure.clientid}$") String clientId,
                                  @Value("${azure.clientSecret}$") String clientSecret,
                                  @Value("${azure.endpoint}$") String endpoint) {
         AzureExecutionService.tentantId = tentantId;
-        AzureExecutionService.clientId = clientid;
+        AzureExecutionService.clientId = clientId;
         AzureExecutionService.clientSecret = clientSecret;
         AzureExecutionService.endpoint = endpoint;
         client = buildConnection();
     }
 
-
-
+    /**
+     * Builds and returns a connection to the Azure Digital Twins service.
+     *
+     * @return The DigitalTwinsClient instance.
+     */
     public static DigitalTwinsClient buildConnection() {
         return new DigitalTwinsClientBuilder()
                 .credential(
@@ -49,7 +84,12 @@ public class AzureExecutionService {
                 .buildClient();
     }
 
-
+    /**
+     * Retrieves a list of all joint angles for a specified digital twin ID.
+     *
+     * @param digitaltwinid The ID of the digital twin.
+     * @return A list of joint angles for the specified digital twin.
+     */
     public static List<Double> getAllJointAngles(String digitaltwinid) {
         List<Double> jointAngles = new ArrayList<>();
 
@@ -76,6 +116,11 @@ public class AzureExecutionService {
         return jointAngles;
     }
 
+    /**
+     * Retrieves a list of keys (IDs) for all digital twins.
+     *
+     * @return A list of digital twin keys (IDs).
+     */
     public static List<String> getKeys() {
         List<String> keys = new ArrayList<>();
 
@@ -88,6 +133,13 @@ public class AzureExecutionService {
         return keys;
     }
 
+    /**
+     * Retrieves the string value for a specified key from a JSON string.
+     *
+     * @param jsonString The JSON string.
+     * @param key         The key for which to retrieve the value.
+     * @return The string value associated with the specified key.
+     */
     public static String getStringValueForKey(String jsonString, String key) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -99,7 +151,13 @@ public class AzureExecutionService {
         }
     }
 
-
+    /**
+     * Retrieves the joint angle for a specified digital twin and joint name.
+     *
+     * @param digitaltwinid The ID of the digital twin.
+     * @param jointName     The name of the joint for which to retrieve the angle.
+     * @return The joint angle value.
+     */
     public static double getJointAngle(String digitaltwinid, String jointName) {
         double value = 0.0;
 
@@ -111,10 +169,16 @@ public class AzureExecutionService {
             }
         }
 
-
         return value;
     }
 
+    /**
+     * Retrieves the double value for a specified key from a JSON string.
+     *
+     * @param jsonString The JSON string.
+     * @param key         The key for which to retrieve the value.
+     * @return The double value associated with the specified key.
+     */
     public static double getDoubleValueForKey(String jsonString, String key) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -126,7 +190,13 @@ public class AzureExecutionService {
         }
     }
 
-
+    /**
+     * Sets the joint angle for a specified digital twin and joint name.
+     *
+     * @param digitaltwinid The ID of the digital twin.
+     * @param jointName     The name of the joint for which to set the angle.
+     * @param jointAngle    The new joint angle value.
+     */
     public static void setJointAngle(String digitaltwinid, String jointName, double jointAngle) {
         PagedIterable<String> pageableResponse = client.query("SELECT * FROM digitaltwins", String.class);
 
@@ -139,5 +209,4 @@ public class AzureExecutionService {
             }
         }
     }
-
 }

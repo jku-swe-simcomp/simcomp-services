@@ -1,8 +1,12 @@
 import { Grid, MenuItem, Select } from '@mui/material';
 import { useState } from 'react';
 import AdjustJointAngleForm from './commands/AdjustJointAngleForm';
-import CompositeCommand from './commands/CompositeCommand';
+import CompositeCommandForm from './commands/CompositeCommandForm';
 import SetJointPositionForm from './commands/SetJointPositionForm';
+import PoseCommandForm from './commands/PoseCommandForm';
+import ResetToHomeForm from './commands/ResetToHomeForm';
+import OpenHandForm from './commands/OpenHandForm';
+import GrabCommandForm from './commands/GrabCommandForm';
 
 export default function CommandTypeSelector(props) {
     let possibleCommands = props.possibleCommands;
@@ -37,11 +41,27 @@ export default function CommandTypeSelector(props) {
                 : <></>
             }
             {command === 'SET_JOINT_POSITION' ?
-                <SetJointPositionForm addToComposite={props.addToComposite} composite={composite} sessionKey={sessionKey}/>
+                <SetJointPositionForm addToComposite={props.addToComposite} composite={composite} sessionKey={sessionKey} />
                 : <></>
             }
             {command === 'COMPOSITE_COMMAND' ?
-                <CompositeCommand sessionKey={sessionKey} possibleCommands={possibleCommands} />
+                <CompositeCommandForm sessionKey={sessionKey} possibleCommands={possibleCommands} />
+                : <></>
+            }
+            {command === 'POSE' ?
+                <PoseCommandForm addToComposite={props.addToComposite} sessionKey={sessionKey} composite={composite} />
+                : <></>
+            }
+            {command === 'RESET_TO_HOME' ?
+                <ResetToHomeForm addToComposite={props.addToComposite} sessionKey={sessionKey} composite={composite} />
+                : <></>
+            }
+            {command === 'OPEN_HAND' ?
+                <OpenHandForm addToComposite={props.addToComposite} sessionKey={sessionKey} composite={composite} />
+                : <></>
+            }
+            {command === 'GRAB' ?
+                <GrabCommandForm addToComposite={props.addToComposite} sessionKey={sessionKey} composite={composite} />
                 : <></>
             }
             <hr />
