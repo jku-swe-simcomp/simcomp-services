@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WebotsDroneCommandExecutionVisitor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">webots-drone-adaptor</a> &gt; <a href="index.source.html" class="el_package">at.jku.swe.simcomp.webotsdroneadaptor.service</a> &gt; <span class="el_source">WebotsDroneCommandExecutionVisitor.java</span></div><h1>WebotsDroneCommandExecutionVisitor.java</h1><pre class="source lang-java linenums">package at.jku.swe.simcomp.webotsdroneadaptor.service;
+
+import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.RoboOperationFailedException;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
+import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
+import at.jku.swe.simcomp.commons.adaptor.execution.command.visitor.CommandExecutionVisitor;
+import at.jku.swe.simcomp.webotsdroneadaptor.service.command_executors.CustomExecutor;
+import org.json.simple.parser.ParseException;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+
+/**
+ * Class to implement the visitor pattern for the supported
+ * command types. For each command type a visitor method is
+ * implemented, that executes the command with the respective
+ * command executor.
+ */
+@Service
+public class WebotsDroneCommandExecutionVisitor extends CommandExecutionVisitor {
+    private final DroneSessionService sessionService;
+    private final CustomExecutor customExecutor;
+
+    /**
+     * Constructor to set all command executors, and the session service
+     * @param sessionService session service instance to keep track of the session instances
+     * @param customExecutor executor for custom commands
+     */
+<span class="fc" id="L30">    public WebotsDroneCommandExecutionVisitor(DroneSessionService sessionService, CustomExecutor customExecutor){</span>
+<span class="fc" id="L31">        this.sessionService = sessionService;</span>
+<span class="fc" id="L32">        this.customExecutor = customExecutor;</span>
+<span class="fc" id="L33">    }</span>
+
+
+
+    /**
+     * Method to call the executor for set joint position commands, with a new command.
+     * The execution is executed for a session, the session gets renewed.
+     *
+     * @param command to set the joint poistion of one axis of the robot arm
+     * @param sessionKey the key of the session
+     *
+     * @return the result of the execution
+     * @throws SessionNotValidException if the session is not registered
+     * @throws RoboOperationFailedException if the simulation could not execute the command
+     * @throws IOException if no connection to the simulation could be built
+     * @throws ParseException if the JSON of the command is not valid
+     */
+    @Override
+    public ExecutionResultDTO visit(ExecutionCommand.CustomCommand command, String sessionKey) throws Exception {
+<span class="fc" id="L52">        return customExecutor.execute(command, sessionService.renewSession(sessionKey));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
