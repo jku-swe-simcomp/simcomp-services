@@ -13,7 +13,7 @@
     <artifactId>webots-drone-adaptor</artifactId>
     <version>1.0</version>
     <name>webots-drone-adaptor</name>
-    <description>Adaptor for Drone Webots simulation of Ned2.</description>
+    <description>Adaptor for Webots simulation of Drone.</description>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

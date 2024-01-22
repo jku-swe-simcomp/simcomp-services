@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
 /**
  * The class provides a service to manage sessions
  * @see WebotsDroneSimulationInstanceService
- * @see at.jku.swe.simcomp.webotsdroneadaptor.domain.simulation.DroneInstanceRemovalListener
+ * @see DroneInstanceRemovalListener
  */
 @Service
 @Slf4j
