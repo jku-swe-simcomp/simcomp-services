@@ -6,6 +6,6 @@ import at.jku.swe.simcomp.commons.adaptor.endpoint.simulation.SimulationInstance
  * Interface to listen to the closing of session and closes the session
  * if it is managed by the instance of this interface.
  */
-public interface SimulationInstanceRemovalListener {
+public interface DroneInstanceRemovalListener {
     void onSimulationRemoved(SimulationInstanceConfig config);
 }

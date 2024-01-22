@@ -3,7 +3,7 @@ package at.jku.swe.simcomp.webotsdroneadaptor.service;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.BadRequestException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.simulation.SimulationInstanceConfig;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.simulation.SimulationInstanceService;
-import at.jku.swe.simcomp.webotsdroneadaptor.domain.simulation.SimulationInstanceRemovalListener;
+import at.jku.swe.simcomp.webotsdroneadaptor.domain.simulation.DroneInstanceRemovalListener;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,12 +20,12 @@ import java.util.Set;
  * and allows to add and remove instances. The class contains a static
  * set of
  * @see SimulationInstanceConfig and
- * @see SimulationInstanceRemovalListener
+ * @see DroneInstanceRemovalListener
  */
 @Service
-public class WebotsSimulationInstanceService implements SimulationInstanceService {
+public class WebotsDroneSimulationInstanceService implements SimulationInstanceService {
     private static final Logger log = LogManager.getLogger();
-    private static final Set<SimulationInstanceRemovalListener> SIMULATION_INSTANCE_REMOVAL_LISTENERS = Collections.synchronizedSet(new HashSet<>());
+    private static final Set<DroneInstanceRemovalListener> SIMULATION_INSTANCE_REMOVAL_LISTENERS = Collections.synchronizedSet(new HashSet<>());
     private static final Set<SimulationInstanceConfig> INSTANCES = Collections.synchronizedSet(new HashSet<>());
     private final String adaptorName;
 
@@ -34,7 +34,7 @@ public class WebotsSimulationInstanceService implements SimulationInstanceServic
      * be equal to WEBOTS
      * @param adaptorName the name of the adaptor
      */
-    public WebotsSimulationInstanceService(@Value("${adaptor.endpoint.name}") String adaptorName) {
+    public WebotsDroneSimulationInstanceService(@Value("${adaptor.endpoint.name}") String adaptorName) {
        this.adaptorName = adaptorName;
     }
 
@@ -94,7 +94,7 @@ public class WebotsSimulationInstanceService implements SimulationInstanceServic
      * Adds a new removal listener to the static set of removal listeners.
      * @param listener the new removal listener to add
      */
-    public void addSimulationRemovalListener(SimulationInstanceRemovalListener listener) {
+    public void addSimulationRemovalListener(DroneInstanceRemovalListener listener) {
         SIMULATION_INSTANCE_REMOVAL_LISTENERS.add(listener);
         log.info("Added simulation instance removal listener: {}", listener);
     }

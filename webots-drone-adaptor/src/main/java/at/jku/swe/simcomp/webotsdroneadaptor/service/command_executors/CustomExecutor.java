@@ -5,10 +5,7 @@ import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.RoboOperationFailed
 import at.jku.swe.simcomp.commons.adaptor.endpoint.simulation.SimulationInstanceConfig;
 import at.jku.swe.simcomp.commons.adaptor.execution.command.CommandExecutor;
 import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
-import at.jku.swe.simcomp.webotsdroneadaptor.service.WebotsExecutionService;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.NonNull;
+import at.jku.swe.simcomp.webotsdroneadaptor.service.WebotsDroneExecutionService;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -37,6 +34,6 @@ public class CustomExecutor implements CommandExecutor<ExecutionCommand.CustomCo
         JSONParser parser = new JSONParser();
         JSONObject jsonObject = (JSONObject) parser.parse(command.jsonCommand());
 
-        return WebotsExecutionService.executeCommand(jsonObject, config);
+        return WebotsDroneExecutionService.executeCommand(jsonObject, config);
     }
 }
