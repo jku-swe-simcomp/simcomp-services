@@ -101,7 +101,7 @@ public class WebotsSimulationInstanceService implements SimulationInstanceServic
      * @param config the simulation instance that was removed.
      */
     public void notifySimulationRemovalListeners(SimulationInstanceConfig config) {
-<span class="fc" id="L104">        SIMULATION_INSTANCE_REMOVAL_LISTENERS.forEach(listener -&gt; listener.onSimulationRemoved(config));</span>
+<span class="pc" id="L104">        SIMULATION_INSTANCE_REMOVAL_LISTENERS.forEach(listener -&gt; listener.onSimulationRemoved(config));</span>
 <span class="fc" id="L105">        log.info(&quot;Notified simulation instance removal listeners about removal of: {}&quot;, config);</span>
 <span class="fc" id="L106">    }</span>
 

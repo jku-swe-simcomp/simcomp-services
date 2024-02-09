@@ -31,7 +31,7 @@ public class HealthCheckScheduler {
     @Scheduled(fixedRate = 60000)
     public void performHealthCheckAndSetStatus(){
 <span class="fc" id="L33">        log.info(&quot;Performing health check on all adaptors&quot;);</span>
-<span class="nc" id="L34">        adaptorRepository.findAll().forEach(adaptor -&gt; {</span>
+<span class="fc" id="L34">        adaptorRepository.findAll().forEach(adaptor -&gt; {</span>
 <span class="nc" id="L35">            boolean isHealthy = adaptorClient.isHealthy(adaptor);</span>
 <span class="nc bnc" id="L36" title="All 2 branches missed.">            if(isHealthy){</span>
 <span class="nc" id="L37">                log.info(&quot;Adaptor {} is healthy&quot;, adaptor.getName());</span>
@@ -42,7 +42,7 @@ public class HealthCheckScheduler {
             }
 <span class="nc" id="L43">            adaptorRepository.save(adaptor);</span>
 <span class="nc" id="L44">        });</span>
-<span class="nc" id="L45">        log.info(&quot;Health check finished&quot;);</span>
-<span class="nc" id="L46">    }</span>
+<span class="fc" id="L45">        log.info(&quot;Health check finished&quot;);</span>
+<span class="fc" id="L46">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

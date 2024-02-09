@@ -8,7 +8,7 @@ webots-adaptor,at.jku.swe.simcomp.webotsadaptor.service.command_executors,PoseCo
 webots-adaptor,at.jku.swe.simcomp.webotsadaptor.service.command_executors,OpenHandExecutor,0,34,0,0,0,8,0,3,0,3
 webots-adaptor,at.jku.swe.simcomp.webotsadaptor,WebotsAdaptorApplication,8,0,0,0,3,0,2,0,2,0
 webots-adaptor,at.jku.swe.simcomp.webotsadaptor,OpenApiConfig,9,0,0,0,3,0,2,0,2,0
-webots-adaptor,at.jku.swe.simcomp.webotsadaptor.service,WebotsSimulationInstanceService,0,145,1,11,0,31,1,17,0,12
+webots-adaptor,at.jku.swe.simcomp.webotsadaptor.service,WebotsSimulationInstanceService,4,141,1,11,0,31,2,16,1,11
 webots-adaptor,at.jku.swe.simcomp.webotsadaptor.service,WebotsCommandExecutionVisitor,0,78,0,0,0,15,0,7,0,7
 webots-adaptor,at.jku.swe.simcomp.webotsadaptor.service,WebotsExecutionService,24,180,1,9,4,47,4,8,3,4
 webots-adaptor,at.jku.swe.simcomp.webotsadaptor.service,WebotsAdaptorEndpointService,0,49,0,2,0,11,0,6,0,5

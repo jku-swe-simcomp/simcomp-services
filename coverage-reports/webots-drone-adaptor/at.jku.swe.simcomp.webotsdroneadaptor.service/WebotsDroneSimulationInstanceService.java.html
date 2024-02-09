@@ -104,7 +104,7 @@ public class WebotsDroneSimulationInstanceService implements SimulationInstanceS
      * @param config the simulation instance that was removed.
      */
     public void notifySimulationRemovalListeners(SimulationInstanceConfig config) {
-<span class="fc" id="L107">        SIMULATION_INSTANCE_REMOVAL_LISTENERS.forEach(listener -&gt; listener.onSimulationRemoved(config));</span>
+<span class="pc" id="L107">        SIMULATION_INSTANCE_REMOVAL_LISTENERS.forEach(listener -&gt; listener.onSimulationRemoved(config));</span>
 <span class="fc" id="L108">        log.info(&quot;Notified simulation instance removal listeners about removal of: {}&quot;, config);</span>
 <span class="fc" id="L109">    }</span>
 
