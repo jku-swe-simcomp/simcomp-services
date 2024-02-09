@@ -4,7 +4,12 @@ import at.jku.swe.simcomp.azureadapter.service.NiryoOneController.AzureExecution
 import at.jku.swe.simcomp.azureadapter.service.Services.AzureService;
 import com.azure.digitaltwins.core.BasicDigitalTwin;
 import com.azure.digitaltwins.core.DigitalTwinsClient;
+import com.azure.digitaltwins.core.DigitalTwinsClientBuilder;
+import com.azure.identity.ClientSecretCredentialBuilder;
+import com.microsoft.azure.sdk.iot.service.digitaltwin.DigitalTwinClient;
 import org.junit.jupiter.api.Test;
+import org.mockito.internal.stubbing.answers.AnswersWithDelay;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -12,15 +17,12 @@ class AzureServiceTest {
 
     @Test
     void testCreateDigitalTwin() {
-        DigitalTwinsClient mockClient = mock(DigitalTwinsClient.class);
 
-        AzureService azureService = new AzureService();
+        when(AzureExecutionService.testBuildConnection()).thenReturn(AzureExecutionService.testBuildConnection());
 
-        when(AzureExecutionService.buildConnection()).thenReturn(mockClient);
+        AzureService.createDigitalTwin("testDigitalTwinId");
 
-        azureService.createDigitalTwin("testDigitalTwinId");
-
-        verify(mockClient).createOrReplaceDigitalTwin(eq("testDigitalTwinId"), any(BasicDigitalTwin.class), eq(BasicDigitalTwin.class));
+        verify(AzureExecutionService.testBuildConnection()).createOrReplaceDigitalTwin(eq("testDigitalTwinId"), any(BasicDigitalTwin.class), eq(BasicDigitalTwin.class));
     }
 
     @Test

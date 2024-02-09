@@ -1,23 +1,26 @@
 package at.jku.swe.simpcomp.azureadapter.service_tests.services_tests;
 
+import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
+import at.jku.swe.simcomp.commons.adaptor.endpoint.simulation.SimulationInstanceConfig;
+import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
 import at.jku.swe.simcomp.azureadapter.service.NiryoOneController.CommandExecutor.AdjustJointAngleCommandExecutor;
 import at.jku.swe.simcomp.azureadapter.service.NiryoOneController.CommandExecutor.SetJointAngleCommandExecutor;
 import at.jku.swe.simcomp.azureadapter.service.Services.AzureCommandExecutionVisitor;
 import at.jku.swe.simcomp.azureadapter.service.Services.AzureSessionService;
-import at.jku.swe.simcomp.commons.adaptor.dto.ExecutionResultDTO;
-import at.jku.swe.simcomp.commons.adaptor.endpoint.simulation.SimulationInstanceConfig;
-import at.jku.swe.simcomp.commons.adaptor.execution.command.ExecutionCommand;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-class AzureCommandExecutionVisitorTest {
+@ExtendWith(MockitoExtension.class)
+public class AzureCommandExecutionVisitorTest {
 
     @Mock
     private AzureSessionService azureSessionService;

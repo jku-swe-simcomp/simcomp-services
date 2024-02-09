@@ -7,7 +7,11 @@ import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeKey;
 import at.jku.swe.simcomp.commons.adaptor.attribute.AttributeValue;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionInitializationFailedException;
 import at.jku.swe.simcomp.commons.adaptor.endpoint.exception.SessionNotValidException;
+import com.azure.core.http.rest.PagedIterable;
+import com.azure.digitaltwins.core.DigitalTwinsClient;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -51,14 +55,20 @@ class AzureAdapterEndpointServiceTest {
         AzureSessionService mockSessionService = mock(AzureSessionService.class);
         when(mockSessionService.renewSession("mockedSessionId")).thenReturn(null);
 
-        AzureExecutionService mockExecutionService = mock(AzureExecutionService.class);
-        when(mockExecutionService.getAllJointAngles("testInstanceId")).thenReturn(List.of(1.0, 2.0, 3.0, 4.0, 5.0, 6.0));
+        List<Double> jointAngles = List.of(1.0, 2.0, 3.0, 4.0, 5.0, 6.0);
+
+        DigitalTwinsClient mockDigitalTwinsClient = mock(DigitalTwinsClient.class);
+        when(mockDigitalTwinsClient.query(any(), any())).thenThrow(new IllegalArgumentException());
+
+        when(AzureExecutionService.getAllJointAngles("testInstanceId")).thenReturn(jointAngles);
 
         AzureAdaptorEndpointService endpointService = new AzureAdaptorEndpointService(mockSessionService);
+
         AttributeValue attributeValue = endpointService.getAttributeValue(AttributeKey.JOINT_POSITIONS, "mockedSessionId");
 
-        assertEquals(List.of(1.0, 2.0, 3.0, 4.0, 5.0, 6.0), attributeValue);
+        assertEquals(jointAngles, attributeValue.toString(), "Joint positions retrieved do not match the expected values");
     }
+
 
     @Test
     void testGetAttributeValueUnsupportedAttribute() throws SessionNotValidException {

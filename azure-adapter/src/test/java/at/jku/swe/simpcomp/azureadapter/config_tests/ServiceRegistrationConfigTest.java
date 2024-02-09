@@ -4,44 +4,29 @@ import at.jku.swe.simcomp.azureadapter.config.ServiceRegistrationConfig;
 import at.jku.swe.simcomp.commons.adaptor.execution.command.ActionType;
 import at.jku.swe.simcomp.commons.registry.dto.ServiceRegistrationConfigDTO;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringJUnitConfig
+@ExtendWith(MockitoExtension.class)
 public class ServiceRegistrationConfigTest {
 
-    @InjectMocks
-    private ServiceRegistrationConfig serviceRegistrationConfig;
-
-    @Mock
-    @Value("${adaptor.endpoint.name}")
-    private String name;
-
-    @Mock
-    @Value("${adaptor.endpoint.host}")
-    private String host;
-
-    @Mock
-    @Value("${server.port}")
-    private Integer port;
-
     @Test
-    public void testGetServiceRegistrationConfig() {
+    void getServiceRegistrationConfigTest(){
 
-        when(name).thenReturn("TestAdaptor");
-        when(host).thenReturn("localhost");
-        when(port).thenReturn(1234);
+        ServiceRegistrationConfigDTO config = new ServiceRegistrationConfig()
+                .getServiceRegistrationConfig(
+                        "name",
+                        "host",
+                        1234);
 
-        ServiceRegistrationConfigDTO configDTO = serviceRegistrationConfig.getServiceRegistrationConfig(name, host, port);
-
-        assertEquals("TestAdaptor", configDTO.getName());
-        assertEquals("localhost", configDTO.getHost());
-        assertEquals(1234, configDTO.getPort());
-        assertEquals(Set.of(ActionType.SET_JOINT_POSITION, ActionType.ADJUST_JOINT_ANGLE), configDTO.getSupportedActions());
+        assertEquals(config.getPort(), 1234);
+        assertEquals(config.getHost(), "host");
+        assertEquals(config.getName(), "name");
+        Set<ActionType> actions = config.getSupportedActions();
+        assertTrue(actions.contains(ActionType.ADJUST_JOINT_ANGLE));
+        assertTrue(actions.contains(ActionType.SET_JOINT_POSITION));
     }
 }

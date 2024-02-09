@@ -67,6 +67,23 @@ public class AzureExecutionService {
     }
 
     /**
+     *
+     * @return The test DigitalTwinsClient instance.
+     */
+    public static DigitalTwinsClient testBuildConnection() {
+        return new DigitalTwinsClientBuilder()
+                .credential(
+                        new ClientSecretCredentialBuilder()
+                                .tenantId("f11d36c0-5880-41f7-91e5-ac5e42209e77")
+                                .clientId("a39ddd8f-18bf-41b2-9ab9-fea69e235b86")
+                                .clientSecret("unI8Q~MP2uwUGg38dOu4ASnrmcCYNC19fCAKPc9r")
+                                .build()
+                )
+                .endpoint("https://Student.api.wcus.digitaltwins.azure.net")
+                .buildClient();
+    }
+
+    /**
      * Builds and returns a connection to the Azure Digital Twins service.
      *
      * @return The DigitalTwinsClient instance.

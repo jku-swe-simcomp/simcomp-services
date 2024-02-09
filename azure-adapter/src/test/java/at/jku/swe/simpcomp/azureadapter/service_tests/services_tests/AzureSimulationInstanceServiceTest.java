@@ -15,7 +15,7 @@ class AzureSimulationInstanceServiceTest {
         String adaptorName = "testAdaptor";
         AzureSimulationInstanceService service = new AzureSimulationInstanceService(adaptorName);
 
-        SimulationInstanceConfig config = new SimulationInstanceConfig(adaptorName, "testInstanceId", "localhost", 8080);
+        SimulationInstanceConfig config = new SimulationInstanceConfig(adaptorName, "testInstanceId", "localhost", 1234);
 
         assertDoesNotThrow(() -> service.addSimulationInstance(config));
         assertTrue(AzureSimulationInstanceService.getInstances().contains(config));
@@ -26,7 +26,7 @@ class AzureSimulationInstanceServiceTest {
         String adaptorName = "testAdaptor";
         AzureSimulationInstanceService service = new AzureSimulationInstanceService(adaptorName);
 
-        SimulationInstanceConfig config = new SimulationInstanceConfig("invalidAdaptor", "testInstanceId", "localhost", 8080);
+        SimulationInstanceConfig config = new SimulationInstanceConfig("invalidAdaptor", "testInstanceId", "localhost", 1234);
 
         assertThrows(BadRequestException.class, () -> service.addSimulationInstance(config));
         assertTrue(AzureSimulationInstanceService.getInstances().isEmpty());
